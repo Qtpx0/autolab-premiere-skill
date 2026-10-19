@@ -8,7 +8,7 @@
 
 ### 1. Prerequisites
 1. **Adobe Premiere Pro** installed on Windows or macOS.
-2. **AutoLab Extension** installed (via `AutoLab_Setup.exe` or development symlink).
+2. **[AutoLab — The Ultimate Editing Assistant for Premiere Pro](https://babydunx1.github.io/AutoLab-Release/)** installed (`AutoLab_Setup.exe` — Official download: [babydunx1.github.io/AutoLab-Release](https://babydunx1.github.io/AutoLab-Release/)).
 3. **Node.js 18+** installed (`node -v`).
 
 ### 2. Step 1 — Install the `autolab-premiere` Skill
@@ -73,7 +73,7 @@ node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autol
 
 ### 1. สิ่งที่ต้องมีในเครื่องก่อนเริ่ม
 1. ติดตั้งโปรแกรม **Adobe Premiere Pro**
-2. ติดตั้งโปรแกรม **AutoLab** (ผ่านตัวติดตั้ง `AutoLab_Setup.exe` ซึ่งจะวางไฟล์ MCP ทั้งหมดไว้ที่ `C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\` ให้อัตโนมัติ)
+2. ติดตั้งโปรแกรม **[AutoLab — ผู้ช่วยตัดต่ออัจฉริยะสำหรับ Premiere Pro](https://babydunx1.github.io/AutoLab-Release/)** (ดาวน์โหลดตัวติดตั้ง `AutoLab_Setup.exe` ได้ที่ [babydunx1.github.io/AutoLab-Release](https://babydunx1.github.io/AutoLab-Release/) ซึ่งจะวางไฟล์ MCP ทั้งหมดไว้ที่ `C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\` ให้อัตโนมัติ)
 3. ติดตั้ง **Node.js เวอร์ชัน 18 ขึ้นไป** (เช็คด้วยคำสั่ง `node -v`)
 
 ---

@@ -6,6 +6,7 @@
 
 **ติดมือและสมองให้เอเจนต์ AI ควบคุม Adobe Premiere Pro และ AutoLab แบบไร้คนคุม 100% — ครบทั้ง 30 เครื่องมือคุมหน้าจอ AutoLab, 432 เครื่องมือคุมไทม์ไลน์ Premiere Pro, ระบบจัดกรอบตรวจภาพจริงด้วย AI Vision, และสะพานเชื่อมอัตโนมัติแบบไม่ต้องตั้งค่า**
 
+[![AutoLab Studio](https://img.shields.io/badge/AutoLab-Official%20Premiere%20Pro%20Assistant-FF6B00.svg?style=flat-square&logo=adobe-premiere-pro)](https://babydunx1.github.io/AutoLab-Release/)
 [![Tools: 462 (30 AutoLab + 432 Premiere)](https://img.shields.io/badge/tools-462%20(30%20AutoLab%20%2B%20432%20Premiere)-00C2FF.svg)](#tool-catalog--สารบัญเครื่องมือทั้งหมด-462-คำสั่ง)
 [![Premiere MCP: v1.24.1](https://img.shields.io/badge/Premiere%20MCP-v1.24.1-8B5CF6.svg)](skills/autolab-premiere/references/05-premiere-pro-432-tools-catalog.md)
 [![Bridge: Port 17890 + CEP Queue](https://img.shields.io/badge/bridge-Port%2017890%20%2B%20CEP%20Queue-10B981.svg)](skills/autolab-premiere/references/01-connection-and-bridge.md)
@@ -13,7 +14,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platform: Windows · macOS](https://img.shields.io/badge/platform-Windows%20%C2%B7%20macOS-lightgrey.svg)](#installation)
 
-**English** · [ภาษาไทย](#-ภาษาไทย)
+> 🎬 **Official Companion Skill for [AutoLab — The Ultimate Editing Assistant for Premiere Pro](https://babydunx1.github.io/AutoLab-Release/)**  
+> คู่มือสกิลและชุดคำสั่ง MCP อย่างเป็นทางการสำหรับทำงานร่วมกับโปรแกรม **[AutoLab — ผู้ช่วยตัดต่ออัจฉริยะสำหรับ Adobe Premiere Pro](https://babydunx1.github.io/AutoLab-Release/)**
+
+**English** · [ภาษาไทย](#-ภาษาไทย) · [🌐 ดาวน์โหลดโปรแกรม AutoLab (Official Website)](https://babydunx1.github.io/AutoLab-Release/)
 
 </div>
 
@@ -306,7 +310,15 @@ Connecting **462 raw MCP tools** (`30 AutoLab tools` + `432 Premiere Pro tools`)
 
 ---
 
+## 🤝 Acknowledgments & Open-Source Attribution · กิตติกรรมประกาศและแหล่งอ้างอิง
+
+- 🎬 **[AutoLab — The Ultimate Editing Assistant for Premiere Pro](https://babydunx1.github.io/AutoLab-Release/)**: สกิลชุดนี้ออกแบบมาเพื่อทำงานร่วมกับส่วนเสริม **AutoLab CEP Extension** (`Port 17890` HTTP RPC + Unified CEP Bridge + 30 `autolab_*` workflow tools) สามารถดาวน์โหลดตัวติดตั้งและดูรายละเอียดโปรแกรมหลักได้ที่ [babydunx1.github.io/AutoLab-Release](https://babydunx1.github.io/AutoLab-Release/)
+- 🛠️ **Native Premiere Pro MCP Engine (`v1.24.1` · 432 Tools)**: ส่วนขยายคำสั่งควบคุม Premiere Pro พื้นฐานทั้ง 432 คำสั่ง พัฒนาต่อยอดและปรับปรุงระบบ Unified Windows CEP Bridge จากโปรเจกต์โอเพนซอร์สภายใต้สัญญาอนุญาต MIT ([`leancoderkavy/premiere-pro-mcp`](https://github.com/leancoderkavy/premiere-pro-mcp) และ [`hetpatel-11/Adobe_Premiere_Pro_MCP`](https://github.com/hetpatel-11/Adobe_Premiere_Pro_MCP)) ขอขอบคุณทีมผู้พัฒนาต้นทางทุกท่าน
+
+---
+
 ## 📄 License · สัญญาอนุญาต
 
-MIT License — see [LICENSE](LICENSE).
+MIT License — see [LICENSE](LICENSE).  
 สัญญาอนุญาต MIT — ดูรายละเอียดในไฟล์ [LICENSE](LICENSE)
+
