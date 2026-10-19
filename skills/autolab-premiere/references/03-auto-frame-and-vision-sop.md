@@ -140,8 +140,8 @@ flowchart TD
      "resMode": "custom",
      "width": 1080,
      "height": 1920,
-     "promoStart": 20,
-     "promoInterval": 20,
+     "promoStart": 5,
+     "promoInterval": 0,
      "injectHeadline": true,
      "autoCutState": 0
    }

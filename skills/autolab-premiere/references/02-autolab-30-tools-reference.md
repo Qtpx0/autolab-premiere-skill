@@ -402,8 +402,8 @@
   | `resMode` | `string` (`"custom"` \| `"hd"` \| `"4k"`) | optional | โหมดความละเอียด |
   | `width` | `number` | optional | ความกว้างซีเควนซ์ (`default: 1080`) |
   | `height` | `number` | optional | ความสูงซีเควนซ์ (`default: 1920`) |
-  | `promoStart` | `number` | optional | วินาทีที่ป้ายโปรโมทเริ่มเด้ง (`default: 20`) |
-  | `promoInterval` | `number` | optional | ระยะเวลาเว้นวรรคป้ายโปรโมท (`default: 20`) |
+  | `promoStart` | `number` | optional | วินาทีที่ป้ายโปรโมทเริ่มแสดง (`default: 5`) |
+  | `promoInterval` | `number` | optional | ระยะเวลาวนซ้ำป้ายโปรโมท (`default: 0` = ลากจนจบคลิป) |
   | `injectHeadline` | `boolean` | optional | เปิด/ปิดการยัดข้อความพาดหัวเข้ากรอบ `.mogrt` (`default: true`) |
   | `autoCutState` | `number` (`0` \| `1` \| `2`) | optional | สถานะ AutoCut (**ต้องเป็น `0` เสมอสำหรับงานหนัง/คลิปไฮไลท์**) |
 - **ตัวอย่างการเรียกใช้:**
@@ -412,8 +412,8 @@
     "resMode": "custom",
     "width": 1080,
     "height": 1920,
-    "promoStart": 20,
-    "promoInterval": 20,
+    "promoStart": 5,
+    "promoInterval": 0,
     "injectHeadline": true,
     "autoCutState": 0
   }
