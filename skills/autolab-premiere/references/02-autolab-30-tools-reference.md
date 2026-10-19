@@ -63,16 +63,38 @@
   | `force` | `boolean` | optional | บังคับดาวน์โหลดใหม่ทั้งหมดแม้เวอร์ชันในเครื่องจะตรงกัน (`default: false`) |
 
 ### 1.5 `autolab_manage_profiles`
-- **หน้าที่:** ดูรายการ (`list`), บันทึก (`save`), ลบ (`delete`), หรือเลือกใช้งาน (`set_active`) **Master Profile** (ซึ่งมัดรวม กรอบ `.mogrt` + ป้ายโปรโมท `.mogrt` + ค่า Transform Scale/PosX/PosY ไว้ด้วยกัน)
+- **หน้าที่:** ดูรายการ (`list`), บันทึก (`save`), ลบ (`delete`), เลือกใช้งาน (`set_active`), แก้ไขเฉพาะโปรโมทของ Profile เดียว (`update_promo`), หรือเปลี่ยนแบนเนอร์โปรโมทพร้อมกันหลาย Profile (`batch_update_promo`) โดย **คงค่า Frame MOGRT และ Transform (Scale, PosX, PosY) เดิมไว้ 100% ปลอดภัย ไม่ถูกรีเซ็ต**
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
   | :--- | :--- | :---: | :--- |
-  | `action` | `string` (`"list"` \| `"save"` \| `"delete"` \| `"set_active"`) | optional | คำสั่งที่ต้องการทำกับ `MasterProfileManager` |
-  | `id` | `string` | optional | รหัสโปรไฟล์ (ใช้เมื่อ `action` เป็น `"delete"` หรือ `"set_active"`) |
-  | `name` | `string` | optional | ชื่อโปรไฟล์ (ใช้เมื่อ `action` เป็น `"save"`) |
-  | `frame` | `object` (`{ name, path }`) | optional | ข้อมูลกรอบ `.mogrt` ที่ต้องการบันทึกในโปรไฟล์ |
-  | `promo` | `object` (`{ name, path }`) | optional | ข้อมูลป้ายโปรโมท `.mogrt` ที่ต้องการบันทึกในโปรไฟล์ |
-  | `transform` | `object` (`{ scale, posX, posY }`) | optional | ค่าขนาดและตำแหน่งภาพที่ต้องการบันทึกในโปรไฟล์ |
+  | `action` | `string` (`"list"` \| `"save"` \| `"delete"` \| `"set_active"` \| `"update_promo"` \| `"batch_update_promo"`) | optional | คำสั่งที่ต้องการทำกับ `MasterProfileManager` |
+  | `id` | `string` | optional | รหัสโปรไฟล์ (ใช้เมื่อ `action` เป็น `"delete"`, `"set_active"`, หรือ `"update_promo"`) |
+  | `name` | `string` | optional | ชื่อโปรไฟล์ (ใช้เมื่อ `action` เป็น `"save"` หรือระบุเป้าหมายใน `"update_promo"`) |
+  | `promoName` | `string` | optional | ชื่อแบนเนอร์โปรโมทใหม่ที่ต้องการใส่ เช่น `"หนัง IF_Q"` หรือ `"IF_Q"` (ระบบจะค้นหาและ resolve path ให้อัตโนมัติ) |
+  | `promo` | `object` (`{ name, path }`) | optional | ข้อมูลป้ายโปรโมท `.mogrt` แบบระบุ path ตรง |
+  | `oldPromoName` | `string` | optional | ใช้ใน `batch_update_promo`: กรองเปลี่ยนเฉพาะ Profile ที่กำลังใช้โปรโมทเก่านี้อยู่ เช่น `"ZEED"` |
+  | `filterQuery` | `string` | optional | ใช้ใน `batch_update_promo`: กรอง Profile ตามคำค้นหาในชื่อ Profile |
+  | `profiles` / `profileNames` | `string[]` | optional | ใช้ใน `batch_update_promo`: ระบุรายการ ID หรือชื่อ Profile ที่ต้องการเปลี่ยนเจาะจง |
+  | `all` | `boolean` | optional | ใช้ใน `batch_update_promo`: หากเป็น `true` จะสลับโปรโมทให้ทุก Profile ในเครื่อง |
+  | `clearPromo` | `boolean` | optional | หากเป็น `true` จะล้างโปรโมทออกจาก Profile ที่เลือก (กลายเป็น None) |
+  | `frame` | `object` (`{ name, path }`) | optional | ข้อมูลกรอบ `.mogrt` ที่ต้องการบันทึกในโปรไฟล์ (ใช้กับ `save`) |
+  | `transform` | `object` (`{ scale, posX, posY }`) | optional | ค่าขนาดและตำแหน่งภาพที่ต้องการบันทึกในโปรไฟล์ (ใช้กับ `save`) |
+- **ตัวอย่างการเรียกใช้ (สลับโปรโมท ZEED เป็น IF ในทุกพรีเซ็ตหนัง):**
+  ```json
+  {
+    "action": "batch_update_promo",
+    "oldPromoName": "ZEED",
+    "promoName": "หนัง IF_Q"
+  }
+  ```
+- **ตัวอย่างการเรียกใช้ (เปลี่ยนเจาะจงเฉพาะบาง Profile):**
+  ```json
+  {
+    "action": "batch_update_promo",
+    "profiles": ["ทองเนื้อเก้า (ลำยอง)", "หลักสูตร รัก"],
+    "promoName": "หนัง IF_Q"
+  }
+  ```
 
 ### 1.6 `autolab_manage_transforms`
 - **หน้าที่:** ดูรายการ (`list`), บันทึก (`save`), ลบ (`delete`), หรือเลือกใช้งาน (`set_active`) **Transform Preset** (ค่า Scale, PosX, PosY ที่ตั้งเก็บไว้ใช้ซ้ำ)
