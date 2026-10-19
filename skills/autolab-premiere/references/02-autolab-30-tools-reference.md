@@ -1,11 +1,11 @@
-# 02 — Complete AutoLab MCP 30-Tool Reference Manual
-# คู่มืออ้างอิงเครื่องมือ AutoLab MCP ครบทั้ง 30 คำสั่ง (พารามิเตอร์และตัวอย่างการใช้งานจริง)
+# 02 — Complete AutoLab MCP Tool Reference Manual (33 Tools)
+# คู่มืออ้างอิงเครื่องมือ AutoLab MCP ครบทั้ง 33 คำสั่ง (พารามิเตอร์และตัวอย่างการใช้งานจริง)
 
-เอกสารนี้คือคู่มืออ้างอิงฉบับสมบูรณ์ของเซิร์ฟเวอร์ **`autolab` MCP (`AutoLab/mcp/autolab-mcp.js`)** ทั้งหมด **30 คำสั่ง** แบ่งตาม 7 หมวดหมู่การทำงานของโปรแกรม AutoLab
+เอกสารนี้คือคู่มืออ้างอิงฉบับสมบูรณ์ของเซิร์ฟเวอร์ **`autolab` MCP (`AutoLab/mcp/autolab-mcp.js`)** ทั้งหมด **33 คำสั่ง** แบ่งตาม 7 หมวดหมู่การทำงานของโปรแกรม AutoLab
 
 ---
 
-## 📑 สารบัญหมวดหมู่ทั้ง 30 คำสั่ง (Category Index)
+## 📑 สารบัญหมวดหมู่ทั้ง 33 คำสั่ง (Category Index)
 
 1. [**หมวด A: ระบบ นำทาง และจัดการเทมเพลต `.mogrt` (System, Navigation & Templates — 6 Tools)**](#cat-a)
    - `autolab_get_status` · `autolab_navigate` · `autolab_list_templates` · `autolab_sync_company_pack` · `autolab_manage_profiles` · `autolab_manage_transforms`
@@ -17,10 +17,10 @@
    - `autolab_af_tuner_start` · `autolab_af_tuner_auto_fit` · `autolab_af_tuner_adjust` · `autolab_af_tuner_apply`
 5. [**หมวด E: ระบบ `✨ ตั้งชื่อ AI` และ `✂️ ย่อชื่อที่ยาว` พาดหัว 1-2 บรรทัด (AI Naming & Name Refiner — 4 Tools)**](#cat-e)
    - `autolab_af_configure_naming` · `autolab_af_run_autoname` · `autolab_af_run_name_refiner` · `autolab_af_set_clip_title`
-6. [**หมวด F: ตั้งค่า Topbar และสั่งรันสร้างคลิปจริง `START` (Topbar & Batch Execution — 4 Tools)**](#cat-f)
-   - `autolab_af_configure_topbar` · `autolab_af_start_queue` · `autolab_af_batch_status` · `autolab_af_cancel_queue`
-7. [**หมวด G: คำสั่งขั้นสูงไร้ขีดจำกัด (Universal JS / ExtendScript Escape Hatches — 2 Tools)**](#cat-g)
-   - `autolab_call_js` · `autolab_call_jsx`
+6. [**หมวด F: ตั้งค่า Topbar, คำสั่งรวบยอด `af_pipeline` และสั่งรันสร้างคลิปจริง `START` (Topbar, Fast Pipeline & Batch Execution — 5 Tools)**](#cat-f)
+   - `autolab_af_configure_topbar` · `autolab_af_pipeline` · `autolab_af_start_queue` · `autolab_af_batch_status` · `autolab_af_cancel_queue`
+7. [**หมวด G: คำสั่งเตรียม Bin/ส่งออก Media Encoder และคำสั่งขั้นสูงไร้ขีดจำกัด (Production Helpers & Escape Hatches — 4 Tools)**](#cat-g)
+   - `autolab_pr_prepare_ep` · `autolab_pr_export_ame` · `autolab_call_js` · `autolab_call_jsx`
 
 ---
 
@@ -392,7 +392,7 @@
 
 <a id="cat-f"></a>
 
-## 6. หมวด F: ตั้งค่า Topbar และสั่งรันสร้างคลิปจริง `START` (4 Tools)
+## 6. หมวด F: ตั้งค่า Topbar, คำสั่งรวบยอด `af_pipeline` และสั่งรันสร้างคลิปจริง `START` (5 Tools)
 
 ### 6.1 `autolab_af_configure_topbar`
 - **หน้าที่:** ตั้งค่าแถบด้านบนของหน้า Auto Frame: ขนาดความละเอียด (`1080x1920`), วินาทีเริ่มแสดงป้ายโปรโมท (`promoStart`), ระยะเวลาวนซ้ำป้ายโปรโมท (`promoInterval`), สวิตช์ใส่ข้อความพาดหัวลงกรอบ (`injectHeadline`), และสถานะ `AutoCut` (**ต้องตั้ง `autoCutState: 0` (OFF) เสมอสำหรับงานหนัง/ละคร**)
@@ -419,7 +419,48 @@
   }
   ```
 
-### 6.2 `autolab_af_start_queue`
+### 6.2 `autolab_af_pipeline`
+- **หน้าที่:** คำสั่งรวบยอดความเร็วสูงสุด (Single-Call Fast Pipeline) สำหรับเรื่องที่มี Master Profile หรือทราบค่ากรอบ/สเกลอยู่แล้ว โดยจะทำงานต่อเนื่องใน 1 คำสั่งโดยไม่เสียเวลารอ LLM Turn:
+  1. ดึงเฉพาะ Sequences จาก `binPath`/`binName` เข้าคิว (`af_queue_add` พร้อมบล็อก Sub-bin ย่อย เช่น `ไฟล์ต้นฉบับ` อัตโนมัติ)
+  2. ผูก Master Profile (`profileName`) หรือกรอบ (`frame`), ป้ายโปรโมท (`promo`), และสเกล (`scale`, `posX`, `posY`)
+  3. ตั้งค่า Topbar (`1080x1920`, `promoStart: 5`, `promoInterval: 0`, `autoCutState: 0`)
+  4. รัน `✨ AI Auto-Name` (โหมด `variety`) และกด Apply All อัตโนมัติ
+  5. เชื่อมต่อ `💬 Name Refiner` (`✂️ ย่อชื่อที่ยาว` ≤ 17 ตัวอักษรไทย) ต่อทันทีใน `0ms`
+  6. กดปุ่ม `START` เพื่อสร้างซีเควนซ์ทั้งหมดทันที (เมื่อตั้ง `startQueue: true`)
+  - **Stage-Aware Error Reporting:** หากขั้นตอนใดเกิดข้อผิดพลาด (เช่น API Timeout ตอนตั้งชื่อ AI) ระบบจะหยุดทันทีโดยไม่เผลอกด START และแจ้งกลับอย่างชัดเจนว่าขั้นตอนใดสำเร็จไปแล้วและค้างอยู่ที่ขั้นตอนไหน (เช่น `Pipeline completed [queue_add (46 clips) -> set_bin_template -> configure_topbar (5-0)] successfully, but failed at [af_run_autoname]`)
+- **พารามิเตอร์:**
+  | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
+  | :--- | :--- | :---: | :--- |
+  | `binPath` | `string` | optional | พาธของ Bin เป้าหมายใน Premiere Pro (เช่น `"Movies/SeriesA/ep1/HIGHLIGHTS_ep1"`) |
+  | `binName` | `string` | optional | ชื่อ Bin เป้าหมาย (เช่น `"HIGHLIGHTS_ep1"`) |
+  | `binNames` / `binPaths` | `string[]` | optional | รายชื่อหรือพาธของหลาย Bin พร้อมกัน |
+  | `binKey` | `string` | optional | คีย์ของ Bin ที่ต้องการผูกเทมเพลต (`default: "*"` ทุก Bin) |
+  | `clearFirst` | `boolean` | optional | ล้างคิวเก่าก่อนดึงเข้าคิวใหม่ (`default: true`) |
+  | `onlySequences` / `sequencesOnly` | `boolean` | optional | ดึงเฉพาะ Sequences และไม่มุดลง Sub-bin ย่อย (`default: true`) |
+  | `profileName` / `masterProfile` | `string` | optional | ชื่อ Master Profile ที่ต้องการผูก |
+  | `profileId` | `string` | optional | รหัส ID ของ Master Profile |
+  | `frame` / `frameMogrt` | `string` | optional | ชื่อหรือพาธไฟล์กรอบ `.mogrt` |
+  | `promo` / `promoMogrt` | `string` | optional | ชื่อหรือพาธไฟล์ป้ายโปรโมท `.mogrt` |
+  | `scale` / `posX` / `posY` | `number` | optional | ค่าสเกลและตำแหน่งวิดีโอ |
+  | `promoStart` | `number` | optional | วินาทีที่ป้ายโปรโมทเริ่มแสดง (`default: 5`) |
+  | `promoInterval` | `number` | optional | ระยะเวลาวนซ้ำป้ายโปรโมท (`default: 0` = ลากจนจบคลิป) |
+  | `mode` / `namingMode` | `string` (`"variety"` \| `"news"`) | optional | โหมดตั้งชื่อ AI (`default: "variety"`) |
+  | `runAutoName` | `boolean` | optional | รัน `✨ AI Auto-Name` อัตโนมัติ (`default: true`) |
+  | `runNameRefiner` | `boolean` | optional | รัน `💬 Name Refiner` ต่อทันทีหากมีชื่อยาวเกิน 17 ตัวอักษร (`default: true`) |
+  | `startQueue` | `boolean` | optional | กดปุ่ม `START` สร้างซีเควนซ์ต่อทันทีเมื่อตั้งชื่อเสร็จ (`default: false`) |
+  | `wait` | `boolean` | optional | รอจนกว่าการสร้างซีเควนซ์ทั้งหมดจะเสร็จสมบูรณ์ (`default: true`) |
+- **ตัวอย่างการเรียกใช้:**
+  ```json
+  {
+    "binPath": "Movies/SeriesA/ep1/HIGHLIGHTS_ep1",
+    "profileName": "MySeriesProfile",
+    "promoStart": 5,
+    "promoInterval": 0,
+    "startQueue": true
+  }
+  ```
+
+### 6.3 `autolab_af_start_queue`
 - **หน้าที่:** กดปุ่ม **`START`** (`#btnRun` ➔ `BatchManager.processQueue`) เพื่อเริ่มสร้างซีเควนซ์จริงใน Premiere Pro ครบทุกคลิปในคิว: สร้างซีเควนซ์ `1080x1920`, ปรับ Scale/PosX/PosY ตามค่าของแต่ละ Bin, วางกรอบ `.mogrt` พร้อมเขียนข้อความพาดหัวบรรทัดที่ 1-2, วางป้ายโปรโมท `.mogrt` ตามจังหวะเวลา และจัดเก็บซีเควนซ์ที่เสร็จแล้วเข้า Bin ปลายทาง
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
@@ -428,11 +469,11 @@
   | `resetDoneFirst` | `boolean` | optional | รีเซ็ตคลิปที่ขึ้นสถานะ Done ให้กลับมาทำใหม่ด้วยหรือไม่ (`default: false`) |
   | `autoDismissModal` | `boolean` | optional | ปิดหน้าต่างแจ้งเตือน DONE อัตโนมัติเมื่อทำเสร็จ (`default: true`) |
 
-### 6.3 `autolab_af_batch_status`
+### 6.4 `autolab_af_batch_status`
 - **หน้าที่:** ดูสถานะความคืบหน้าขณะกำลังรันสร้างซีเควนซ์ใน Auto Frame Queue (จำนวนที่เสร็จแล้ว, กำลังทำ, รอคิว, Error และเปอร์เซ็นต์ของแต่ละคลิป)
 - **พารามิเตอร์:** `{}` _(ไม่มีพารามิเตอร์)_
 
-### 6.4 `autolab_af_cancel_queue`
+### 6.5 `autolab_af_cancel_queue`
 - **หน้าที่:** สั่งหยุด/ยกเลิกการรันคิว Auto Frame หลังจากคลิปที่กำลังทำอยู่เสร็จสิ้น
 - **พารามิเตอร์:** `{}` _(ไม่มีพารามิเตอร์)_
 
@@ -440,9 +481,34 @@
 
 <a id="cat-g"></a>
 
-## 7. หมวด G: คำสั่งขั้นสูงไร้ขีดจำกัด — Universal Escape Hatches (2 Tools)
+## 7. หมวด G: คำสั่งเตรียม Bin / ส่งออก Media Encoder และคำสั่งขั้นสูงไร้ขีดจำกัด (4 Tools)
 
-### 7.1 `autolab_call_js`
+### 7.1 `autolab_pr_prepare_ep`
+- **หน้าที่:** เตรียมความพร้อมก่อนเริ่มตัดในคำสั่งเดียว: เปลี่ยนชื่อโฟลเดอร์บน Disk (เช่น ลบป้ายแจ้งเตือนสต็อกใกล้หมด), สร้างโฟลเดอร์ย่อยสำหรับตอนใหม่ (`ep1`, `ep2`...) บน Disk, ลบ Bin `HIGHLIGHTS_` ของตอนเก่าที่ส่งออกไปแล้วใน Premiere Pro, สร้าง Sub-bin `epX` ใน Premiere Pro และย้ายไฟล์ฟุตเทจจาก Bin พักไฟล์ (`รอ` / `รอตัด`) ออกมาเตรียมตัด
+- **พารามิเตอร์:**
+  | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
+  | :--- | :--- | :---: | :--- |
+  | `binName` | `string` | **required** | ชื่อหรือพาธของ Bin หลักใน Premiere Pro |
+  | `epName` | `string` | optional | ชื่อ Sub-bin ตอนย่อยที่ต้องการสร้าง/ใช้ (เช่น `"ep1"`, `"ep2"`) |
+  | `sourceSubBin` | `string` | optional | ชื่อ Sub-bin ต้นทางที่เก็บไฟล์รอตัด (เช่น `"รอ,รอตัด"`) |
+  | `clipName` | `string` | optional | ชื่อไฟล์ฟุตเทจที่ต้องการย้าย (หากไม่ระบุจะย้ายไฟล์แรกใน `sourceSubBin`) |
+  | `renameDiskFrom` | `string` | optional | พาธโฟลเดอร์เดิมบน Disk ที่ต้องการเปลี่ยนชื่อ |
+  | `renameDiskTo` | `string` | optional | พาธโฟลเดอร์ใหม่บน Disk หลังเปลี่ยนชื่อ |
+  | `createDiskDir` | `string` | optional | พาธโฟลเดอร์ปลายทางบน Disk ที่ต้องการสร้างไว้รอรับไฟล์ Export |
+  | `removeOldHighlights` | `boolean` | optional | ลบ Bin `HIGHLIGHTS_` เก่าในโฟลเดอร์เป้าหมายก่อนเริ่มตัด (`default: true`) |
+  | `recoverFromOriginalFirst` | `boolean` | optional | ดึงไฟล์ฟุตเทจตัวเต็มจาก `HIGHLIGHTS_/ไฟล์ต้นฉบับ` กลับออกมาก่อนลบ `HIGHLIGHTS_` (`default: false`) |
+
+### 7.2 `autolab_pr_export_ame`
+- **หน้าที่:** ส่งออกทุก Sequence ใน Bin `HIGHLIGHTS_` เข้าคิว **Adobe Media Encoder** แบบยกชุดในคำสั่งเดียว
+- **พารามิเตอร์:**
+  | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
+  | :--- | :--- | :---: | :--- |
+  | `highlightsBinPath` | `string` | **required** | พาธหรือชื่อของ Bin `HIGHLIGHTS_` ใน Premiere Pro |
+  | `outputDir` | `string` | **required** | โฟลเดอร์ปลายทางบน Disk สำหรับบันทึกไฟล์ `.mp4` ที่เรนเดอร์เสร็จ |
+  | `presetPath` | `string` | optional | พาธเต็มของไฟล์ `.epr` preset (หากไม่ระบุจะค้นหา Preset มาตรฐานให้อัตโนมัติ) |
+  | `presetName` | `string` | optional | ชื่อไฟล์ `.epr` preset ที่ต้องการค้นหาในเครื่อง |
+
+### 7.3 `autolab_call_js`
 - **หน้าที่:** รันโค้ด JavaScript ใดๆ ก็ได้ภายในบริบทหน้าต่าง AutoLab CEP Panel โดยตรง (เข้าถึง `window.FrameQueueManager`, `window.AiManager`, `window.NameRefinerChat`, `window.BatchManager`, `window.AutoHighlightsEngine`, และ DOM ทั้งหมดได้ 100%)
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
@@ -450,7 +516,7 @@
   | `code` | `string` | **required** | โค้ดเนื้อหาฟังก์ชัน JavaScript ที่ต้องการรัน เช่น `"return window.FrameQueueManager.getCount();"` |
   | `args` | `object` | optional | อาร์กิวเมนต์ที่ส่งเข้าไปในตัวแปร `params` ของโค้ด |
 
-### 7.2 `autolab_call_jsx`
+### 7.4 `autolab_call_jsx`
 - **หน้าที่:** รันโค้ด ExtendScript (`.jsx`) ใดๆ ก็ได้ภายใน Adobe Premiere Pro ผ่านคิว Single-Flight ของ AutoLab (พร้อม `JSON.stringify` polyfill ในตัว)
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
@@ -458,3 +524,4 @@
   | `script` | `string` | **required** | โค้ด ExtendScript ที่ต้องการรันและคืนค่ากลับมา |
   | `jsxFile` | `string` | optional | ชื่อไฟล์ใน `AutoLab/jsx/` ที่ต้องการโหลดก่อนรัน เช่น `"auto_frame.jsx"` หรือ `"host.jsx"` |
   | `timeoutMs` | `number` | optional | เวลารอสูงสุดมิลลิวินาที (`default: 60000`) |
+
