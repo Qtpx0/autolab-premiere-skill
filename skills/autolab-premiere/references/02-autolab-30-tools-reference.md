@@ -1,11 +1,11 @@
-# 02 — Complete AutoLab MCP Tool Reference Manual (33 Tools)
-# คู่มืออ้างอิงเครื่องมือ AutoLab MCP ครบทั้ง 33 คำสั่ง (พารามิเตอร์และตัวอย่างการใช้งานจริง)
+# 02 — Complete AutoLab MCP Tool Reference Manual (34 Tools)
+# คู่มืออ้างอิงเครื่องมือ AutoLab MCP ครบทั้ง 34 คำสั่ง (พารามิเตอร์และตัวอย่างการใช้งานจริง)
 
-เอกสารนี้คือคู่มืออ้างอิงฉบับสมบูรณ์ของเซิร์ฟเวอร์ **`autolab` MCP (`AutoLab/mcp/autolab-mcp.js`)** ทั้งหมด **33 คำสั่ง** แบ่งตาม 7 หมวดหมู่การทำงานของโปรแกรม AutoLab
+เอกสารนี้คือคู่มืออ้างอิงฉบับสมบูรณ์ของเซิร์ฟเวอร์ **`autolab` MCP (`AutoLab/mcp/autolab-mcp.js`)** ทั้งหมด **34 คำสั่ง** แบ่งตาม 7 หมวดหมู่การทำงานของโปรแกรม AutoLab
 
 ---
 
-## 📑 สารบัญหมวดหมู่ทั้ง 33 คำสั่ง (Category Index)
+## 📑 สารบัญหมวดหมู่ทั้ง 34 คำสั่ง (Category Index)
 
 1. [**หมวด A: ระบบ นำทาง และจัดการเทมเพลต `.mogrt` (System, Navigation & Templates — 6 Tools)**](#cat-a)
    - `autolab_get_status` · `autolab_navigate` · `autolab_list_templates` · `autolab_sync_company_pack` · `autolab_manage_profiles` · `autolab_manage_transforms`
@@ -19,8 +19,8 @@
    - `autolab_af_configure_naming` · `autolab_af_run_autoname` · `autolab_af_run_name_refiner` · `autolab_af_set_clip_title`
 6. [**หมวด F: ตั้งค่า Topbar, คำสั่งรวบยอด `af_pipeline` และสั่งรันสร้างคลิปจริง `START` (Topbar, Fast Pipeline & Batch Execution — 5 Tools)**](#cat-f)
    - `autolab_af_configure_topbar` · `autolab_af_pipeline` · `autolab_af_start_queue` · `autolab_af_batch_status` · `autolab_af_cancel_queue`
-7. [**หมวด G: คำสั่งเตรียม Bin/ส่งออก Media Encoder และคำสั่งขั้นสูงไร้ขีดจำกัด (Production Helpers & Escape Hatches — 4 Tools)**](#cat-g)
-   - `autolab_pr_prepare_ep` · `autolab_pr_export_ame` · `autolab_call_js` · `autolab_call_jsx`
+7. [**หมวด G: คำสั่งตรวจสอบ Bin / เตรียมตอน / ส่งออก Media Encoder และคำสั่งขั้นสูง (Production Helpers & Escape Hatches — 5 Tools)**](#cat-g)
+   - `autolab_pr_inspect` · `autolab_pr_prepare_ep` · `autolab_pr_export_ame` · `autolab_call_js` · `autolab_call_jsx`
 
 ---
 
@@ -481,9 +481,21 @@
 
 <a id="cat-g"></a>
 
-## 7. หมวด G: คำสั่งเตรียม Bin / ส่งออก Media Encoder และคำสั่งขั้นสูงไร้ขีดจำกัด (4 Tools)
+## 7. หมวด G: คำสั่งตรวจสอบ Bin / เตรียมตอน / ส่งออก Media Encoder และคำสั่งขั้นสูง (5 Tools)
 
-### 7.1 `autolab_pr_prepare_ep`
+### 7.1 `autolab_pr_inspect`
+- **หน้าที่:** ตรวจสอบโครงสร้างโฟลเดอร์/Bin ใน Premiere Pro แบบเจาะจงหรือสแกนทั้งโปรเจกต์: ดูจำนวนคลิป, ดู Sub-bin ทั้งหมด, และดึงรายการไฟล์ที่ค้างอยู่ใน Bin พักไฟล์ (`รอ` / `รอตัด`) พร้อมตรวจจับเลขตอนอัตโนมัติ (`detectedEp: "ep3"`, `"ep4"`) ช่วยให้ AI รู้ได้ทันที 100% ว่าต้องตัดต่อตอนไหนโดยไม่ต้องเดา
+- **พารามิเตอร์:**
+  | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
+  | :--- | :--- | :---: | :--- |
+  | `binName` | `string` | optional | ชื่อหรือพาธเต็มของ Bin ใน Premiere Pro ที่ต้องการส่องเจาะจง (เช่น `"ก.หนัง/หลักสูตร (รัก) ภาคบังคับ"` หรือ `"ก.หนัง/ทองเนื้อเก้า (ลำยอง)/รอ"`) |
+  | `binPath` | `string` | optional | นามแฝง (Alias) ของ `binName` |
+  | `query` | `string` | optional | คำค้นหาชื่อหรือพาธของ Bin (หากไม่ระบุจะสแกนภาพรวมทั้งโปรเจกต์) |
+  | `diskRoot` | `string` | optional | โฟลเดอร์บน Disk ที่ต้องการสแกนนับจำนวนไฟล์ `.mp4` ควบคู่กัน |
+  | `diskFilter` | `string` | optional | คำกรองชื่อโฟลเดอร์บน Disk |
+  | `excludeDirs` | `string` | optional | รายชื่อโฟลเดอร์ที่ต้องการยกเว้นคั่นด้วยจุลภาค เช่น `"จบแล้ว,ลงแล้ว"` |
+
+### 7.2 `autolab_pr_prepare_ep`
 - **หน้าที่:** เตรียมความพร้อมก่อนเริ่มตัดในคำสั่งเดียว: เปลี่ยนชื่อโฟลเดอร์บน Disk (เช่น ลบป้ายแจ้งเตือนสต็อกใกล้หมด), สร้างโฟลเดอร์ย่อยสำหรับตอนใหม่ (`ep1`, `ep2`...) บน Disk, ลบ Bin `HIGHLIGHTS_` ของตอนเก่าที่ส่งออกไปแล้วใน Premiere Pro, สร้าง Sub-bin `epX` ใน Premiere Pro และย้ายไฟล์ฟุตเทจจาก Bin พักไฟล์ (`รอ` / `รอตัด`) ออกมาเตรียมตัด
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
@@ -498,7 +510,7 @@
   | `removeOldHighlights` | `boolean` | optional | ลบ Bin `HIGHLIGHTS_` เก่าในโฟลเดอร์เป้าหมายก่อนเริ่มตัด (`default: true`) |
   | `recoverFromOriginalFirst` | `boolean` | optional | ดึงไฟล์ฟุตเทจตัวเต็มจาก `HIGHLIGHTS_/ไฟล์ต้นฉบับ` กลับออกมาก่อนลบ `HIGHLIGHTS_` (`default: false`) |
 
-### 7.2 `autolab_pr_export_ame`
+### 7.3 `autolab_pr_export_ame`
 - **หน้าที่:** ส่งออกทุก Sequence ใน Bin `HIGHLIGHTS_` เข้าคิว **Adobe Media Encoder** แบบยกชุดในคำสั่งเดียว
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
@@ -508,7 +520,7 @@
   | `presetPath` | `string` | optional | พาธเต็มของไฟล์ `.epr` preset (หากไม่ระบุจะค้นหา Preset มาตรฐานให้อัตโนมัติ) |
   | `presetName` | `string` | optional | ชื่อไฟล์ `.epr` preset ที่ต้องการค้นหาในเครื่อง |
 
-### 7.3 `autolab_call_js`
+### 7.4 `autolab_call_js`
 - **หน้าที่:** รันโค้ด JavaScript ใดๆ ก็ได้ภายในบริบทหน้าต่าง AutoLab CEP Panel โดยตรง (เข้าถึง `window.FrameQueueManager`, `window.AiManager`, `window.NameRefinerChat`, `window.BatchManager`, `window.AutoHighlightsEngine`, และ DOM ทั้งหมดได้ 100%)
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
@@ -516,7 +528,7 @@
   | `code` | `string` | **required** | โค้ดเนื้อหาฟังก์ชัน JavaScript ที่ต้องการรัน เช่น `"return window.FrameQueueManager.getCount();"` |
   | `args` | `object` | optional | อาร์กิวเมนต์ที่ส่งเข้าไปในตัวแปร `params` ของโค้ด |
 
-### 7.4 `autolab_call_jsx`
+### 7.5 `autolab_call_jsx`
 - **หน้าที่:** รันโค้ด ExtendScript (`.jsx`) ใดๆ ก็ได้ภายใน Adobe Premiere Pro ผ่านคิว Single-Flight ของ AutoLab (พร้อม `JSON.stringify` polyfill ในตัว)
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |

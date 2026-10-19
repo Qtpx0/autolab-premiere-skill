@@ -1,14 +1,14 @@
 ---
 name: autolab-premiere
-description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension (33 AutoLab UI, pipeline & production tools) and Adobe Premiere Pro MCP (432 native timeline/project tools · v1.24.1). Use whenever the user asks to inspect Premiere Pro bins/movies, run Auto Highlights, load clips into Auto Frame Queue, assign .mogrt Frames & Promo banners per bin, tune frame scale/position ('🎯 จัดกรอบ') with AI Vision PNG verification, run AI Auto-Name (Variety mode), run Name Refiner ('✂️ ย่อชื่อที่ยาว' + '✅ Apply All'), run the single-call high-speed af_pipeline, batch-export sequences to Adobe Media Encoder, or build a personalized production workflow skill."
+description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension (34 AutoLab UI, pipeline & production tools) and Adobe Premiere Pro MCP (432 native timeline/project tools · v1.24.1). Use whenever the user asks to inspect Premiere Pro bins/movies, run Auto Highlights, load clips into Auto Frame Queue, assign .mogrt Frames & Promo banners per bin, tune frame scale/position ('🎯 จัดกรอบ') with AI Vision PNG verification, run AI Auto-Name (Variety mode), run Name Refiner ('✂️ ย่อชื่อที่ยาว' + '✅ Apply All'), run the single-call high-speed af_pipeline, batch-export sequences to Adobe Media Encoder, or build a personalized production workflow skill."
 ---
 
 # AutoLab & Adobe Premiere Pro Autonomous Control Skill (`autolab-premiere`)
-# คู่มือมาตรฐานการควบคุม AutoLab (33 Tools) และ Adobe Premiere Pro (432 Tools) แบบไร้คนคุม 100%
+# คู่มือมาตรฐานการควบคุม AutoLab (34 Tools) และ Adobe Premiere Pro (432 Tools) แบบไร้คนคุม 100%
 
 สกิลนี้เป็นคู่มือปฏิบัติการหลักสำหรับเอเจนต์ AI ทุกค่าย (Claude, Cursor, Codex, Antigravity, Windsurf, DeepSeek Harness, OpenClaw) ในการควบคุม **AutoLab CEP Extension** ร่วมกับ **Adobe Premiere Pro** ผ่านสะพานเชื่อมคู่ขนานในเครื่อง (`AutoLab/js/core/mcp_bridge.js` ที่พอร์ต `17890` และ `%TEMP%\premiere-mcp-bridge`):
 
-1. **`autolab` MCP (`33 Tools`)** — ควบคุมทุกหน้าจอ ทุกปุ่ม และทุกคิวงานของโปรแกรม AutoLab โดยตรงด้วยความเร็ว `1–7ms` (`Auto Highlights`, `Auto Frame Queue`, คำสั่งรวบยอดความเร็วสูง `af_pipeline`, `🎯 จัดกรอบ Live Frame Tuner`, `✨ AI Auto-Name`, `💬 Name Refiner ✂️ ย่อชื่อที่ยาว`, `START Batch`, เตรียมโฟลเดอร์ `pr_prepare_ep`, และส่งคิว `pr_export_ame`)
+1. **`autolab` MCP (`34 Tools`)** — ควบคุมทุกหน้าจอ ทุกปุ่ม และทุกคิวงานของโปรแกรม AutoLab โดยตรงด้วยความเร็ว `1–7ms` (`Auto Highlights`, `Auto Frame Queue`, คำสั่งรวบยอดความเร็วสูง `af_pipeline`, `🎯 จัดกรอบ Live Frame Tuner`, `✨ AI Auto-Name`, `💬 Name Refiner ✂️ ย่อชื่อที่ยาว`, `START Batch`, ตรวจสอบ Bin & ตรวจจับเลขตอน `pr_inspect`, เตรียมโฟลเดอร์ `pr_prepare_ep`, และส่งคิว `pr_export_ame`)
 2. **`premiere-pro` MCP (`432 Tools · v1.24.1`)** — ควบคุม Adobe Premiere Pro เชิงลึก (สำรวจโปรเจกต์/Bin, จัดการ Sequence/Track, ตัดต่อคลิป, ปรับขนาด/ตำแหน่ง, ใส่เอฟเฟกต์/สี Lumetri, ปรับแต่งเสียง/คีย์เฟรม, มาร์กเกอร์/ซับไตเติล, แคปภาพหน้าจอ Program Monitor และส่งออกไฟล์ผ่าน Media Encoder)
 
 ---
@@ -32,9 +32,9 @@ description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension
 
 ---
 
-## 🗂️ 2. สารบัญเครื่องมือ AutoLab MCP ทั้ง 33 คำสั่ง (Complete 33-Tool Quick Map)
+## 🗂️ 2. สารบัญเครื่องมือ AutoLab MCP ทั้ง 34 คำสั่ง (Complete 34-Tool Quick Map)
 
-> 📖 ดูตารางพารามิเตอร์ทุกฟิลด์และตัวอย่าง JSON ครบทั้ง 33 คำสั่งได้ที่: [`references/02-autolab-30-tools-reference.md`](references/02-autolab-30-tools-reference.md)
+> 📖 ดูตารางพารามิเตอร์ทุกฟิลด์และตัวอย่าง JSON ครบทั้ง 34 คำสั่งได้ที่: [`references/02-autolab-30-tools-reference.md`](references/02-autolab-30-tools-reference.md)
 
 | หมวดหมู่ (Category) | ชื่อเครื่องมือ (Exact Tool Names) | หน้าที่หลัก (Primary Responsibility) |
 | :--- | :--- | :--- |
@@ -44,7 +44,7 @@ description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension
 | **D. Live Frame Tuner `🎯 จัดกรอบ` (4)** | `autolab_af_tuner_start`<br>`autolab_af_tuner_auto_fit`<br>`autolab_af_tuner_adjust`<br>`autolab_af_tuner_apply` | สร้างซีเควนซ์ `_AutoLab_Preview_` ใน Premiere Pro, วัดขอบดำด้วย FFmpeg `cropdetect`, ปรับจูน `scale`/`posX`/`posY`, ส่งออกภาพ `.png` ให้ AI Vision ตรวจดู และบันทึกค่าเข้า Bin |
 | **E. AI Naming & Refiner `✂️ ย่อชื่อ` (4)** | `autolab_af_configure_naming`<br>`autolab_af_run_autoname`<br>`autolab_af_run_name_refiner`<br>`autolab_af_set_clip_title` | ตั้งโหมด `variety`, กด `✨ AI Auto-Name` ถอดเสียง+คิดชื่อคลิปไวรัล (รองรับ `autoRefine: true`), กด `💬 Name Refiner` ➔ `✂️ ย่อชื่อที่ยาว` (> 17 ตัวอักษร) ➔ `✅ Apply All`, และแก้ไขข้อความพาดหัว 1-2 บรรทัด |
 | **F. Topbar, Fast Pipeline & `START` (5)** | `autolab_af_configure_topbar`<br>`autolab_af_pipeline`<br>`autolab_af_start_queue`<br>`autolab_af_batch_status`<br>`autolab_af_cancel_queue` | ตั้งค่าความละเอียด `1080x1920`, เวลาป้ายโปรโมทมาตรฐาน (`promoStart: 5`, `promoInterval: 0`), คำสั่งรวบยอดความเร็วสูง `autolab_af_pipeline` (ครบจบใน 1 คำสั่ง), และกดปุ่ม `START` สร้างซีเควนซ์ |
-| **G. Production Helpers & Escape Hatches (4)** | `autolab_pr_prepare_ep`<br>`autolab_pr_export_ame`<br>`autolab_call_js`<br>`autolab_call_jsx` | เตรียมโฟลเดอร์ Disk + สร้าง Bin `epX` + ย้ายฟุตเทจจาก `รอ` (`pr_prepare_ep`), ส่งออกทุก Sequence เข้าคิว Adobe Media Encoder (`pr_export_ame`), และรัน JS / ExtendScript โดยตรง |
+| **G. Production Helpers & Escape Hatches (5)** | `autolab_pr_inspect`<br>`autolab_pr_prepare_ep`<br>`autolab_pr_export_ame`<br>`autolab_call_js`<br>`autolab_call_jsx` | ส่องดูโครงสร้าง Bin & ดึงชื่อไฟล์ใน `รอ` พร้อมตรวจจับเลขตอนอัตโนมัติ (`pr_inspect`), เตรียมโฟลเดอร์ Disk + สร้าง Bin `epX` + ย้ายฟุตเทจจาก `รอ` (`pr_prepare_ep`), ส่งออกทุก Sequence เข้าคิว Adobe Media Encoder (`pr_export_ame`), และรัน JS / ExtendScript โดยตรง |
 
 ---
 
