@@ -133,10 +133,12 @@ flowchart LR
 
 เมื่อผู้ใช้ตอบคำถามครบแล้ว ให้ AI นำข้อมูลของผู้ใช้มาเติมลงในแม่แบบด้านล่างนี้ แล้วสร้างไฟล์ที่ `.agents/skills/<ชื่อสกิลของผู้ใช้>/SKILL.md` ทันที:
 
+> **กฎบังคับ:** `description` ต้อง **ไม่เกิน 450 ตัวอักษร** เพราะ catalog ของ agent ทุกค่ายตัดที่ 500 — ห้ามตัด keyword ทิ้ง ให้ตัดคำเชื่อม/พาธ/ชื่อไฟล์เทคนิคแทน แล้ววัดความยาวก่อนบันทึก และถ้าค่า description มี ": " ให้ครอบด้วย "...\" เสมอ ไม่งั้น frontmatter พังแล้วสกิลจะหายจาก catalog
+
 ````markdown
 ---
 name: my-premiere-production-workflow
-description: Personal and shared-machine autonomous production workflow for Adobe Premiere Pro and AutoLab CEP Extension. Covers personal disk stock folders, Premiere bin organization (waiting bins, episodic epX sub-bins, HIGHLIGHTS_ cleanup), Auto Highlights presets (TV shows vs Movies/Series speed assist rules), 2D Multi-User / Multi-Promo Routing Matrix (Category x Owner/Page tag), automatic MOGRT aperture + black-bar auto-fit scaling, single-call af_pipeline execution (5-0 promo standard, Variety AI Auto-Name + <=17 chars Name Refiner), and batch export to Adobe Media Encoder Queue.
+description: "Personal and shared-machine production workflow for AutoLab CEP + Premiere Pro: personal disk stock folders, Bin hygiene (รอ/รอตัด/epX/HIGHLIGHTS_), Auto Highlights presets (TV vs Movie speed), Multi-User/Multi-Promo routing matrix, MOGRT auto-fit framing, af_pipeline (promo + Variety Auto-Name + Name Refiner <=17), batch export to AME"
 ---
 
 # สกิลเวิร์กโฟลว์ตัดต่ออัตโนมัติประจำเครื่อง (`my-premiere-production-workflow`)

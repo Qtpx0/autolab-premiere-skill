@@ -1,6 +1,6 @@
 ---
 name: autolab-premiere
-description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension (34 AutoLab UI, pipeline & production tools) and Adobe Premiere Pro MCP (432 native timeline/project tools · v1.24.1). Use whenever the user asks to inspect Premiere Pro bins/movies, run Auto Highlights, load clips into Auto Frame Queue, assign .mogrt Frames & Promo banners per bin, tune frame scale/position ('🎯 จัดกรอบ') with AI Vision PNG verification, run AI Auto-Name (Variety mode), run Name Refiner ('✂️ ย่อชื่อที่ยาว' + '✅ Apply All'), run the single-call high-speed af_pipeline, batch-export sequences to Adobe Media Encoder, or build a personalized production workflow skill."
+description: "Official control skill for AutoLab CEP (34 tools) + Adobe Premiere Pro MCP (432 tools). Use for: disk/Bin stock check (pr_inspect), Auto Highlights, Auto Frame Queue, .mogrt Frame + Promo banner per Bin, จัดกรอบ AI Vision, AI Auto-Name (Variety), Name Refiner ย่อชื่อพาดหัว <=17 ตัวอักษร, af_pipeline, export เข้า Adobe Media Encoder (AME), และสร้างสกิลเวิร์กโฟลว์ประจำตัว"
 ---
 
 # AutoLab & Adobe Premiere Pro Autonomous Control Skill (`autolab-premiere`)
