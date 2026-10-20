@@ -1,0 +1,47 @@
+{
+  "name": "dsh-autolab-premiere",
+  "version": "0.1.0",
+  "description": "DeepSeek Harness bundle for AutoLab CEP + Adobe Premiere Pro: wires the 34 AutoLab and 432 Premiere Pro MCP tools, turns the operator iron rules into hard guards, and contributes the official autolab-premiere skill.",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "lib",
+    "scripts",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node scripts/smoke-test.mjs"
+  },
+  "icon": "./icon.svg",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "deepseek",
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "cordis",
+    "autolab",
+    "premiere-pro",
+    "mcp",
+    "skill"
+  ],
+  "license": "MIT",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

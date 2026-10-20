@@ -1,0 +1,63 @@
+# dsh-autolab-premiere — bundle patch for the `desktop` profile.
+#
+# The DSH plugin manager applies these rows after every bundle layer, so composing
+# this bundle in or out never rewrites another plugin's entry.
+#
+#   mcp-autolab       34 AutoLab tools        HTTP RPC to the CEP bridge (1-7 ms)
+#   mcp-premiere-pro  432 Premiere Pro tools  CEP file queue (%TEMP%\premiere-mcp-bridge)
+#   autolab-premiere  this package            guards + prompt contract + bundled skill
+#
+# `args` point at the AutoLab CEP extension installed by AutoLab_Setup.exe. Change
+# `args[0]` when AutoLab lives somewhere else on the machine. Both MCP rows use
+# `failOnStartupError: false`: Premiere Pro may simply not be open yet, and that
+# must never stop the harness from starting.
+- insert:
+    - id: mcp-autolab
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: autolab
+        transport: stdio
+        command: node
+        args:
+          - 'C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js'
+        env:
+          # autolab-mcp.js discovers the live bridge port from
+          # %TEMP%\autolab-mcp-bridge\autolab-bridge-info.json, so TEMP must survive
+          # the MCP client's environment scrubbing.
+          TEMP: !!js process.env.TEMP
+          TMP: !!js process.env.TMP
+        toolCallTimeoutMs: 120000
+        failOnStartupError: false
+
+    - id: mcp-premiere-pro
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: premiere-pro
+        transport: stdio
+        command: node
+        args:
+          - 'C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\premiere-pro-mcp\runtime\index.js'
+        env:
+          TEMP: !!js process.env.TEMP
+          TMP: !!js process.env.TMP
+          PREMIERE_TEMP_DIR: !!js process.getBuiltinModule('node:path').join(process.env.TEMP ?? '', 'premiere-mcp-bridge')
+        toolCallTimeoutMs: 120000
+        failOnStartupError: false
+
+    - id: autolab-premiere
+      name: 'dsh-autolab-premiere'
+      config:
+        enableGuard: true
+        bundledSkill: true
+        prompt:
+          # Appended after the contract that ships in lib/guards.js. Two jobs:
+          #   1. name the tools exactly as DSH exposes them, so the model never has
+          #      to guess how the skill's `autolab_pr_inspect` maps to a real call;
+          #   2. carry the routing keywords that the 500-character skill catalog
+          #      description truncates away (Auto Frame, จัดกรอบ, MOGRT, AI Auto-Name,
+          #      Name Refiner, START, export AME), so those requests still load the skill.
+          extra: |
+            ### ชื่อเครื่องมือจริงใน DSH + งานที่ต้องโหลดสกิล (สำคัญ):
+            - AutoLab tools ใน DSH ขึ้นต้นด้วย `mcp__autolab__` เสมอ: `mcp__autolab__autolab_pr_inspect`, `mcp__autolab__autolab_pr_prepare_ep`, `mcp__autolab__autolab_ah_configure`, `mcp__autolab__autolab_ah_queue_add`, `mcp__autolab__autolab_ah_run`, `mcp__autolab__autolab_af_pipeline`, `mcp__autolab__autolab_af_run_autoname`, `mcp__autolab__autolab_af_run_name_refiner`, `mcp__autolab__autolab_pr_export_ame` — ชื่อแบบ `autolab_pr_inspect` ที่สกิลเขียนไว้คือชื่อ raw ต้องเติม `mcp__autolab__` ข้างหน้าเสมอ (ห้ามเรียกแบบไม่มี prefix)
+            - Premiere Pro tools ขึ้นต้นด้วย `mcp__premiere-pro__` เช่น `mcp__premiere-pro__get_project_info`
+            - งานกลุ่มนี้ = งานของสกิล `autolab-premiere-automation` (ประจำเครื่อง) และ `autolab-premiere` (กลาง) ให้โหลดสกิลก่อนเริ่มทุกครั้ง: เช็คสต็อกบน Disk, รอ / รอตัด / epX / `HIGHLIGHTS_` / `ไฟล์ต้นฉบับ`, Auto Highlights, Auto Frame Queue, จัดกรอบ Scale/PosY, ผูก .mogrt Frame + Promo banner ต่อ Bin, Master Profile, AI Auto-Name (Variety), Name Refiner / ย่อชื่อพาดหัวให้ไม่เกิน 17 ตัวอักษร, กด START สร้างซีเควนซ์, Topbar 1080x1920, export เข้า Adobe Media Encoder (AME), ป้าย `- - จะหมด`
