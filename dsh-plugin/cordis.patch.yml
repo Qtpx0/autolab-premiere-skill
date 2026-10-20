@@ -31,6 +31,7 @@
 
     - id: mcp-premiere-pro
       name: '@deepseek-ai/dsh-mcp-client'
+      disabled: true
       config:
         serverName: premiere-pro
         transport: stdio
