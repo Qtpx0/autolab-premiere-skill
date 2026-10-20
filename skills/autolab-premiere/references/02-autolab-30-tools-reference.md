@@ -497,12 +497,36 @@
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
   | :--- | :--- | :---: | :--- |
+  | `categoryBin` | `string` | optional | ชื่อหรือคำค้นของ Root Bin ใน Premiere Pro (เช่น `"ก.หนัง"`, `"ข.รายการ"`, `"Anime"`) เพื่อล็อกเป้าสแกนเฉพาะหมวดนั้น 100% ไม่ปนกับหมวดอื่น และช่วยให้คืนผลลัพธ์เร็วระดับ 0.05 วินาที |
+  | `rootBin` | `string` | optional | นามแฝง (Alias) ของ `categoryBin` |
   | `binName` | `string` | optional | ชื่อหรือพาธเต็มของ Bin ใน Premiere Pro ที่ต้องการส่องเจาะจง (เช่น `"Movies/Series_A"`) |
   | `binPath` | `string` | optional | นามแฝง (Alias) ของ `binName` |
   | `query` | `string` | optional | คำค้นหาชื่อหรือพาธของ Bin (หากไม่ระบุจะสแกนภาพรวมทั้งโปรเจกต์) |
-  | `diskRoot` | `string` | optional | โฟลเดอร์บน Disk ที่ต้องการสแกนนับจำนวนไฟล์ `.mp4` ควบคู่กัน |
+  | `queries` | `array` | optional | รายชื่อเรื่องหลายเรื่องพร้อมกัน เช่น `["ทองเนื้อเก้า", "หลักสูตร"]` |
+  | `diskRoot` | `string` | optional | โฟลเดอร์บน Disk ที่ต้องการสแกนนับจำนวนไฟล์ `.mp4` และสรุปสต็อก (`totalRemaining` + `lowStockShows`) ควบคู่กัน |
   | `diskFilter` | `string` | optional | คำกรองชื่อโฟลเดอร์บน Disk |
   | `excludeDirs` | `string` | optional | รายชื่อโฟลเดอร์ที่ต้องการยกเว้นคั่นด้วยจุลภาค เช่น `"จบแล้ว,ลงแล้ว"` |
+  | `lowStockThreshold` | `number` | optional | เกณฑ์สต็อกต่ำสำหรับสรุป `lowStockShows` ใน `diskSummary` (`default: 15`) |
+  | `scanPremiere` | `boolean` | optional | บังคับให้สแกนเจาะจงใน Premiere Pro แม้จะไม่ได้ระบุ `query` (`default: false`) |
+- **โครงสร้างข้อมูลที่ได้คืนมา (จัดเรียง Disk ขึ้นก่อนเสมอ):**
+  ```json
+  {
+    "success": true,
+    "diskRoot": "D:\\Clips\\Output\\Movies",
+    "diskSummary": {
+      "totalShows": 10,
+      "lowStockCount": 3,
+      "lowStockShows": [
+        { "name": "เรื่อง A", "totalRemaining": 0 },
+        { "name": "เรื่อง B", "totalRemaining": 10 }
+      ]
+    },
+    "diskFolders": [ ... ],
+    "readyToCutCount": 1,
+    "readyToCut": [ ... ],
+    "shows": [ ... ]
+  }
+  ```
 
 ### 7.2 `autolab_pr_prepare_ep`
 - **หน้าที่:** เตรียมความพร้อมก่อนเริ่มตัดในคำสั่งเดียว (รองรับทั้งเรื่องเดียวหรือหลายเรื่องพร้อมกันผ่าน `items: [...]`): เปลี่ยนชื่อโฟลเดอร์บน Disk, สร้างโฟลเดอร์ย่อยสำหรับตอนใหม่ (`ep1`, `ep2`...) บน Disk, ลบ Bin `HIGHLIGHTS_` ของตอนเก่าที่ส่งออกไปแล้วใน Premiere Pro, สร้าง Sub-bin `epX` ใน Premiere Pro และย้ายไฟล์ฟุตเทจจาก Sub-bin พักไฟล์ออกมาเตรียมตัด

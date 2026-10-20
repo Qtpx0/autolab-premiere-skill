@@ -74,9 +74,19 @@ description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension
 
 ## 🔄 3. ลำดับขั้นตอนมาตรฐานครบวงจร (End-to-End Autonomous SOP)
 
-### Step 1: ตรวจสอบการเชื่อมต่อ, สำรวจเทมเพลต และเตรียมโฟลเดอร์/Bin (`autolab_pr_prepare_ep`)
-1. เรียก `autolab_get_status({})` และ `autolab_list_templates({})` เพื่อดูสถานะพาเนลและรายชื่อ `masterProfiles` / `frames` / `promos` ในเครื่อง
-2. หากต้องการเตรียมโฟลเดอร์บน Disk คู่กับสร้าง Sub-bin ตอนใหม่ (`ep1`, `ep2`...) และย้ายไฟล์จาก Sub-bin พักไฟล์ในคำสั่งเดียว (รองรับส่ง `items: [...]` หลายเรื่องพร้อมกัน):
+### Step 1: สำรวจโปรเจกต์ & เช็คสต็อก (`autolab_pr_inspect`) และเตรียมโฟลเดอร์/Bin (`autolab_pr_prepare_ep`)
+1. **สำรวจสถานะและเทมเพลต:** เรียก `autolab_get_status({})` และ `autolab_list_templates({})` เพื่อดูสถานะพาเนลและรายชื่อ `masterProfiles` / `frames` / `promos` ในเครื่อง
+2. **เช็คสต็อกบน Disk และสำรวจ Bin ใน Premiere Pro (`autolab_pr_inspect`):**
+   ```json
+   // Tool: autolab_pr_inspect
+   {
+     "diskRoot": "<พาธโฟลเดอร์บน Disk>",
+     "categoryBin": "<ชื่อ Root Bin เช่น ก.หนัง หรือ ข.รายการ>",
+     "excludeDirs": "จบแล้ว,ลงแล้ว"
+   }
+   ```
+   *(หรือใส่ `query: "<ชื่อเรื่อง>"` หรือ `queries: [...]` เพื่อส่องดูไฟล์ใน `รอ` และตรวจจับเลขตอน `detectedEp`)*
+3. **เตรียมโฟลเดอร์บน Disk คู่กับสร้าง Sub-bin ตอนใหม่ (`ep1`, `ep2`...) และย้ายไฟล์จาก Sub-bin พักไฟล์ในคำสั่งเดียว (รองรับส่ง `items: [...]` หลายเรื่องพร้อมกัน):**
    ```json
    // Tool: autolab_pr_prepare_ep
    {
