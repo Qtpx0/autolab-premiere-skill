@@ -66,35 +66,98 @@ flowchart LR
 
 ---
 
-## 3. การใช้งานผ่าน CLI โดยตรง (Direct CLI Execution Mode)
+## 3. การกำหนดค่า MCP Server สำหรับ AI ทุกแพลตฟอร์ม (Universal AI Client Setup Guide)
 
-นอกจากทำงานเป็น MCP Server แล้ว ไฟล์ `autolab-mcp.js` ยังเป็น **CLI Tool ในตัว** (ไม่ต้องพึ่งแพ็กเกจภายนอก) ทำให้เอเจนต์หรือสคริปต์สามารถสั่งงานผ่าน Terminal ได้ทันที:
+เพื่อให้ AI Agent ทุกค่าย (Antigravity, Cursor, Claude Desktop, Windsurf, Cline) มี Native Tools ในหัวโดยตรง เรียกทำงานได้ใน **10–100ms** โดยไม่ต้องสั่งผ่าน Terminal ให้เพิ่มบล็อกการตั้งค่านี้ลงในไฟล์คอนฟิกของ AI แต่ละค่าย:
 
-```powershell
-# 1. ตรวจสอบสถานะการเชื่อมต่อและข้อมูลคิวปัจจุบัน
-node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --status
+### 3.1 JSON Configuration มาตรฐาน (ใช้เหมือนกันทุกแพลตฟอร์ม)
 
-# 2. แสดงรายชื่อเครื่องมือทั้งหมด 30 คำสั่งพร้อมคำอธิบาย
-node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --list-tools
-
-# 3. เรียกใช้เครื่องมือใดๆ พร้อมส่งพารามิเตอร์ JSON
-node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call autolab_get_status "{}"
-node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call autolab_af_queue_inspect "{}"
+```json
+{
+  "mcpServers": {
+    "autolab": {
+      "command": "node",
+      "args": [
+        "C:\\Program Files (x86)\\Common Files\\Adobe\\CEP\\extensions\\AutoLab\\mcp\\autolab-mcp.js"
+      ]
+    },
+    "premiere-pro": {
+      "command": "node",
+      "args": [
+        "C:\\Program Files (x86)\\Common Files\\Adobe\\CEP\\extensions\\AutoLab\\mcp\\premiere-pro-mcp\\runtime\\index.js"
+      ],
+      "env": {
+        "PREMIERE_TEMP_DIR": "C:\\Users\\<USER>\\AppData\\Local\\Temp\\premiere-mcp-bridge"
+      }
+    }
+  }
+}
 ```
 
-หรือยิง HTTP Request ตรงไปที่พอร์ต `17890`:
+### 3.2 ตำแหน่งไฟล์คอนฟิกของ AI แต่ละค่าย (Config File Locations)
+
+| ค่าย AI (Platform) | ตำแหน่งไฟล์คอนฟิกบน Windows (Configuration File Path) |
+| :--- | :--- |
+| 🪐 **Google Antigravity** | `C:\Users\<USER>\.gemini\config\mcp_config.json` *(ยึดโฟลเดอร์ `config` เท่านั้น)* |
+| 💻 **Cursor IDE** | `C:\Users\<USER>\.cursor\mcp.json` *(หรือไฟล์ `.cursor/mcp.json` ใน Workspace)* |
+| 🧠 **Claude Desktop** | `C:\Users\<USER>\AppData\Roaming\Claude\claude_desktop_config.json` |
+| 🏄 **Codeium Windsurf** | `C:\Users\<USER>\.codeium\windsurf\mcp_config.json` |
+| 🧩 **VS Code (Cline / Roo Code)** | ตั้งค่าผ่านแถบ MCP Settings ใน Extension UI โดยป้อนคำสั่งและอาร์กิวเมนต์ตามตารางด้านบน |
+
+> 💡 **หมายเหตุ:** ในหน้าต่าง AutoLab Premiere Pro ผู้ใช้สามารถคลิกปุ่ม **`⚡ ผูกเข้า AI ในเครื่องอัตโนมัติ`** เพียง 1 คลิก ระบบจะหยอดคอนฟิกลงไฟล์ของทุกค่ายข้างต้นให้ทันทีโดยอัตโนมัติ
+
+---
+
+## 4. การใช้งานผ่าน CLI โดยตรงสำหรับ Terminal Agents (Codex, DSH, Terminal)
+
+สำหรับเอเจนต์ที่ไม่มี Native MCP GUI สามารถสั่งงานผ่าน CLI ได้ตรงๆ โดยใช้ **`--arg key=value`** เพื่อป้องกันปัญหาอัญประกาศ (Double-quote escaping) ของ PowerShell บน Windows:
 
 ```powershell
-# ตรวจเช็ค Health Endpoint
-curl http://127.0.0.1:17890/health
+# 1. แสดงวิธีใช้งานและตัวอย่างคำสั่งด่วน (5ms)
+node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --help
 
-# ส่งคำสั่ง Action ผ่าน POST /api/action
-curl -X POST http://127.0.0.1:17890/api/action -H "Content-Type: application/json" -d "{\"action\":\"status\",\"params\":{}}"
+# 2. ตรวจสอบสถานะการเชื่อมต่อและคิวงาน (Live Health & Queue)
+node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --status
+
+# 3. รันคำสั่ง Pipeline รวดเดียวจบ (One-Shot af_pipeline)
+node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call autolab_af_pipeline --arg binPath="ก.หนัง/ไทบ้านเดอะซีรีย์/HIGHLIGHTS_ไทบ้านเดอะซีรีย์" --arg frame="กรอบหนัง 02" --arg promo="หนัง IF_Q"
+
+# 4. ตั้งค่าเทมเพลตและจัดกรอบสเกลอัตโนมัติ (Two-Command Chain)
+node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call autolab_af_set_bin_template --arg binKey=* --arg frame="กรอบหนัง 02" --arg promo="หนัง IF_Q"
+node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call autolab_af_tuner_auto_fit --arg binKey=* --arg apply=true
 ```
 
 ---
 
-## 4. ตารางวินิจฉัยและแก้ไขปัญหา (Troubleshooting Matrix)
+## 5. กฎการตรวจสอบคุณภาพอัจฉริยะ 4 จุด (4-Point Intelligent Quality Audit Protocol)
+
+เอเจนต์ไม่ใช่สคริปต์ตาบอดที่ส่งคำสั่งแล้วไม่สนใจผลลัพธ์ แต่เป็นเอเจนต์ที่ต้องทำงานรวดเร็วและ **ตรวจสอบคุณภาพได้ 100% ในเวลา 1–2 วินาที**:
+
+```mermaid
+flowchart TD
+    Start["คำสั่งจากผู้ใช้ (เช่น ใส่กรอบ IF ให้ไทบ้าน)"] --> P1["⚡ Phase 1: One-Shot Pipeline Execution (< 500ms)<br/>เรียก af_pipeline หรือ Set Template + Auto-Fit"]
+    P1 --> P2["🔍 Phase 2: Intelligent Quality Audit (~100ms)<br/>ตรวจสอบ 4 Checkpoints จากผลลัพธ์"]
+    
+    subgraph Audit ["4-Point Quality Checkpoints"]
+        C1["1. Template Coverage 100%<br/>(allBinsHaveTemplates === true)"]
+        C2["2. Scale & Crop Integrity<br/>(scale 150-180%, ตัดขอบดำสำเร็จ)"]
+        C3["3. Title Length Safety<br/>(longClipsOver17Chars === 0)"]
+        C4["4. Footage Health<br/>(duration > 0s, sequence online)"]
+    end
+    
+    P2 --> C1 & C2 & C3 & C4
+    C1 & C2 & C3 & C4 --> Report["📊 Compact Audit Summary (1 วินาที)<br/>รายงานผล 3 บรรทัดพร้อมตัวเลขเป๊ะให้ลูกพี่"]
+```
+
+### รายละเอียด 4 Checkpoints ที่เอเจนต์ต้องตรวจสอบ:
+1. **Template Coverage (ความครอบคลุม):** เช็คว่า `allBinsHaveTemplates === true` ทุกคลิปต้องมีกรอบและโปรโม ไม่มีคลิปตกหล่น
+2. **Scale & Crop Integrity (สเกลและขอบดำ):** เช็คว่าค่า `scale` อยู่ในเกณฑ์ปกติของ Aperture (ปกติ `150%–180%`) ไม่ใช่ 0% หรือ 500% และตรวจว่าตัดขอบดำเสร็จสิ้น (`cropAnalysis.hasBlackBars`)
+3. **Title Length Safety (ความปลอดภัยของชื่อ):** เช็คว่า `longClipsOver17Chars === 0` หากยังมีคลิปยาวเกิน 17 ตัวอักษร ให้รัน `autolab_af_run_name_refiner` ต่อทันทีเพื่อป้องกันชื่อล้นกรอบโปรโม
+4. **Footage Health (ความสมบูรณ์ของไฟล์):** ตรวจว่าคลิปมี Duration สมบูรณ์ ไม่เป็นคลิปเสียหรือคลิป 0 วินาที
+
+---
+
+## 6. ตารางวินิจฉัยและแก้ไขปัญหา (Troubleshooting Matrix)
 
 | อาการที่พบ (Symptom) | สาเหตุ (Root Cause) | วิธีแก้ไข (Resolution) |
 | :--- | :--- | :--- |
