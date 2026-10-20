@@ -552,6 +552,7 @@
   | `outputDir` | `string` | **required** | โฟลเดอร์ปลายทางบน Disk สำหรับบันทึกไฟล์ `.mp4` ที่เรนเดอร์เสร็จ |
   | `presetPath` | `string` | optional | พาธเต็มของไฟล์ `.epr` preset (หากไม่ระบุจะค้นหา Preset มาตรฐานให้อัตโนมัติ) |
   | `presetName` | `string` | optional | ชื่อไฟล์ `.epr` preset ที่ต้องการค้นหาในเครื่อง |
+  | `verbose` | `boolean` | optional | ส่งรายการ `jobs` ทั้งหมดกลับมา (ค่าตั้งต้น `false` จะส่งเฉพาะสรุปและ `sampleJobs` 3 ตัวอย่าง เพื่อไม่ให้ JSON ล้นเข้า `output.txt`) |
 
 ### 7.4 `autolab_call_js`
 - **หน้าที่:** รันโค้ด JavaScript ใดๆ ก็ได้ภายในบริบทหน้าต่าง AutoLab CEP Panel โดยตรง (เข้าถึง `window.FrameQueueManager`, `window.AiManager`, `window.NameRefinerChat`, `window.BatchManager`, `window.AutoHighlightsEngine`, และ DOM ทั้งหมดได้ 100%)

@@ -33,14 +33,16 @@ description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension
    - เรียก `autolab_af_run_name_refiner` (หรือเปิด `autoRefine: true` / ใช้ `autolab_af_pipeline`) เพื่อคัดกรองชื่อพาดหัวที่ยาวเกิน **17 ตัวอักษรไทย (`FILTER_CAP = 17`)** มาสั่งย่อให้กระชับไม่ล้นกรอบ `.mogrt`
 6. **ใช้คำสั่งรวบยอด `autolab_af_pipeline` ได้ทั้งกรณีมี `Master Profile` และไม่มี `Master Profile` (มีระบบ Auto-Fit วัดกรอบ+ตัดขอบดำในตัว):**
    - แทนที่จะแยกเรียกทีละคำสั่งให้เสียเวลารอ LLM 6–7 รอบ ให้ใช้ `autolab_af_pipeline` คำสั่งเดียว ซึ่งจะดึงคลิปเข้าคิว (พร้อมบล็อก Sub-bin `ไฟล์ต้นฉบับ`), ผูกพรีเซ็ต/กรอบ, **วัดช่องใส `.mogrt` + สแกนขอบดำวิดีโอ 3 ช่วงเวลา (`cropdetect`) คำนวณ `scale / posX / posY` ระดับพิกเซลให้อัตโนมัติ (เมื่อระบุ `frame` โดยไม่มี `profileName`/`scale` หรือตั้ง `autoFit: true`)**, ตั้งค่า Topbar `5 - 0`, รัน `✨ AI Auto-Name`, รัน `💬 Name Refiner` ย่อชื่อ และกด `START` ต่อเนื่องทันทีแบบ `0ms` Latency!
-7. **การวัดและจัดกรอบอัตโนมัติ (`autolab_af_tuner_auto_fit`) สำหรับเรื่องที่ไม่มีพรีเซ็ต — ห้ามเดาค่าสเกลเอง และไม่ต้อง Hardcode ค่าใดๆ:**
+7. **รายงานความคืบหน้าระหว่างทาง (Live Step-by-Step Reporting):**
+   - ในกระบวนการทำงานที่มีขั้นตอนยาวๆ (กู้ไฟล์ ➔ Auto Highlights ➔ Auto Frame ➔ Export) ให้ AI พิมพ์ข้อความสั้นๆ 1 บรรทัดบนหน้าแชทบอกผู้ใช้ก่อนเริ่มแต่ละขั้นตอนเสมอ เช่น `⏳ กำลังกู้ฟุตเทจออกจากไฟล์ต้นฉบับและล้างของเก่า...`, `⚡ กำลังรัน Auto Highlights (คัด 100 ช็อต)...`, `🎯 กำลังจัดกรอบและตั้งชื่อ (Auto Frame)...`, `🚀 กำลังส่งเข้าคิว Media Encoder...` ห้ามปล่อยให้หน้าจอเงียบหายไปเฉยๆ!
+8. **การวัดและจัดกรอบอัตโนมัติ (`autolab_af_tuner_auto_fit`) สำหรับเรื่องที่ไม่มีพรีเซ็ต — ห้ามเดาค่าสเกลเอง และไม่ต้อง Hardcode ค่าใดๆ:**
    - คลิปแต่ละเรื่องมีขนาดไฟล์และขอบดำบน/ล่างที่ฝังอยู่ในเนื้อวิดีโอ (Hardcoded Letterbox) ไม่เท่ากัน ต่อให้เป็น `1920x1080` เหมือนกันก็อาจมีขอบดำข้างในไม่เท่ากัน และกรอบ `.mogrt` แต่ละแบบมีช่องใสไม่เท่ากัน
    - ห้ามเดาตัวเลข `scale` / `posY` หรือใส่ `targetWindowWidth` ตายตัวเด็ดขาด ให้เรียก `autolab_af_tuner_auto_fit({ "binKey": "*" })` ระบบจะแกะ `thumb.png` ใน `.mogrt` วัดช่องใสจริง + สแกนพิกเซลวิดีโอ 3 ช่วงเวลา (`120s`, `360s`, `720s`) เพื่อเช็คว่ามีขอบดำหรือไม่ (`hasBlackBars: true/false`) แล้วคำนวณและบันทึก `scale`, `posX`, `posY` ลงคิวทันทีใน `~0.2–0.4 วินาที` (หากต้องการเรนเดอร์ภาพ `.png` ออกมาตรวจด้วยตา AI Vision ให้ส่ง `"preview": true`)
-8. **ห้ามส่งชื่อป้ายโปรโมทแบบย่อหรือกำกวมเข้า MCP เด็ดขาด (Exact Template Name & Shared-Machine Multi-Promo Routing):**
+9. **ห้ามส่งชื่อป้ายโปรโมทแบบย่อหรือกำกวมเข้า MCP เด็ดขาด (Exact Template Name & Shared-Machine Multi-Promo Routing):**
    - เครื่องของผู้ใช้/พนักงานมักมีป้ายโปรโมทหลายตัวในแบรนด์เดียวกัน (เช่น แยกตามหมวดงาน `Show_Promo_A`, `Movie_Promo_A` หรือแยกตามพนักงานหลายคนที่ใช้คอมเครื่องเดียวกัน เช่น `_Team1`, `_Team2`)
    - ระบบกลาง MCP จะ **ปฏิเสธคำค้นที่กำกวมทันที (`Ambiguous promo template`)** เพื่อป้องกันการใส่ป้ายโปรโมทผิดเพจ/ผิดคน
    - ดังนั้นเมื่อผู้ใช้พูดชื่อแบรนด์สั้นๆ **AI ต้องตรวจสอบตารางจับคู่โปรโมในสกิลประจำเครื่องของผู้ใช้ (หรือดูจาก `autolab_list_templates` + หมวดหมู่ Bin/โฟลเดอร์)** แล้วแปลงเป็น **ชื่อไฟล์เต็มเป๊ะ (เช่น `"Movie_Promo_Team1"` หรือ `"Movie_Promo_Team2"`)** ก่อนส่งเข้า `autolab_af_set_bin_template` หรือ `autolab_af_pipeline` เสมอ!
-9. **กฎเหล็กเอเจนต์ทำงานความเร็วสูงควบคู่การตรวจสอบคุณภาพ (High-Speed & Intelligent Quality Audit Protocol):**
+10. **กฎเหล็กเอเจนต์ทำงานความเร็วสูงควบคู่การตรวจสอบคุณภาพ (High-Speed & Intelligent Quality Audit Protocol):**
    - **เอเจนต์ไม่ใช่สคริปต์ตาบอด:** ห้ามยิงคำสั่งทิ้งขว้างโดยไม่ตรวจสอบผลลัพธ์ และห้ามมัวแต่นั่งงมอ่านโค้ดทีละบรรทัดจนช้าเป็นนาที
    - **การทำงานต้องแบ่งเป็น 2 เฟส จบใน 1–2 วินาที:**
      - **Phase 1: Ultra-Fast Execution (< 500ms):** สั่งงานผ่าน `autolab_af_pipeline` (หรือ Native Tools) แบบ One-shot คำสั่งเดียวจบ
@@ -204,6 +206,7 @@ description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension
   "outputDir": "D:\\OutputClips\\ชื่อเรื่อง\\ep1"
 }
 ```
+*(ระบบคืนผลสรุปย่อแบบ Compact: `queuedCount`, `failedCount`, `sampleJobs` เพื่อความเร็วระดับ 0ms และไม่ล้นเข้า `output.txt`)*
 
 ---
 
