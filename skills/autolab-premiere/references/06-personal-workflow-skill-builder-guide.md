@@ -292,3 +292,7 @@ lowStockThreshold: 15
 1. สรุปตารางกฎที่ได้บันทึกไว้ในสกิลให้ผู้ใช้เห็นอย่างชัดเจน
 2. แจ้งตำแหน่งไฟล์สกิลที่สร้างเสร็จแล้วให้ผู้ใช้ทราบ
 3. เสนอทดสอบรันเช็คสต็อกบน Disk (`--check-disk`) หรือสำรวจโปรเจกต์จริง 1 เรื่องเพื่อยืนยันว่าพาธและชื่อพรีเซ็ตทั้งหมดทำงานได้ตรง 100%
+4. **ติดตั้ง MCP Instructions (ป้องกัน AI ใช้ tool ผิด):**
+   - คัดลอก [`mcp-instructions/autolab-instructions.md`](../mcp-instructions/autolab-instructions.md) ไปวางที่ `<antigravity MCP dir>/autolab/instructions.md` ของเครื่องผู้ใช้
+   - เพิ่มข้อความ routing patch จาก [`mcp-instructions/premiere-pro-patch.md`](../mcp-instructions/premiere-pro-patch.md) เข้าไปที่ต้นของ `<antigravity MCP dir>/premiere-pro/instructions.md`
+   - *(ไฟล์เหล่านี้บังคับให้ AI ใช้ `autolab_pr_inspect` แทน `get_bin_contents` สำหรับเช็คสต็อก และอ่าน SKILL.md ก่อนทำงานเสมอ — ป้องกันปัญหา AI หลอนไปใช้ premiere-pro MCP 432 tools ตรงแล้วพ่น output ล้น)*
