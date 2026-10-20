@@ -508,7 +508,8 @@
   | `excludeDirs` | `string` | optional | รายชื่อโฟลเดอร์ที่ต้องการยกเว้นคั่นด้วยจุลภาค เช่น `"จบแล้ว,ลงแล้ว"` |
   | `lowStockThreshold` | `number` | optional | เกณฑ์สต็อกต่ำสำหรับสรุป `lowStockShows` ใน `diskSummary` (`default: 15`) |
   | `scanPremiere` | `boolean` | optional | บังคับให้สแกนเจาะจงใน Premiere Pro แม้จะไม่ได้ระบุ `query` (`default: false`) |
-- **โครงสร้างข้อมูลที่ได้คืนมา (จัดเรียง Disk ขึ้นก่อนเสมอ):**
+  | `includeShows` | `boolean` | optional | คืนค่าก้อน `shows` สรุปรายเรื่องแบบละเอียด (`default: false` — ตัดออกเป็นค่าเริ่มต้นเพื่อลดขนาด JSON ให้สั้นกระชับ ไม่เด้งเข้า `output.txt`) |
+- **โครงสร้างข้อมูลที่ได้คืนมา (จัดเรียง Disk ขึ้นก่อนเสมอ และตัด shows ซ้ำซ้อนออก):**
   ```json
   {
     "success": true,
@@ -523,8 +524,7 @@
     },
     "diskFolders": [ ... ],
     "readyToCutCount": 1,
-    "readyToCut": [ ... ],
-    "shows": [ ... ]
+    "readyToCut": [ ... ]
   }
   ```
 
