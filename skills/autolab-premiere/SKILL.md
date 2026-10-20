@@ -12,8 +12,10 @@ description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension
 2. **`premiere-pro` MCP (`432 Tools · v1.24.1`)** — ควบคุม Adobe Premiere Pro เชิงลึก (สำรวจโปรเจกต์/Bin, จัดการ Sequence/Track, ตัดต่อคลิป, ปรับขนาด/ตำแหน่ง, ใส่เอฟเฟกต์/สี Lumetri, ปรับแต่งเสียง/คีย์เฟรม, มาร์กเกอร์/ซับไตเติล, แคปภาพหน้าจอ Program Monitor และส่งออกไฟล์ผ่าน Media Encoder)
 
 > [!CAUTION]
-> **🛡️ IRONCLAD OPERATOR PROTOCOL (ZERO CODE READING / ONE-SHOT EXECUTION):**
-> When executing Premiere operations (Auto Frame, Highlights, Queues), the Agent is strictly an **OPERATOR**. It is STRICTLY FORBIDDEN to read `AutoLab/js/**` source files or inspect implementation code before/after calling tools. Never write manual regex via `call_js`. Execute the pipeline in **exactly 1 tool call** (`autolab_af_pipeline`) and report live status immediately.
+> **🛡️ IRONCLAD OPERATOR & AUTONOMOUS CHAINING PROTOCOL (ZERO CODE READING / ZERO HESITATION):**
+> 1. **Operator Only:** When executing Premiere operations (Auto Frame, Highlights, Queues), the Agent is strictly an **OPERATOR**. It is STRICTLY FORBIDDEN to read `AutoLab/js/**` source files or inspect implementation code before/after calling tools. Never write manual regex or ad-hoc DOM/JSX inspection via `call_js`/`call_jsx`.
+> 2. **Multi-Bin Native Queueing:** Both **Auto Highlights** (`autolab_ah_queue_add` with `binNames: [...]`) and **Auto Frame** (`autolab_af_pipeline` with `bins: [...]`), as well as `autolab_pr_inspect({ queries: [...] })`, `autolab_pr_prepare_ep({ items: [...] })`, and `autolab_pr_export_ame({ items: [...] })`, natively support processing **multiple shows/bins at once in a single call**. NEVER ask "จะเริ่มเรื่องไหนก่อน" or process shows one-by-one when the user asks to process multiple shows!
+> 3. **End-to-End Autonomous Execution:** When the user says *"ถ้ามีก็ตัดให้เลย export ให้ด้วย"*, execute the modular steps continuously from start to finish (`pr_inspect` ➔ `pr_prepare_ep` ➔ `ah_configure` + `ah_queue_add` + `ah_run` ➔ `af_pipeline` ➔ `pr_export_ame`) **without stopping to ask permission between steps**.
 
 ---
 
@@ -35,9 +37,9 @@ description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension
    - คลิปแต่ละเรื่องมีขนาดไฟล์และขอบดำบน/ล่างที่ฝังอยู่ในเนื้อวิดีโอ (Hardcoded Letterbox) ไม่เท่ากัน ต่อให้เป็น `1920x1080` เหมือนกันก็อาจมีขอบดำข้างในไม่เท่ากัน และกรอบ `.mogrt` แต่ละแบบมีช่องใสไม่เท่ากัน
    - ห้ามเดาตัวเลข `scale` / `posY` หรือใส่ `targetWindowWidth` ตายตัวเด็ดขาด ให้เรียก `autolab_af_tuner_auto_fit({ "binKey": "*" })` ระบบจะแกะ `thumb.png` ใน `.mogrt` วัดช่องใสจริง + สแกนพิกเซลวิดีโอ 3 ช่วงเวลา (`120s`, `360s`, `720s`) เพื่อเช็คว่ามีขอบดำหรือไม่ (`hasBlackBars: true/false`) แล้วคำนวณและบันทึก `scale`, `posX`, `posY` ลงคิวทันทีใน `~0.2–0.4 วินาที` (หากต้องการเรนเดอร์ภาพ `.png` ออกมาตรวจด้วยตา AI Vision ให้ส่ง `"preview": true`)
 8. **ห้ามส่งชื่อป้ายโปรโมทแบบย่อหรือกำกวมเข้า MCP เด็ดขาด (Exact Template Name & Shared-Machine Multi-Promo Routing):**
-   - เครื่องของผู้ใช้/พนักงานมักมีป้ายโปรโมทหลายตัวในแบรนด์เดียวกัน (เช่น แยกหมวด `รายการ IF_Q`, `รายการ IF_C`, `หนัง IF_Q`, `หนัง IF_C` หรือแยกตามพนักงานหลายคนที่ใช้คอมเครื่องเดียวกัน)
+   - เครื่องของผู้ใช้/พนักงานมักมีป้ายโปรโมทหลายตัวในแบรนด์เดียวกัน (เช่น แยกตามหมวดงาน `Show_Promo_A`, `Movie_Promo_A` หรือแยกตามพนักงานหลายคนที่ใช้คอมเครื่องเดียวกัน เช่น `_Team1`, `_Team2`)
    - ระบบกลาง MCP จะ **ปฏิเสธคำค้นที่กำกวมทันที (`Ambiguous promo template`)** เพื่อป้องกันการใส่ป้ายโปรโมทผิดเพจ/ผิดคน
-   - ดังนั้นเมื่อผู้ใช้พูดสั้นๆ เช่น *"ใช้แบรนเนอร์ IF"* **AI ต้องตรวจสอบตารางจับคู่โปรโมในสกิลประจำเครื่องของผู้ใช้ (หรือดูจาก `autolab_list_templates` + ชื่อ Bin/โฟลเดอร์ว่าเป็น `หนัง` หรือ `รายการ` และเป็นของคนตัด/เพจไหน)** แล้วแปลงเป็น **ชื่อไฟล์เต็มเป๊ะ (เช่น `"หนัง IF_Q"` หรือ `"หนัง IF_C"`)** ก่อนส่งเข้า `autolab_af_set_bin_template` หรือ `autolab_af_pipeline` เสมอ!
+   - ดังนั้นเมื่อผู้ใช้พูดชื่อแบรนด์สั้นๆ **AI ต้องตรวจสอบตารางจับคู่โปรโมในสกิลประจำเครื่องของผู้ใช้ (หรือดูจาก `autolab_list_templates` + หมวดหมู่ Bin/โฟลเดอร์)** แล้วแปลงเป็น **ชื่อไฟล์เต็มเป๊ะ (เช่น `"Movie_Promo_Team1"` หรือ `"Movie_Promo_Team2"`)** ก่อนส่งเข้า `autolab_af_set_bin_template` หรือ `autolab_af_pipeline` เสมอ!
 9. **กฎเหล็กเอเจนต์ทำงานความเร็วสูงควบคู่การตรวจสอบคุณภาพ (High-Speed & Intelligent Quality Audit Protocol):**
    - **เอเจนต์ไม่ใช่สคริปต์ตาบอด:** ห้ามยิงคำสั่งทิ้งขว้างโดยไม่ตรวจสอบผลลัพธ์ และห้ามมัวแต่นั่งงมอ่านโค้ดทีละบรรทัดจนช้าเป็นนาที
    - **การทำงานต้องแบ่งเป็น 2 เฟส จบใน 1–2 วินาที:**
@@ -74,15 +76,18 @@ description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension
 
 ### Step 1: ตรวจสอบการเชื่อมต่อ, สำรวจเทมเพลต และเตรียมโฟลเดอร์/Bin (`autolab_pr_prepare_ep`)
 1. เรียก `autolab_get_status({})` และ `autolab_list_templates({})` เพื่อดูสถานะพาเนลและรายชื่อ `masterProfiles` / `frames` / `promos` ในเครื่อง
-2. หากต้องการเตรียมโฟลเดอร์บน Disk คู่กับสร้าง Sub-bin ตอนใหม่ (`ep1`, `ep2`...) และย้ายไฟล์จาก Bin `รอ` ในคำสั่งเดียว:
+2. หากต้องการเตรียมโฟลเดอร์บน Disk คู่กับสร้าง Sub-bin ตอนใหม่ (`ep1`, `ep2`...) และย้ายไฟล์จาก Sub-bin พักไฟล์ในคำสั่งเดียว (รองรับส่ง `items: [...]` หลายเรื่องพร้อมกัน):
    ```json
    // Tool: autolab_pr_prepare_ep
    {
-     "binName": "ชื่อโฟลเดอร์เรื่อง",
-     "epName": "ep1",
-     "sourceSubBin": "รอ,รอตัด",
-     "createDiskDir": "D:\\OutputClips\\ชื่อเรื่อง\\ep1",
-     "removeOldHighlights": true
+     "items": [
+       {
+         "binName": "Series_A",
+         "epName": "ep1",
+         "createDiskDir": "D:\\OutputClips\\Series_A\\ep1",
+         "removeOldHighlights": true
+       }
+     ]
    }
    ```
 
@@ -122,8 +127,8 @@ description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension
 // Tool: autolab_af_pipeline
 {
   "bins": [
-    { "binPath": "ก.หนัง/ไทบ้านเดอะซีรีย์/HIGHLIGHTS_ไทบ้านเดอะซีรีย์", "frame": "กรอบหนัง 02", "promo": "หนัง IF_Q" },
-    { "binPath": "ก.หนัง/TASTE (2025) เด็กเจนแซ่บ/ep6/HIGHLIGHTS_ep6", "frame": "กรอบหนัง 01", "promo": "หนัง IF_Q" }
+    { "binPath": "Movies/Series_A/ep1/HIGHLIGHTS_ep1", "frame": "Frame_02.mogrt", "promo": "Promo_BrandA.mogrt" },
+    { "binPath": "Movies/Series_B/ep2/HIGHLIGHTS_ep2", "frame": "Frame_01.mogrt", "promo": "Promo_BrandA.mogrt" }
   ],
   "autoFit": true,
   "startNow": true
@@ -200,10 +205,10 @@ description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension
 1. **ให้ AI เปิดอ่านคู่มือ [`references/06-personal-workflow-skill-builder-guide.md`](references/06-personal-workflow-skill-builder-guide.md) ทันที**
 2. **AI สำรวจและจัดกลุ่มไฟล์ในเครื่องให้ผู้ใช้ดูก่อนถาม (Phase 1 Auto-Discovery & Smart Clustering):**
    - เรียก `autolab_list_templates` และ `autolab_get_status`
-   - หากตรวจพบป้ายโปรโมทหลายตัว (เช่น แยก `รายการ ...` vs `หนัง ...` หรือมีรหัสต่อท้ายคนตัด/เพจ เช่น `_Q`, `_C`, `_A`, `_B`), **AI ต้องจัดกลุ่มขึ้นมาแสดงให้ผู้ใช้เห็นทันที**
+   - หากตรวจพบป้ายโปรโมทหลายตัว (เช่น แยกตามหมวดหมู่เนื้อหา หรือมีรหัสต่อท้ายคนตัด/เพจ เช่น `_Team1`, `_Team2`, `_A`, `_B`), **AI ต้องจัดกลุ่มขึ้นมาแสดงให้ผู้ใช้เห็นทันที**
 3. **AI เสนอระบบแยกโปรโม/แยกคนตัดสำเร็จรูปให้ผู้ใช้แค่เลือกตอบง่ายๆ (Phase 2 Guided Multi-User & Multi-Promo Architecture):**
-   - แนะนำวิธีแยกด้วย **คำต่อท้ายชื่อโฟลเดอร์/Bin (Folder Suffix Tag)** เช่น โฟลเดอร์ปกติ = คนที่ 1 (เช่น `_Q`), โฟลเดอร์ที่มีคำต่อท้าย `- คอม` หรือ `- ชื่อคนที่ 2` = คนที่ 2 (เช่น `_C`)
-   - แนะนำวิธีแยกตาม **หมวดหมู่โฟลเดอร์หลัก** เช่น อยู่ใน `ก.หนัง` = ใช้โปรโม `หนัง ...` + เปิด Speed Assist หนัง + วัดกรอบอัตโนมัติ (`af_tuner_auto_fit`), ถ้าเป็นรายการทีวี = ใช้โปรโม `รายการ ...` + ปิด Speed Assist
+   - แนะนำวิธีแยกด้วย **คำต่อท้ายชื่อโฟลเดอร์/Bin (Folder Suffix Tag)** เช่น โฟลเดอร์ปกติ = คนที่ 1 (เช่น `_Team1`), โฟลเดอร์ที่มีคำต่อท้ายระบุคนที่ 2 = คนที่ 2 (เช่น `_Team2`)
+   - แนะนำวิธีแยกตาม **หมวดหมู่โฟลเดอร์หลัก** เช่น หมวดหนัง/ซีรีส์ = ใช้โปรโมหมวดหนัง + เปิด Speed Assist หนัง + วัดกรอบอัตโนมัติ (`af_tuner_auto_fit`), หมวดรายการทีวี = ใช้โปรโมหมวดรายการ + ปิด Speed Assist
 4. **AI สร้างไฟล์สกิลประจำเครื่องพร้อมตารางจับคู่ 2 มิติ (2D Routing Matrix) แยกต่างหาก (Phase 3–4 Generate Separate Skill):**
    - สร้างไฟล์ `.agents/skills/<my-workflow>/SKILL.md` ให้ผู้ใช้โดยอัตโนมัติ (ห้ามเขียนข้อมูลส่วนตัวของผู้ใช้ทับลงในสกิลกลาง `autolab-premiere` เด็ดขาด เพื่อความปลอดภัยและเพื่อให้ดึงอัปเดตสกิลกลางได้ตลอดเวลา)
 

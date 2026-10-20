@@ -143,10 +143,10 @@ node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autol
 node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --status
 
 # 3. รันคำสั่ง Pipeline รวดเดียวจบ (One-Shot af_pipeline)
-node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call autolab_af_pipeline --arg binPath="ก.หนัง/ไทบ้านเดอะซีรีย์/HIGHLIGHTS_ไทบ้านเดอะซีรีย์" --arg frame="กรอบหนัง 02" --arg promo="หนัง IF_Q"
+node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call autolab_af_pipeline --arg binPath="Movies/Series_A/HIGHLIGHTS_Series_A" --arg frame="Frame_02.mogrt" --arg promo="Promo_BrandA.mogrt"
 
 # 4. ตั้งค่าเทมเพลตและจัดกรอบสเกลอัตโนมัติ (Two-Command Chain)
-node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call autolab_af_set_bin_template --arg binKey=* --arg frame="กรอบหนัง 02" --arg promo="หนัง IF_Q"
+node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call autolab_af_set_bin_template --arg binKey=* --arg frame="Frame_02.mogrt" --arg promo="Promo_BrandA.mogrt"
 node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call autolab_af_tuner_auto_fit --arg binKey=* --arg apply=true
 ```
 
@@ -158,7 +158,7 @@ node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autol
 
 ```mermaid
 flowchart TD
-    Start["คำสั่งจากผู้ใช้ (เช่น ใส่กรอบ IF ให้ไทบ้าน)"] --> P1["⚡ Phase 1: One-Shot Pipeline Execution (< 500ms)<br/>เรียก af_pipeline หรือ Set Template + Auto-Fit"]
+    Start["คำสั่งจากผู้ใช้ (เช่น ใส่กรอบและโปรโมทให้ซีรีส์)"] --> P1["⚡ Phase 1: One-Shot Pipeline Execution (< 500ms)<br/>เรียก af_pipeline หรือ Set Template + Auto-Fit"]
     P1 --> P2["🔍 Phase 2: Intelligent Quality Audit (~100ms)<br/>ตรวจสอบ 4 Checkpoints จากผลลัพธ์"]
     
     subgraph Audit ["4-Point Quality Checkpoints"]

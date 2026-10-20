@@ -70,7 +70,7 @@
   | `action` | `string` (`"list"` \| `"save"` \| `"delete"` \| `"set_active"` \| `"update_promo"` \| `"batch_update_promo"`) | optional | คำสั่งที่ต้องการทำกับ `MasterProfileManager` |
   | `id` | `string` | optional | รหัสโปรไฟล์ (ใช้เมื่อ `action` เป็น `"delete"`, `"set_active"`, หรือ `"update_promo"`) |
   | `name` | `string` | optional | ชื่อโปรไฟล์ (ใช้เมื่อ `action` เป็น `"save"` หรือระบุเป้าหมายใน `"update_promo"`) |
-  | `promoName` | `string` | optional | ชื่อแบนเนอร์โปรโมทใหม่ที่ต้องการใส่ เช่น `"หนัง IF_Q"` หรือ `"IF_Q"` (ระบบจะค้นหาและ resolve path ให้อัตโนมัติ) |
+  | `promoName` | `string` | optional | ชื่อแบนเนอร์โปรโมทใหม่ที่ต้องการใส่ เช่น `"Promo_BrandA.mogrt"` (ระบบจะค้นหาและ resolve path ให้อัตโนมัติ) |
   | `promo` | `object` (`{ name, path }`) | optional | ข้อมูลป้ายโปรโมท `.mogrt` แบบระบุ path ตรง |
   | `oldPromoName` | `string` | optional | ใช้ใน `batch_update_promo`: กรองเปลี่ยนเฉพาะ Profile ที่กำลังใช้โปรโมทเก่านี้อยู่ เช่น `"ZEED"` |
   | `filterQuery` | `string` | optional | ใช้ใน `batch_update_promo`: กรอง Profile ตามคำค้นหาในชื่อ Profile |
@@ -84,15 +84,15 @@
   {
     "action": "batch_update_promo",
     "oldPromoName": "ZEED",
-    "promoName": "หนัง IF_Q"
+    "promoName": "Promo_BrandA.mogrt"
   }
   ```
 - **ตัวอย่างการเรียกใช้ (เปลี่ยนเจาะจงเฉพาะบาง Profile):**
   ```json
   {
     "action": "batch_update_promo",
-    "profiles": ["ทองเนื้อเก้า (ลำยอง)", "หลักสูตร รัก"],
-    "promoName": "หนัง IF_Q"
+    "profiles": ["Series_A", "Movie_B"],
+    "promoName": "Promo_BrandA.mogrt"
   }
   ```
 
@@ -493,11 +493,11 @@
 ## 7. หมวด G: คำสั่งตรวจสอบ Bin / เตรียมตอน / ส่งออก Media Encoder และคำสั่งขั้นสูง (5 Tools)
 
 ### 7.1 `autolab_pr_inspect`
-- **หน้าที่:** ตรวจสอบโครงสร้างโฟลเดอร์/Bin ใน Premiere Pro แบบเจาะจงหรือสแกนทั้งโปรเจกต์: ดูจำนวนคลิป, ดู Sub-bin ทั้งหมด, และดึงรายการไฟล์ที่ค้างอยู่ใน Bin พักไฟล์ (`รอ` / `รอตัด`) พร้อมตรวจจับเลขตอนอัตโนมัติ (`detectedEp: "ep3"`, `"ep4"`) ช่วยให้ AI รู้ได้ทันที 100% ว่าต้องตัดต่อตอนไหนโดยไม่ต้องเดา
+- **หน้าที่:** ตรวจสอบโครงสร้างโฟลเดอร์/Bin ใน Premiere Pro แบบเจาะจง (รองรับทั้งเรื่องเดียวหรือหลายเรื่องพร้อมกันผ่าน `queries: [...]`) หรือสแกนทั้งโปรเจกต์: ดูจำนวนคลิป, ดู Sub-bin ทั้งหมด, และดึงรายการไฟล์ฟุตเทจที่ยังไม่ได้ตัด (`readyToCut`) พร้อมตรวจจับเลขตอนอัตโนมัติ (`detectedEp: "ep3"`, `"ep4"`) ช่วยให้ AI รู้ได้ทันที 100% ว่าต้องตัดต่อตอนไหนโดยไม่ต้องเดา
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
   | :--- | :--- | :---: | :--- |
-  | `binName` | `string` | optional | ชื่อหรือพาธเต็มของ Bin ใน Premiere Pro ที่ต้องการส่องเจาะจง (เช่น `"ก.หนัง/หลักสูตร (รัก) ภาคบังคับ"` หรือ `"ก.หนัง/ทองเนื้อเก้า (ลำยอง)/รอ"`) |
+  | `binName` | `string` | optional | ชื่อหรือพาธเต็มของ Bin ใน Premiere Pro ที่ต้องการส่องเจาะจง (เช่น `"Movies/Series_A"`) |
   | `binPath` | `string` | optional | นามแฝง (Alias) ของ `binName` |
   | `query` | `string` | optional | คำค้นหาชื่อหรือพาธของ Bin (หากไม่ระบุจะสแกนภาพรวมทั้งโปรเจกต์) |
   | `diskRoot` | `string` | optional | โฟลเดอร์บน Disk ที่ต้องการสแกนนับจำนวนไฟล์ `.mp4` ควบคู่กัน |
@@ -505,13 +505,13 @@
   | `excludeDirs` | `string` | optional | รายชื่อโฟลเดอร์ที่ต้องการยกเว้นคั่นด้วยจุลภาค เช่น `"จบแล้ว,ลงแล้ว"` |
 
 ### 7.2 `autolab_pr_prepare_ep`
-- **หน้าที่:** เตรียมความพร้อมก่อนเริ่มตัดในคำสั่งเดียว: เปลี่ยนชื่อโฟลเดอร์บน Disk (เช่น ลบป้ายแจ้งเตือนสต็อกใกล้หมด), สร้างโฟลเดอร์ย่อยสำหรับตอนใหม่ (`ep1`, `ep2`...) บน Disk, ลบ Bin `HIGHLIGHTS_` ของตอนเก่าที่ส่งออกไปแล้วใน Premiere Pro, สร้าง Sub-bin `epX` ใน Premiere Pro และย้ายไฟล์ฟุตเทจจาก Bin พักไฟล์ (`รอ` / `รอตัด`) ออกมาเตรียมตัด
+- **หน้าที่:** เตรียมความพร้อมก่อนเริ่มตัดในคำสั่งเดียว (รองรับทั้งเรื่องเดียวหรือหลายเรื่องพร้อมกันผ่าน `items: [...]`): เปลี่ยนชื่อโฟลเดอร์บน Disk, สร้างโฟลเดอร์ย่อยสำหรับตอนใหม่ (`ep1`, `ep2`...) บน Disk, ลบ Bin `HIGHLIGHTS_` ของตอนเก่าที่ส่งออกไปแล้วใน Premiere Pro, สร้าง Sub-bin `epX` ใน Premiere Pro และย้ายไฟล์ฟุตเทจจาก Sub-bin พักไฟล์ออกมาเตรียมตัด
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
   | :--- | :--- | :---: | :--- |
   | `binName` | `string` | **required** | ชื่อหรือพาธของ Bin หลักใน Premiere Pro |
   | `epName` | `string` | optional | ชื่อ Sub-bin ตอนย่อยที่ต้องการสร้าง/ใช้ (เช่น `"ep1"`, `"ep2"`) |
-  | `sourceSubBin` | `string` | optional | ชื่อ Sub-bin ต้นทางที่เก็บไฟล์รอตัด (เช่น `"รอ,รอตัด"`) |
+  | `sourceSubBin` | `string` | optional | ชื่อ Sub-bin ต้นทางที่เก็บไฟล์ฟุตเทจ (หากไม่ระบุ ระบบจะค้นหา Sub-bin ที่มีไฟล์ฟุตเทจยังไม่ได้ตัดให้อัตโนมัติ) |
   | `clipName` | `string` | optional | ชื่อไฟล์ฟุตเทจที่ต้องการย้าย (หากไม่ระบุจะย้ายไฟล์แรกใน `sourceSubBin`) |
   | `renameDiskFrom` | `string` | optional | พาธโฟลเดอร์เดิมบน Disk ที่ต้องการเปลี่ยนชื่อ |
   | `renameDiskTo` | `string` | optional | พาธโฟลเดอร์ใหม่บน Disk หลังเปลี่ยนชื่อ |
