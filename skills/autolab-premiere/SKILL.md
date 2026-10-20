@@ -25,10 +25,11 @@ description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension
    - ห้ามใช้โหมด `📰 News` (`"news"`) กับงานหนัง/ละคร/ซีรีส์เด็ดขาด
 5. **หลังกด `✨ AI Auto-Name` ต้องตามด้วย `💬 Name Refiner` ➔ `✂️ ย่อชื่อที่ยาว` ➔ `✅ Apply All` เสมอ:**
    - เรียก `autolab_af_run_name_refiner` (หรือเปิด `autoRefine: true` / ใช้ `autolab_af_pipeline`) เพื่อคัดกรองชื่อพาดหัวที่ยาวเกิน **17 ตัวอักษรไทย (`FILTER_CAP = 17`)** มาสั่งย่อให้กระชับไม่ล้นกรอบ `.mogrt`
-6. **ใช้คำสั่งรวบยอด `autolab_af_pipeline` เมื่อมีชุดพรีเซ็ต (`Master Profile`) หรือทราบค่าสเกลอยู่แล้ว:**
-   - แทนที่จะแยกเรียกทีละคำสั่งให้เสียเวลารอ LLM 6–7 รอบ ให้ใช้ `autolab_af_pipeline` คำสั่งเดียว ซึ่งจะดึงคลิปเข้าคิว (พร้อมบล็อก Sub-bin `ไฟล์ต้นฉบับ`), ผูกพรีเซ็ต/กรอบ, ตั้งค่า Topbar `5 - 0`, รัน `✨ AI Auto-Name`, รัน `💬 Name Refiner` ย่อชื่อ และกด `START` ต่อเนื่องทันทีแบบ `0ms` Latency!
-7. **การกด `🎯 จัดกรอบ` (Live Frame Tuner) สำหรับเรื่องใหม่ที่ยังไม่มีพรีเซ็ต ต้องเปิดดูภาพ PNG จริงด้วยสายตา AI (Closed-Loop Vision Verification):**
-   - คลิปแต่ละเรื่องมีสัดส่วนภาพและขอบดำบน/ล่าง (Letterbox) ไม่เท่ากัน ห้ามเดาตัวเลข `scale` / `posY` ตาบอดเด็ดขาด ต้องรัน `autolab_af_tuner_auto_fit` แล้วเปิดดูไฟล์ภาพ `.png` (`previewImage.path`) ที่เรนเดอร์จริงจากหน้าจอ `_AutoLab_Preview_` ก่อนกด `autolab_af_tuner_apply` เสมอ
+6. **ใช้คำสั่งรวบยอด `autolab_af_pipeline` ได้ทั้งกรณีมี `Master Profile` และไม่มี `Master Profile` (มีระบบ Auto-Fit วัดกรอบ+ตัดขอบดำในตัว):**
+   - แทนที่จะแยกเรียกทีละคำสั่งให้เสียเวลารอ LLM 6–7 รอบ ให้ใช้ `autolab_af_pipeline` คำสั่งเดียว ซึ่งจะดึงคลิปเข้าคิว (พร้อมบล็อก Sub-bin `ไฟล์ต้นฉบับ`), ผูกพรีเซ็ต/กรอบ, **วัดช่องใส `.mogrt` + สแกนขอบดำวิดีโอ 3 ช่วงเวลา (`cropdetect`) คำนวณ `scale / posX / posY` ระดับพิกเซลให้อัตโนมัติ (เมื่อระบุ `frame` โดยไม่มี `profileName`/`scale` หรือตั้ง `autoFit: true`)**, ตั้งค่า Topbar `5 - 0`, รัน `✨ AI Auto-Name`, รัน `💬 Name Refiner` ย่อชื่อ และกด `START` ต่อเนื่องทันทีแบบ `0ms` Latency!
+7. **การวัดและจัดกรอบอัตโนมัติ (`autolab_af_tuner_auto_fit`) สำหรับเรื่องที่ไม่มีพรีเซ็ต — ห้ามเดาค่าสเกลเอง และไม่ต้อง Hardcode ค่าใดๆ:**
+   - คลิปแต่ละเรื่องมีขนาดไฟล์และขอบดำบน/ล่างที่ฝังอยู่ในเนื้อวิดีโอ (Hardcoded Letterbox) ไม่เท่ากัน ต่อให้เป็น `1920x1080` เหมือนกันก็อาจมีขอบดำข้างในไม่เท่ากัน และกรอบ `.mogrt` แต่ละแบบมีช่องใสไม่เท่ากัน
+   - ห้ามเดาตัวเลข `scale` / `posY` หรือใส่ `targetWindowWidth` ตายตัวเด็ดขาด ให้เรียก `autolab_af_tuner_auto_fit({ "binKey": "*" })` ระบบจะแกะ `thumb.png` ใน `.mogrt` วัดช่องใสจริง + สแกนพิกเซลวิดีโอ 3 ช่วงเวลา (`120s`, `360s`, `720s`) เพื่อเช็คว่ามีขอบดำหรือไม่ (`hasBlackBars: true/false`) แล้วคำนวณและบันทึก `scale`, `posX`, `posY` ลงคิวทันทีใน `~0.2–0.4 วินาที` (หากต้องการเรนเดอร์ภาพ `.png` ออกมาตรวจด้วยตา AI Vision ให้ส่ง `"preview": true`)
 
 ---
 
@@ -94,29 +95,37 @@ description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension
 }
 ```
 
-#### 🎯 กรณีที่ B: เรื่องใหม่ที่ยังไม่มีพรีเซ็ตสเกล — **ต้องวัดและจูนขนาดด้วย `🎯 จัดกรอบ` + AI Vision ก่อน**
-1. ดึงเฉพาะ Sequences เข้า Auto Frame Queue และผูกกรอบ `.mogrt` + ป้ายโปรโมท:
-   ```json
-   // Tool: autolab_af_queue_add
-   { "binPath": "หมวดหมู่/ชื่อเรื่อง/ep1/HIGHLIGHTS_ep1", "onlySequences": true, "clearFirst": true }
+#### 🎯 กรณีที่ B: เรื่องใหม่ที่ยังไม่มีพรีเซ็ตสเกล (ไม่มี `Master Profile`) — **วัดช่องใส `.mogrt` + สแกนขอบดำวิดีโออัตโนมัติระดับพิกเซล (`~0.2–0.4s`)**
+- **วิธีที่ 1: รันรวดเดียวใน `autolab_af_pipeline` (ส่งแค่ `frame` กับ `promo` โดยไม่ต้องส่ง `profileName` และไม่ต้องเดา `scale`)**
+  ระบบจะแกะช่องใสจริงของ `.mogrt` + สแกนหาขอบดำในวิดีโอ 3 ช่วงเวลา (`120s/360s/720s`) + คำนวณและเซ็ต `scale / posX / posY` ลงคิวให้อัตโนมัติทันที:
+  ```json
+  // Tool: autolab_af_pipeline
+  {
+    "binPath": "หมวดหมู่/ชื่อเรื่อง/ep1/HIGHLIGHTS_ep1",
+    "frame": "ชื่อกรอบ.mogrt",
+    "promo": "ชื่อป้ายโปรโมท.mogrt",
+    "autoFit": true,
+    "promoStart": 5,
+    "promoInterval": 0,
+    "startQueue": true
+  }
+  ```
+- **วิธีที่ 2: สั่งวัดขนาดและเช็คขอบดำแยกขั้นตอน (`autolab_af_tuner_auto_fit`)**
+  1. ดึงเฉพาะ Sequences เข้า Auto Frame Queue และผูกกรอบ `.mogrt` + ป้ายโปรโมท:
+     ```json
+     // Tool: autolab_af_queue_add
+     { "binPath": "หมวดหมู่/ชื่อเรื่อง/ep1/HIGHLIGHTS_ep1", "onlySequences": true, "clearFirst": true }
 
-   // Tool: autolab_af_set_bin_template
-   { "binKey": "*", "frame": "ชื่อกรอบ.mogrt", "promo": "ชื่อป้ายโปรโมท.mogrt" }
-   ```
-2. สั่งวัดขอบดำด้วย `cropdetect` และเรนเดอร์ภาพตัวอย่างจริงจาก Premiere Pro:
-   ```json
-   // Tool: autolab_af_tuner_auto_fit
-   { "binKey": "HIGHLIGHTS_ep1", "targetWindowWidth": 1080 }
-   ```
-3. **เปิดดูไฟล์ภาพ PNG ที่ได้จาก `previewImage.path` ด้วยเครื่องมืออ่านไฟล์ภาพของ AI:**
-   - ตรวจดูว่าภาพวิดีโอขยายเต็มช่องกรอบโดยไม่มีขอบดำโผล่บน/ล่าง และศีรษะตัวละครไม่ถูกกรอบพาดหัวบัง
-   - หากต้องปรับเพิ่ม/ลด `scale` หรือขยับ `posY` ให้เรียก `autolab_af_tuner_adjust({ "scale": 148, "posX": 540, "posY": 985 })` แล้วตรวจภาพ PNG ใหม่อีกครั้ง
-4. เมื่อพอดีเป๊ะแล้ว กดยืนยันค่าเข้า Bin (ระบบจะลบ `_AutoLab_Preview_` ให้อัตโนมัติ):
-   ```json
-   // Tool: autolab_af_tuner_apply
-   { "binKey": "HIGHLIGHTS_ep1" }
-   ```
-5. ตั้งค่า Topbar (`5 - 0`), รัน `✨ AI Auto-Name` พ่วง `💬 Name Refiner` (`autoRefine: true`), และกดปุ่ม `START`:
+     // Tool: autolab_af_set_bin_template
+     { "binKey": "*", "frame": "ชื่อกรอบ.mogrt", "promo": "ชื่อป้ายโปรโมท.mogrt" }
+     ```
+  2. สั่งวัดขนาดช่องใส `.mogrt` คู่กับสแกนขอบดำวิดีโอและเซ็ตค่าลง Bin ทันที (`~0.2–0.4 วินาที` โดยไม่ต้องใส่ตัวเลข Hardcode ใดๆ):
+     ```json
+     // Tool: autolab_af_tuner_auto_fit
+     { "binKey": "*" }
+     ```
+     *(ระบบจะคืนค่า `mogrtAperture` บอกพิกัดช่องใสของกรอบ, `cropAnalysis` บอก `srcW/srcH`, `cropW/cropH`, `hasBlackBars: true/false`, และ `updatedTransform` บอก `scale, posX, posY` ที่คำนวณและบันทึกเข้า Bin เรียบร้อยแล้ว — หากต้องการเรนเดอร์ภาพ PNG จาก Premiere Pro มาตรวจด้วยตา AI Vision เพิ่มเติม ให้ส่ง `"preview": true`)*
+  3. ตั้งค่า Topbar (`5 - 0`), รัน `✨ AI Auto-Name` พ่วง `💬 Name Refiner` (`autoRefine: true`), และกดปุ่ม `START`:
    ```json
    // 1. ตั้งค่า Topbar (Tool: autolab_af_configure_topbar)
    {

@@ -265,22 +265,28 @@
   | `outputPreviewPath` | `string` | optional | พาธไฟล์ `.png` ที่ต้องการบันทึกภาพตัวอย่าง |
 
 ### 4.2 `autolab_af_tuner_auto_fit`
-- **หน้าที่:** คำนวณขนาดกรอบอัตโนมัติอัจฉริยะ (**Smart Auto-Fit**): รัน FFmpeg `cropdetect` บนไฟล์วิดีโอของ Bin เพื่อตรวจจับขอบดำบน/ล่าง (Letterbox) และหาพื้นที่ภาพจริง จากนั้นคำนวณค่า `scale`, `posX`, `posY` ที่พอดีกับช่องกรอบ อัปเดตเข้าซีเควนซ์ `_AutoLab_Preview_` ใน Premiere Pro ทันที และส่งออกไฟล์ภาพ `.png` ให้ AI Vision ตรวจสอบ
+- **หน้าที่:** คำนวณขนาดกรอบอัตโนมัติระดับพิกเซล (**Millimeter Smart Auto-Fit · ~0.2–0.4s · Zero-Dependency**):
+  1. แกะ `thumb.png` ในไฟล์กรอบ `.mogrt` ด้วย Pure Node.js (`fs` + `zlib`) เพื่อวัดพิกัดช่องโปร่งใสจริง (`topY`, `bottomY`, `apertureW`, `apertureH`, `centerX`, `centerY`)
+  2. รัน FFmpeg `cropdetect=24:2:0` แบบขนาน 3 ช่วงเวลา (`120s`, `360s`, `720s` ช่วงละ 6 เฟรม) แล้วหา **Bounding Union** เพื่อตรวจจับขอบดำที่ฝังในเนื้อวิดีโอ (`hasBlackBars: true/false`, `cropW`, `cropH`, `cropX`, `cropY`) โดยไม่โดนฉากมืดหลอก
+  3. คำนวณและบันทึก `scale`, `posX`, `posY` ที่พอดีกับช่องกรอบพร้อมระยะเผื่อทับขอบ (`safeBleedPx: 12`) ลงใน Bin ทันทีโดยไม่ต้องเปิด Preview Sequence ช้าๆ (ยกเว้นส่ง `preview: true`)
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
   | :--- | :--- | :---: | :--- |
-  | `binKey` | `string` | optional | ชื่อหรือรหัส Bin เป้าหมาย |
-  | `targetWindowWidth` | `number` | optional | ความกว้างช่องแสดงผลที่ต้องการเติมเต็ม (`default: 1080`) |
-  | `targetWindowHeight` | `number` | optional | ความสูงขั้นต่ำของพื้นที่ภาพจริงเพื่อป้องกันขอบดำโผล่บน/ล่าง |
+  | `binKey` | `string` | optional | ชื่อหรือรหัส Bin เป้าหมาย (`default: "*"` สำหรับ Bin แรก/ทุก Bin) |
+  | `frame` | `string` | optional | ชื่อหรือพาธไฟล์กรอบ `.mogrt` (หากไม่ระบุจะใช้กรอบที่ผูกไว้ใน Bin) |
+  | `targetWindowWidth` | `number` | optional | กำหนดความกว้างช่องใสเอง (หากไม่ระบุจะวัดจาก `.mogrt` อัตโนมัติ) |
+  | `targetWindowHeight` | `number` | optional | กำหนดความสูงช่องใสเอง (หากไม่ระบุจะวัดจาก `.mogrt` อัตโนมัติ) |
+  | `safeBleedPx` | `number` | optional | ระยะเผื่อทับขอบบน+ล่างเพื่อกันรอยต่อ sub-pixel (`default: 12` = บน 6px + ล่าง 6px) |
   | `extraZoomPercent` | `number` | optional | ซูมเผื่อเพิ่มอีกกี่เปอร์เซ็นต์ เช่น `5` (+5%) |
-  | `posX` | `number` | optional | กำหนดตำแหน่งแนวนอนเอง (`default: 540`) |
-  | `posY` | `number` | optional | กำหนดตำแหน่งแนวตั้งเอง (`default: 960`) |
-  | `outputPreviewPath` | `string` | optional | พาธไฟล์ `.png` สำหรับบันทึกภาพตัวอย่าง |
-- **ตัวอย่างการเรียกใช้:**
+  | `posX` | `number` | optional | กำหนดตำแหน่งแนวนอนเอง (หากไม่ระบุจะคำนวณจากจุดกึ่งกลางช่องใส `.mogrt` + ชดเชยขอบดำ) |
+  | `posY` | `number` | optional | กำหนดตำแหน่งแนวตั้งเอง (หากไม่ระบุจะคำนวณจากจุดกึ่งกลางช่องใส `.mogrt` + ชดเชยขอบดำ) |
+  | `apply` | `boolean` | optional | บันทึกค่าที่คำนวณได้ลง Bin ทันที (`default: true`) |
+  | `preview` | `boolean` | optional | เรนเดอร์ไฟล์ภาพ `.png` จากซีเควนซ์ `_AutoLab_Preview_` ใน Premiere Pro (`default: false` เพื่อความเร็ว ~0.2s) |
+  | `outputPreviewPath` | `string` | optional | พาธไฟล์ `.png` สำหรับบันทึกภาพตัวอย่างเมื่อ `preview: true` |
+- **ตัวอย่างการเรียกใช้ (ไม่ต้องใส่ตัวเลข Hardcode):**
   ```json
   {
-    "binKey": "เป็นต่อ",
-    "targetWindowWidth": 1080
+    "binKey": "*"
   }
   ```
 
@@ -441,7 +447,10 @@
   | `profileId` | `string` | optional | รหัส ID ของ Master Profile |
   | `frame` / `frameMogrt` | `string` | optional | ชื่อหรือพาธไฟล์กรอบ `.mogrt` |
   | `promo` / `promoMogrt` | `string` | optional | ชื่อหรือพาธไฟล์ป้ายโปรโมท `.mogrt` |
-  | `scale` / `posX` / `posY` | `number` | optional | ค่าสเกลและตำแหน่งวิดีโอ |
+  | `scale` / `posX` / `posY` | `number` | optional | ค่าสเกลและตำแหน่งวิดีโอ (หากไม่ระบุเมื่อตั้ง `frame` โดยไม่มี `profileName` ระบบจะรัน `af_tuner_auto_fit` วัดกรอบ+ตัดขอบดำให้อัตโนมัติ) |
+  | `autoFit` | `boolean` | optional | สั่งรัน `af_tuner_auto_fit` วัดช่องใส `.mogrt` + ตัดขอบดำวิดีโอใน Pipeline อัตโนมัติ (`default: true` เมื่อมี `frame` แต่ไม่มี `profileName`/`scale`) |
+  | `safeBleedPx` | `number` | optional | ระยะเผื่อทับขอบพิกเซลสำหรับ `autoFit` (`default: 12`) |
+  | `extraZoomPercent` | `number` | optional | ซูมเผื่อเพิ่มกี่เปอร์เซ็นต์สำหรับ `autoFit` |
   | `promoStart` | `number` | optional | วินาทีที่ป้ายโปรโมทเริ่มแสดง (`default: 5`) |
   | `promoInterval` | `number` | optional | ระยะเวลาวนซ้ำป้ายโปรโมท (`default: 0` = ลากจนจบคลิป) |
   | `mode` / `namingMode` | `string` (`"variety"` \| `"news"`) | optional | โหมดตั้งชื่อ AI (`default: "variety"`) |
