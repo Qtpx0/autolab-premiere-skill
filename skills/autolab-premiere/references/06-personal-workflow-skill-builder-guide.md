@@ -187,32 +187,70 @@ description: Personal and shared-machine autonomous production workflow for Adob
 
 ## 🔄 4. ลำดับคำสั่งปฏิบัติการจริง (End-to-End Execution Recipe)
 
-1. **เช็คสต็อกบน Disk (โดยไม่กวน Premiere Pro):**
-   ```powershell
-   node AutoLab/mcp/autolab-mcp.js --check-disk "<คำค้น>" --dir "<พาธโฟลเดอร์บน Disk>" --exclude "จบแล้ว,ลงแล้ว"
+> 💡 **กฎสำคัญ:** ในโปรแกรม AI (Antigravity / Cursor) ให้เรียก **Native MCP Tools** โดยตรงเสมอ (รวดเร็ว 1-5ms ไม่ต้องรัน Terminal) หากจำเป็นต้องรันผ่าน Terminal ให้ใช้พาธติดตั้งสากล: `node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js"`
+
+1. **เช็คสต็อกบน Disk (จัดอันดับเรื่องที่เหลือน้อยสุด โดยไม่ต้องเปิด Premiere Pro):**
+   ```json
+   // Tool: autolab_pr_inspect
+   {
+     "diskRoot": "<พาธโฟลเดอร์บน Disk>",
+     "excludeDirs": "จบแล้ว,ลงแล้ว"
+   }
    ```
-2. **สำรวจ Bin และพรีเซ็ตของเรื่องที่จะตัด:**
-   ```powershell
-   node AutoLab/mcp/autolab-mcp.js --inspect "<ชื่อเรื่อง>" --dir "<พาธโฟลเดอร์บน Disk>" --exclude "จบแล้ว,ลงแล้ว"
+   *(หรือรันผ่าน CLI: `node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --check-disk --dir "<พาธโฟลเดอร์บน Disk>" --exclude "จบแล้ว,ลงแล้ว"` — ห้ามใส่คำค้นกรอง เพื่อให้ระบบสแกนสต็อกครบทุกเรื่อง)*
+
+2. **สำรวจ Bin และตรวจหาเลขตอนที่ค้างในโฟลเดอร์พักไฟล์:**
+   ```json
+   // Tool: autolab_pr_inspect
+   {
+     "queries": ["<ชื่อเรื่องหรือคำค้น>"]
+   }
    ```
-3. **เตรียมโฟลเดอร์บน Disk และเตรียม Bin `epX` ใน Premiere Pro:**
-   ```powershell
-   node AutoLab/mcp/autolab-mcp.js --call pr_prepare_ep --arg binName="<ชื่อ Bin>" --arg epName="<epX>" --arg createDiskDir="<พาธปลายทางบน Disk>" --arg removeOldHighlights=true
+
+3. **เตรียมโฟลเดอร์บน Disk, สร้าง Bin `epX`, และย้ายฟุตเทจเตรียมตัดในคำสั่งเดียว:**
+   ```json
+   // Tool: autolab_pr_prepare_ep
+   {
+     "binName": "<ชื่อ Bin>",
+     "epName": "<epX>",
+     "createDiskDir": "<พาธปลายทางบน Disk>",
+     "removeOldHighlights": true
+   }
    ```
-4. **ตั้งค่าและรัน Auto Highlights:**
-   ```powershell
-   node AutoLab/mcp/autolab-mcp.js --call ah_configure --arg preset=movie
-   node AutoLab/mcp/autolab-mcp.js --call ah_queue_add --arg binPath="<พาธ Bin>" --arg clearFirst=true
-   node AutoLab/mcp/autolab-mcp.js --call ah_run --arg wait=true
+
+4. **ตั้งค่าและรัน Auto Highlights (100 ช็อตเต็มระบบ):**
+   ```json
+   // 1. ตั้งค่า (Tool: autolab_ah_configure)
+   { "preset": "movie", "targetCount": 100 }
+
+   // 2. ดึงฟุตเทจเข้าคิว (Tool: autolab_ah_queue_add)
+   { "binPath": "<พาธ Bin>", "clearFirst": true }
+
+   // 3. เริ่มตัด (Tool: autolab_ah_run)
+   { "wait": false }
    ```
-5. **รัน Auto Frame Pipeline รวดเดียวจบ (`af_pipeline` — รองรับทั้งมี Master Profile และวัดกรอบใหม่ `autoFit=true`):**
-   ```powershell
-   # กรณีเรื่องใหม่ไม่มีพรีเซ็ต (ส่งชื่อเต็มของ frame และ promo ตามตาราง Routing Matrix + autoFit=true):
-   node AutoLab/mcp/autolab-mcp.js --call af_pipeline --arg binPath="<พาธ HIGHLIGHTS_>" --arg frame="<ชื่อกรอบเต็ม>" --arg promo="<ชื่อป้ายโปรโมทเต็มตามตารางข้อ 3.1>" --arg autoFit=true --arg promoStart=5 --arg promoInterval=0 --arg startQueue=true
+
+5. **รัน Auto Frame Pipeline รวดเดียวจบ (`af_pipeline`):**
+   ```json
+   // Tool: autolab_af_pipeline
+   {
+     "binPath": "<พาธ HIGHLIGHTS_>",
+     "frame": "<ชื่อกรอบเต็ม>",
+     "promo": "<ชื่อป้ายโปรโมทเต็มตามตารางข้อ 3.1>",
+     "autoFit": true,
+     "promoStart": 5,
+     "promoInterval": 0,
+     "startQueue": true
+   }
    ```
+
 6. **ส่งออกทุก Sequence เข้าคิว Adobe Media Encoder (`pr_export_ame`):**
-   ```powershell
-   node AutoLab/mcp/autolab-mcp.js --call pr_export_ame --arg highlightsBinPath="<พาธ HIGHLIGHTS_>" --arg outputDir="<พาธปลายทางบน Disk>"
+   ```json
+   // Tool: autolab_pr_export_ame
+   {
+     "highlightsBinPath": "<พาธ HIGHLIGHTS_>",
+     "outputDir": "<พาธปลายทางบน Disk>"
+   }
    ```
 ````
 
