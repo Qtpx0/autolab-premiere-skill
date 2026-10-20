@@ -153,13 +153,17 @@ var roBin = findBin(root, "รอ");
 
 ### Step 3: โหมดความเร็วสูงสุดคำสั่งเดียว (`autolab_af_pipeline`) vs โหมดจัดกรอบใหม่ (`🎯 จัดกรอบ`)
 
-#### ⚡ กรณีที่ A: เรื่องนั้นมี `Master Profile` (หรือทราบค่ากรอบและสเกลอยู่แล้ว) — **รัน `autolab_af_pipeline` คำสั่งเดียวจบ!**
+#### ⚡ กรณีที่ A: เรื่องนั้นมี `Master Profile` (หรือมีพรีเซ็ตที่เซ็ตไว้) — **ส่ง `profileName` คู่กับ `autoFit: true` ใน `autolab_af_pipeline` คำสั่งเดียวจบ!**
+- ระบบจะผูกคู่ Frame + Promo จาก Master Profile ที่สร้างไว้ให้ทันที
+- และรัน **Auto Scale (`autoFit: true`) เป็นค่ามาตรฐานเริ่มต้นเสมอ** เพื่อวัดช่องใสของกรอบและสแกนขอบดำวิดีโอหน้างานจริง ป้องกันไม่ให้ภาพล้นหรือติดขอบดำ
+- *(ข้อยกเว้น: หากต้องการล็อกขนาดตาม Master Profile ตายตัวโดยไม่ให้ระบบคำนวณใหม่ ให้ระบุ `"autoFit": false`)*
 ```json
 // Tool: autolab_af_pipeline
-// ดึงเฉพาะ Sequences + ผูกพรีเซ็ต + ตั้ง Topbar (5-0) + รัน AI Auto-Name (Variety) + ย่อชื่อเกิน 17 ตัวอักษร + กด START ในคำสั่งเดียว
+// ดึงเฉพาะ Sequences + ผูกพรีเซ็ต (Frame + Promo) + คำนวณ Auto Scale มิลลิเมตรกันขอบดำ + ตั้ง Topbar (5-0) + รัน AI Auto-Name (Variety) + ย่อชื่อเกิน 17 ตัวอักษร + กด START ในคำสั่งเดียว
 {
   "binPath": "หมวดหมู่/ชื่อเรื่อง/ep1/HIGHLIGHTS_ep1",
   "profileName": "ชื่อชุดพรีเซ็ตหลัก",
+  "autoFit": true,
   "promoStart": 5,
   "promoInterval": 0,
   "startQueue": true
