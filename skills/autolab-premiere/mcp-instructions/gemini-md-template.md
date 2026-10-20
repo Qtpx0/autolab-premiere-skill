@@ -1,3 +1,8 @@
+# GEMINI.md — Workspace Rule Template for AutoLab + Premiere Pro
+# Copy this ENTIRE content into a file called `GEMINI.md` at the ROOT of your production workspace.
+# e.g. G:\Dev\my-premiere-workspace\GEMINI.md
+# This file is always-on and loaded every session automatically.
+
 ## Premiere Pro + AutoLab Tool Routing (MANDATORY)
 
 เมื่อผู้ใช้สั่งงานเกี่ยวกับ Premiere Pro (เช็คสต็อก, ดู bin, ตัดไฮไลท์, ใส่กรอบ, export):

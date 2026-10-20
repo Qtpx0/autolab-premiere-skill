@@ -293,7 +293,7 @@ lowStockThreshold: 15
 2. แจ้งตำแหน่งไฟล์สกิลที่สร้างเสร็จแล้วให้ผู้ใช้ทราบ
 3. เสนอทดสอบรันเช็คสต็อกบน Disk (`--check-disk`) หรือสำรวจโปรเจกต์จริง 1 เรื่องเพื่อยืนยันว่าพาธและชื่อพรีเซ็ตทั้งหมดทำงานได้ตรง 100%
 4. **ติดตั้ง MCP Instructions + Workspace Rule (ป้องกัน AI ใช้ tool ผิด — ขั้นตอนนี้บังคับ!):**
-   - **สร้าง Workspace Rule:** คัดลอกเนื้อหาจาก [`mcp-instructions/workspace-rule-template.md`](../mcp-instructions/workspace-rule-template.md) ไปสร้างเป็นไฟล์ `<workspace>/.gemini/rules/tool-routing.md` (สร้างโฟลเดอร์ `.gemini/rules/` ถ้ายังไม่มี) — ไฟล์นี้บังคับให้ AI อ่าน SKILL.md ก่อนทำงานและห้ามใช้ premiere-pro MCP tools ตรงเด็ดขาด
+   - **สร้าง Workspace Rule:** คัดลอกเนื้อหาจาก [`mcp-instructions/gemini-md-template.md`](../mcp-instructions/gemini-md-template.md) ไปสร้างเป็นไฟล์ **`GEMINI.md`** ที่ **root ของ workspace** ผู้ใช้ (ห้ามวางใน `.gemini/rules/` เด็ดขาด — ไม่ใช่ discovery path!) — ไฟล์ `GEMINI.md` จะ always-on ทุกเซสชันอัตโนมัติ
    - **คัดลอก MCP Instructions:** คัดลอก [`mcp-instructions/autolab-instructions.md`](../mcp-instructions/autolab-instructions.md) ไปวางที่ `<antigravity MCP dir>/autolab/instructions.md` ของเครื่องผู้ใช้
    - เพิ่มข้อความ routing patch จาก [`mcp-instructions/premiere-pro-patch.md`](../mcp-instructions/premiere-pro-patch.md) เข้าไปที่ต้นของ `<antigravity MCP dir>/premiere-pro/instructions.md`
    - *(ทั้ง 3 ไฟล์ทำงานร่วมกันป้องกัน AI หลอนไปใช้ premiere-pro MCP 432 tools ตรง — workspace rule เป็นตัวหลักที่ชัวร์ 100%, MCP instructions เป็นตัวเสริม)*
