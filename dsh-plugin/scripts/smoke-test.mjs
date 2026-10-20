@@ -40,6 +40,7 @@ ok(
   Boolean(call('pwsh', { command: 'node -e "const x=require(\'./AutoLab/js/core/mcp_bridge.js\')"' })),
 );
 ok('allows the documented CLI fallback', call('pwsh', { command: 'node "C:\\Program Files (x86)\\Common Files\\Adobe\\CEP\\extensions\\AutoLab\\mcp\\autolab-mcp.js" --call pr_inspect' }) === undefined);
+ok('allows autolab_call_jsx for state repair', call('mcp__autolab__call_jsx', { script: 'app.project.rootItem' }) === undefined);
 ok('allows unrelated shell work', call('pwsh', { command: 'node -e "console.log(1+1)"' }) === undefined);
 
 // ── rule 3: engine must be Gemini Direct Audio ────────────────────────────────

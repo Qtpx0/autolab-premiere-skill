@@ -1,6 +1,6 @@
 ---
 name: autolab-premiere
-description: "Official control skill for AutoLab CEP (34 tools) + Adobe Premiere Pro MCP (432 tools). Use for: disk/Bin stock check (pr_inspect), Auto Highlights, Auto Frame Queue, .mogrt Frame + Promo banner per Bin, จัดกรอบ AI Vision, AI Auto-Name (Variety), Name Refiner ย่อชื่อพาดหัว <=17 ตัวอักษร, af_pipeline, export เข้า Adobe Media Encoder (AME), และสร้างสกิลเวิร์กโฟลว์ประจำตัว"
+description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension (34 AutoLab UI, pipeline & production tools) and Adobe Premiere Pro MCP (432 native timeline/project tools · v1.24.1). Use whenever the user asks to inspect Premiere Pro bins/movies, run Auto Highlights, load clips into Auto Frame Queue, assign .mogrt Frames & Promo banners per bin, tune frame scale/position ('🎯 จัดกรอบ') with AI Vision PNG verification, run AI Auto-Name (Variety mode), run Name Refiner ('✂️ ย่อชื่อที่ยาว' + '✅ Apply All'), run the single-call high-speed af_pipeline, batch-export sequences to Adobe Media Encoder, or build a personalized production workflow skill."
 ---
 
 # AutoLab & Adobe Premiere Pro Autonomous Control Skill (`autolab-premiere`)
@@ -13,9 +13,44 @@ description: "Official control skill for AutoLab CEP (34 tools) + Adobe Premiere
 
 > [!CAUTION]
 > **🛡️ IRONCLAD OPERATOR & AUTONOMOUS CHAINING PROTOCOL (ZERO CODE READING / ZERO HESITATION):**
-> 1. **Operator Only:** When executing Premiere operations (Auto Frame, Highlights, Queues), the Agent is strictly an **OPERATOR**. It is STRICTLY FORBIDDEN to read `AutoLab/js/**` source files or inspect implementation code before/after calling tools. Never write manual regex or ad-hoc DOM/JSX inspection via `call_js`/`call_jsx`.
+> 1. **Operator Only:** When executing Premiere operations (Auto Frame, Highlights, Queues), the Agent is strictly an **OPERATOR**. It is STRICTLY FORBIDDEN to read `AutoLab/js/**` source files or inspect implementation code before/after calling tools. Never write manual regex or inspect internal AutoLab CEP extension files. However, using `autolab_call_jsx` for Premiere Pro project DOM mutations/state repair (such as moving clips with `clip.moveBin()`) is 100% encouraged when high-level tools do not cover the task.
 > 2. **Multi-Bin Native Queueing:** Both **Auto Highlights** (`autolab_ah_queue_add` with `binNames: [...]`) and **Auto Frame** (`autolab_af_pipeline` with `bins: [...]`), as well as `autolab_pr_inspect({ queries: [...] })`, `autolab_pr_prepare_ep({ items: [...] })`, and `autolab_pr_export_ame({ items: [...] })`, natively support processing **multiple shows/bins at once in a single call**. NEVER ask "จะเริ่มเรื่องไหนก่อน" or process shows one-by-one when the user asks to process multiple shows!
 > 3. **End-to-End Autonomous Execution:** When the user says *"ถ้ามีก็ตัดให้เลย export ให้ด้วย"*, execute the modular steps continuously from start to finish (`pr_inspect` ➔ `pr_prepare_ep` ➔ `ah_configure` + `ah_queue_add` + `ah_run` ➔ `af_pipeline` ➔ `pr_export_ame`) **without stopping to ask permission between steps**.
+
+---
+
+## 🔥 0. ท่าฉุกเฉินและงานยืดหยุ่น (ห้ามบอกว่าทำไม่ได้เด็ดขาด — State Repair via `autolab_call_jsx`)
+
+ปุ่มสำเร็จรูป (`af_pipeline`, `pr_prepare_ep`) คือทางลัดของ Standard Flow เท่านั้น **ไม่ใช่ขอบเขตความสามารถของระบบ**
+
+หากเจองานจัดการเฉพาะจุด (เช่น ย้ายคลิปกลับ, จัดการ Bin แปลกๆ, แก้ไข Sequence เฉพาะหน้า):
+
+- ❌ **ห้ามอ้างว่า "ไม่มีปุ่ม / ไม่มี API / design gap"**
+- ❌ **ห้ามข้ามไปใช้ `premiere-pro-mcp`** (ที่มีปัญหา Guard และขยะล้น)
+- ✅ **ต้องใช้ `autolab_call_jsx` เขียน ExtendScript ตรงสั่ง Premiere Pro ทันที** — `clip.moveBin()`, `bin.children`, ฯลฯ Adobe ทำได้ทุกอย่าง
+
+**ตัวอย่างท่าฉุกเฉินที่ใช้บ่อย:**
+
+```javascript
+// ย้ายคลิปกลับ Bin (ไม่ต้อง nodeId, ไม่ผ่าน Guard)
+var root = app.project.rootItem;
+function findBin(node, name) {
+  for (var i = 0; i < node.children.numItems; i++) {
+    var c = node.children[i];
+    if (c.type === ProjectItemType.BIN && c.name === name) return c;
+    var f = findBin(c, name); if (f) return f;
+  }
+  return null;
+}
+var roBin = findBin(root, "รอ");
+// เดินหาคลิปแล้วสั่ง moveBin
+// clip.moveBin(roBin);
+```
+
+**กฎกำกับ:**
+1. `autolab_call_jsx` **ไม่นับเป็น**การ "อ่านโค้ด implementation" ตาม CAUTION ข้อ 1 — ใช้ซ่อมและจัดการ project state ได้เสมอ
+2. ยิง JSX แล้ว error แปลก → **หยุดถามผู้ใช้ 1 บรรทัด** ห้ามเดาซ้ำ
+3. งานที่แตะ project state (ย้าย/ลบ/เปลี่ยน Bin) ถ้าไม่มั่นใจ → **ถามก่อน 1 บรรทัด**
 
 ---
 
@@ -33,16 +68,14 @@ description: "Official control skill for AutoLab CEP (34 tools) + Adobe Premiere
    - เรียก `autolab_af_run_name_refiner` (หรือเปิด `autoRefine: true` / ใช้ `autolab_af_pipeline`) เพื่อคัดกรองชื่อพาดหัวที่ยาวเกิน **17 ตัวอักษรไทย (`FILTER_CAP = 17`)** มาสั่งย่อให้กระชับไม่ล้นกรอบ `.mogrt`
 6. **ใช้คำสั่งรวบยอด `autolab_af_pipeline` ได้ทั้งกรณีมี `Master Profile` และไม่มี `Master Profile` (มีระบบ Auto-Fit วัดกรอบ+ตัดขอบดำในตัว):**
    - แทนที่จะแยกเรียกทีละคำสั่งให้เสียเวลารอ LLM 6–7 รอบ ให้ใช้ `autolab_af_pipeline` คำสั่งเดียว ซึ่งจะดึงคลิปเข้าคิว (พร้อมบล็อก Sub-bin `ไฟล์ต้นฉบับ`), ผูกพรีเซ็ต/กรอบ, **วัดช่องใส `.mogrt` + สแกนขอบดำวิดีโอ 3 ช่วงเวลา (`cropdetect`) คำนวณ `scale / posX / posY` ระดับพิกเซลให้อัตโนมัติ (เมื่อระบุ `frame` โดยไม่มี `profileName`/`scale` หรือตั้ง `autoFit: true`)**, ตั้งค่า Topbar `5 - 0`, รัน `✨ AI Auto-Name`, รัน `💬 Name Refiner` ย่อชื่อ และกด `START` ต่อเนื่องทันทีแบบ `0ms` Latency!
-7. **รายงานความคืบหน้าระหว่างทาง (Live Step-by-Step Reporting):**
-   - ในกระบวนการทำงานที่มีขั้นตอนยาวๆ (กู้ไฟล์ ➔ Auto Highlights ➔ Auto Frame ➔ Export) ให้ AI พิมพ์ข้อความสั้นๆ 1 บรรทัดบนหน้าแชทบอกผู้ใช้ก่อนเริ่มแต่ละขั้นตอนเสมอ เช่น `⏳ กำลังกู้ฟุตเทจออกจากไฟล์ต้นฉบับและล้างของเก่า...`, `⚡ กำลังรัน Auto Highlights (คัด 100 ช็อต)...`, `🎯 กำลังจัดกรอบและตั้งชื่อ (Auto Frame)...`, `🚀 กำลังส่งเข้าคิว Media Encoder...` ห้ามปล่อยให้หน้าจอเงียบหายไปเฉยๆ!
-8. **การวัดและจัดกรอบอัตโนมัติ (`autolab_af_tuner_auto_fit`) สำหรับเรื่องที่ไม่มีพรีเซ็ต — ห้ามเดาค่าสเกลเอง และไม่ต้อง Hardcode ค่าใดๆ:**
+7. **การวัดและจัดกรอบอัตโนมัติ (`autolab_af_tuner_auto_fit`) สำหรับเรื่องที่ไม่มีพรีเซ็ต — ห้ามเดาค่าสเกลเอง และไม่ต้อง Hardcode ค่าใดๆ:**
    - คลิปแต่ละเรื่องมีขนาดไฟล์และขอบดำบน/ล่างที่ฝังอยู่ในเนื้อวิดีโอ (Hardcoded Letterbox) ไม่เท่ากัน ต่อให้เป็น `1920x1080` เหมือนกันก็อาจมีขอบดำข้างในไม่เท่ากัน และกรอบ `.mogrt` แต่ละแบบมีช่องใสไม่เท่ากัน
    - ห้ามเดาตัวเลข `scale` / `posY` หรือใส่ `targetWindowWidth` ตายตัวเด็ดขาด ให้เรียก `autolab_af_tuner_auto_fit({ "binKey": "*" })` ระบบจะแกะ `thumb.png` ใน `.mogrt` วัดช่องใสจริง + สแกนพิกเซลวิดีโอ 3 ช่วงเวลา (`120s`, `360s`, `720s`) เพื่อเช็คว่ามีขอบดำหรือไม่ (`hasBlackBars: true/false`) แล้วคำนวณและบันทึก `scale`, `posX`, `posY` ลงคิวทันทีใน `~0.2–0.4 วินาที` (หากต้องการเรนเดอร์ภาพ `.png` ออกมาตรวจด้วยตา AI Vision ให้ส่ง `"preview": true`)
-9. **ห้ามส่งชื่อป้ายโปรโมทแบบย่อหรือกำกวมเข้า MCP เด็ดขาด (Exact Template Name & Shared-Machine Multi-Promo Routing):**
+8. **ห้ามส่งชื่อป้ายโปรโมทแบบย่อหรือกำกวมเข้า MCP เด็ดขาด (Exact Template Name & Shared-Machine Multi-Promo Routing):**
    - เครื่องของผู้ใช้/พนักงานมักมีป้ายโปรโมทหลายตัวในแบรนด์เดียวกัน (เช่น แยกตามหมวดงาน `Show_Promo_A`, `Movie_Promo_A` หรือแยกตามพนักงานหลายคนที่ใช้คอมเครื่องเดียวกัน เช่น `_Team1`, `_Team2`)
    - ระบบกลาง MCP จะ **ปฏิเสธคำค้นที่กำกวมทันที (`Ambiguous promo template`)** เพื่อป้องกันการใส่ป้ายโปรโมทผิดเพจ/ผิดคน
    - ดังนั้นเมื่อผู้ใช้พูดชื่อแบรนด์สั้นๆ **AI ต้องตรวจสอบตารางจับคู่โปรโมในสกิลประจำเครื่องของผู้ใช้ (หรือดูจาก `autolab_list_templates` + หมวดหมู่ Bin/โฟลเดอร์)** แล้วแปลงเป็น **ชื่อไฟล์เต็มเป๊ะ (เช่น `"Movie_Promo_Team1"` หรือ `"Movie_Promo_Team2"`)** ก่อนส่งเข้า `autolab_af_set_bin_template` หรือ `autolab_af_pipeline` เสมอ!
-10. **กฎเหล็กเอเจนต์ทำงานความเร็วสูงควบคู่การตรวจสอบคุณภาพ (High-Speed & Intelligent Quality Audit Protocol):**
+9. **กฎเหล็กเอเจนต์ทำงานความเร็วสูงควบคู่การตรวจสอบคุณภาพ (High-Speed & Intelligent Quality Audit Protocol):**
    - **เอเจนต์ไม่ใช่สคริปต์ตาบอด:** ห้ามยิงคำสั่งทิ้งขว้างโดยไม่ตรวจสอบผลลัพธ์ และห้ามมัวแต่นั่งงมอ่านโค้ดทีละบรรทัดจนช้าเป็นนาที
    - **การทำงานต้องแบ่งเป็น 2 เฟส จบใน 1–2 วินาที:**
      - **Phase 1: Ultra-Fast Execution (< 500ms):** สั่งงานผ่าน `autolab_af_pipeline` (หรือ Native Tools) แบบ One-shot คำสั่งเดียวจบ
@@ -206,7 +239,6 @@ description: "Official control skill for AutoLab CEP (34 tools) + Adobe Premiere
   "outputDir": "D:\\OutputClips\\ชื่อเรื่อง\\ep1"
 }
 ```
-*(ระบบคืนผลสรุปย่อแบบ Compact: `queuedCount`, `failedCount`, `sampleJobs` เพื่อความเร็วระดับ 0ms และไม่ล้นเข้า `output.txt`)*
 
 ---
 
