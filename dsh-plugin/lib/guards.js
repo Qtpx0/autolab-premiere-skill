@@ -33,7 +33,7 @@ const READ_TOOLS = new Set(['read', 'read_file', 'readfile']);
 export const DEFAULT_PROMPT = `
 ### AutoLab + Premiere Pro — Operator Contract (บังคับโดย guard):
 1. เช็คสต็อก / ส่อง Bin → ใช้ \`pr_inspect\` (\`autolab_pr_inspect\`) เท่านั้น; ห้าม \`list_project_items\`, \`get_bin_contents\`, \`search_project_items\`, \`get_full_project_overview\`
-2. ห้ามเขียนสคริปต์ shell สั่ง Premiere (\`node -e\`, สร้างไฟล์ \`.jsx\`) — ใช้ MCP tools เท่านั้น (หากไม่มีปุ่มสำเร็จรูปสำหรับงานยืดหยุ่น/ซ่อม State ให้ใช้ \`autolab_call_jsx\` ยิง ExtendScript สั่ง Premiere Pro DOM ตรงตามข้อ 0 ของ SKILL.md)
+2. จัดการ Bin ใน Premiere Pro (สร้าง/ลบ/ย้าย/ส่องผัง): ใช้ \`pr_create_bin\`, \`pr_delete_bin\`, \`pr_move_item\`, \`pr_bin_tree\` ห้ามเขียนสคริปต์ shell (\`node -e\`, สร้างไฟล์ \`.jsx\`) หากจำเป็นต้องซ่อม State นอกเหนือจากนี้ ให้ใช้ \`autolab_call_jsx\` ยิง ExtendScript สั่ง Premiere Pro DOM ตรงตามข้อ 0 ของ SKILL.md
 3. Auto Highlights: \`engineMode: "gemini_audio"\` เสมอ (ห้าม Whisper); งานหนัง/ซีรีส์ \`autoCutState: 0\` เสมอ
 4. เจอ \`needsRecovery: true\` (ฟุตเทจยังอยู่ใน \`ไฟล์ต้นฉบับ\`) → ห้าม export sequence เก่า ต้องรัน \`pr_prepare_ep\` (\`recoverFromOriginalFirst\`) แล้วตัดใหม่
 5. ห้ามอ่าน \`output.txt\` ที่ค้างจาก session เก่า

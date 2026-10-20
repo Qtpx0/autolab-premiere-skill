@@ -1,11 +1,11 @@
-# 02 — Complete AutoLab MCP Tool Reference Manual (34 Tools)
-# คู่มืออ้างอิงเครื่องมือ AutoLab MCP ครบทั้ง 34 คำสั่ง (พารามิเตอร์และตัวอย่างการใช้งานจริง)
+# 02 — Complete AutoLab MCP Tool Reference Manual (38 Tools · 41 with aliases)
+# คู่มืออ้างอิงเครื่องมือ AutoLab MCP ครบทั้ง 38 คำสั่ง (พารามิเตอร์และตัวอย่างการใช้งานจริง)
 
-เอกสารนี้คือคู่มืออ้างอิงฉบับสมบูรณ์ของเซิร์ฟเวอร์ **`autolab` MCP (`AutoLab/mcp/autolab-mcp.js`)** ทั้งหมด **34 คำสั่ง** แบ่งตาม 7 หมวดหมู่การทำงานของโปรแกรม AutoLab
+เอกสารนี้คือคู่มืออ้างอิงฉบับสมบูรณ์ของเซิร์ฟเวอร์ **`autolab` MCP (`AutoLab/mcp/autolab-mcp.js`)** ทั้งหมด **38 คำสั่งหลัก (41 คำสั่งรวม Aliases)** แบ่งตาม 7 หมวดหมู่การทำงานของโปรแกรม AutoLab
 
 ---
 
-## 📑 สารบัญหมวดหมู่ทั้ง 34 คำสั่ง (Category Index)
+## 📑 สารบัญหมวดหมู่ทั้ง 38 คำสั่ง (Category Index)
 
 1. [**หมวด A: ระบบ นำทาง และจัดการเทมเพลต `.mogrt` (System, Navigation & Templates — 6 Tools)**](#cat-a)
    - `autolab_get_status` · `autolab_navigate` · `autolab_list_templates` · `autolab_sync_company_pack` · `autolab_manage_profiles` · `autolab_manage_transforms`
@@ -19,8 +19,9 @@
    - `autolab_af_configure_naming` · `autolab_af_run_autoname` · `autolab_af_run_name_refiner` · `autolab_af_set_clip_title`
 6. [**หมวด F: ตั้งค่า Topbar, คำสั่งรวบยอด `af_pipeline` และสั่งรันสร้างคลิปจริง `START` (Topbar, Fast Pipeline & Batch Execution — 5 Tools)**](#cat-f)
    - `autolab_af_configure_topbar` · `autolab_af_pipeline` · `autolab_af_start_queue` · `autolab_af_batch_status` · `autolab_af_cancel_queue`
-7. [**หมวด G: คำสั่งตรวจสอบ Bin / เตรียมตอน / ส่งออก Media Encoder และคำสั่งขั้นสูง (Production Helpers & Escape Hatches — 5 Tools)**](#cat-g)
-   - `autolab_pr_inspect` · `autolab_pr_prepare_ep` · `autolab_pr_export_ame` · `autolab_call_js` · `autolab_call_jsx`
+7. [**หมวด G: คำสั่งจัดการ Bin / ตรวจสอบ / เตรียมตอน / ส่งออก Media Encoder และคำสั่งขั้นสูง (Production Helpers, Bin Management & Escape Hatches — 9 Tools + 3 Aliases)**](#cat-g)
+   - `autolab_pr_inspect` · `autolab_pr_prepare_ep` · `autolab_pr_create_bin` · `autolab_pr_delete_bin` · `autolab_pr_move_item` · `autolab_pr_bin_tree` · `autolab_pr_export_ame` · `autolab_call_js` · `autolab_call_jsx`
+   - *(Aliases: `autolab_pr_bin_move`, `autolab_pr_bin_clean`, `autolab_pr_find_bin`)*
 
 ---
 
@@ -493,7 +494,7 @@
 ## 7. หมวด G: คำสั่งตรวจสอบ Bin / เตรียมตอน / ส่งออก Media Encoder และคำสั่งขั้นสูง (5 Tools)
 
 ### 7.1 `autolab_pr_inspect`
-- **หน้าที่:** ตรวจสอบโครงสร้างโฟลเดอร์/Bin ใน Premiere Pro แบบเจาะจง (รองรับทั้งเรื่องเดียวหรือหลายเรื่องพร้อมกันผ่าน `queries: [...]`) หรือสแกนทั้งโปรเจกต์: ดูจำนวนคลิป, ดู Sub-bin ทั้งหมด, ดึงรายการไฟล์ฟุตเทจที่ยังไม่ได้ตัด (`readyToCut`) พร้อมตรวจจับเลขตอนอัตโนมัติ (`detectedEp: "ep3"`, `"ep4"`), และตรวจจับไฟล์ฟุตเทจที่อยู่ใน `HIGHLIGHTS_/ไฟล์ต้นฉบับ` จากรอบก่อน พร้อมติดป้าย **`needsRecovery: true`** ให้อัตโนมัติ เพื่อให้ระบบรู้ว่าต้องกู้ไฟล์ออกมาตัดใหม่ ไม่หลอนรายงานว่าคลิปรอตัดเป็น 0 อีกต่อไป
+- **หน้าที่:** ตรวจสอบโครงสร้างโฟลเดอร์/Bin ใน Premiere Pro แบบเจาะจง (รองรับทั้งเรื่องเดียวหรือหลายเรื่องพร้อมกันผ่าน `queries: [...]`) หรือสแกนทั้งโปรเจกต์: ดูจำนวนคลิป, ดู Sub-bin ทั้งหมด, และดึงรายการไฟล์ฟุตเทจที่ยังไม่ได้ตัด (`readyToCut`) พร้อมตรวจจับเลขตอนอัตโนมัติ (`detectedEp: "ep3"`, `"ep4"`) ช่วยให้ AI รู้ได้ทันที 100% ว่าต้องตัดต่อตอนไหนโดยไม่ต้องเดา
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
   | :--- | :--- | :---: | :--- |
@@ -541,7 +542,7 @@
   | `renameDiskTo` | `string` | optional | พาธโฟลเดอร์ใหม่บน Disk หลังเปลี่ยนชื่อ |
   | `createDiskDir` | `string` | optional | พาธโฟลเดอร์ปลายทางบน Disk ที่ต้องการสร้างไว้รอรับไฟล์ Export |
   | `removeOldHighlights` | `boolean` | optional | ลบ Bin `HIGHLIGHTS_` เก่าในโฟลเดอร์เป้าหมายก่อนเริ่มตัด (`default: true`) |
-  | `recoverFromOriginalFirst` | `boolean` | optional | ดึงไฟล์ฟุตเทจตัวเต็มจาก `HIGHLIGHTS_/ไฟล์ต้นฉบับ` กลับออกมาก่อนลบ `HIGHLIGHTS_` (`default: true` ปลอดภัยต่อฟุตเทจ 100%) |
+  | `recoverFromOriginalFirst` | `boolean` | optional | ดึงไฟล์ฟุตเทจตัวเต็มจาก `HIGHLIGHTS_/ไฟล์ต้นฉบับ` กลับออกมาก่อนลบ `HIGHLIGHTS_` (`default: false`) |
 
 ### 7.3 `autolab_pr_export_ame`
 - **หน้าที่:** ส่งออกทุก Sequence ใน Bin `HIGHLIGHTS_` เข้าคิว **Adobe Media Encoder** แบบยกชุดในคำสั่งเดียว
@@ -552,7 +553,6 @@
   | `outputDir` | `string` | **required** | โฟลเดอร์ปลายทางบน Disk สำหรับบันทึกไฟล์ `.mp4` ที่เรนเดอร์เสร็จ |
   | `presetPath` | `string` | optional | พาธเต็มของไฟล์ `.epr` preset (หากไม่ระบุจะค้นหา Preset มาตรฐานให้อัตโนมัติ) |
   | `presetName` | `string` | optional | ชื่อไฟล์ `.epr` preset ที่ต้องการค้นหาในเครื่อง |
-  | `verbose` | `boolean` | optional | ส่งรายการ `jobs` ทั้งหมดกลับมา (ค่าตั้งต้น `false` จะส่งเฉพาะสรุปและ `sampleJobs` 3 ตัวอย่าง เพื่อไม่ให้ JSON ล้นเข้า `output.txt`) |
 
 ### 7.4 `autolab_call_js`
 - **หน้าที่:** รันโค้ด JavaScript ใดๆ ก็ได้ภายในบริบทหน้าต่าง AutoLab CEP Panel โดยตรง (เข้าถึง `window.FrameQueueManager`, `window.AiManager`, `window.NameRefinerChat`, `window.BatchManager`, `window.AutoHighlightsEngine`, และ DOM ทั้งหมดได้ 100%)
@@ -570,4 +570,95 @@
   | `script` | `string` | **required** | โค้ด ExtendScript ที่ต้องการรันและคืนค่ากลับมา |
   | `jsxFile` | `string` | optional | ชื่อไฟล์ใน `AutoLab/jsx/` ที่ต้องการโหลดก่อนรัน เช่น `"auto_frame.jsx"` หรือ `"host.jsx"` |
   | `timeoutMs` | `number` | optional | เวลารอสูงสุดมิลลิวินาที (`default: 60000`) |
+
+### 7.6 `autolab_pr_create_bin`
+- **หน้าที่:** สร้าง Bin ใหม่แบบ Recursive `mkdir -p` (รองรับพาธลึก เช่น `"ก.หนัง/Show/ep1"` หรือ `parentBin` + `name`) ไม่เกิด Error หาก Bin มีอยู่แล้ว
+- **พารามิเตอร์:**
+  | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
+  | :--- | :--- | :---: | :--- |
+  | `binPath` | `string` | optional | พาธเต็มหรือสัมพัทธ์ของ Bin ที่ต้องการสร้าง (เช่น `"ก.หนัง/เรื่อง/ep1"`) |
+  | `parentBin` | `string` | optional | พาธของ Bin แม่ (ใช้คู่กับ `name`) |
+  | `name` | `string` | optional | ชื่อ Bin ที่ต้องการสร้าง |
+- **ตัวอย่างการเรียกใช้:**
+  - **Native MCP:**
+    ```json
+    { "binPath": "ก.หนัง/<ชื่อเรื่อง>/ep1" }
+    ```
+  - **Universal CLI:**
+    ```powershell
+    node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_create_bin --arg binPath="ก.หนัง/<ชื่อเรื่อง>/ep1"
+    ```
+
+### 7.7 `autolab_pr_delete_bin` *(นามแฝง: `autolab_pr_bin_clean`)*
+- **หน้าที่:** ลบ Bin, คลิป หรือ Sequence ใน Premiere Pro แบบ High-Speed Batch Sweep (<150ms) รูดลงถังขยะใบเดียว ไม่สะดุด และรองรับการกวาดล้างตามเงื่อนไข (Wildcard Pattern / Sequence Sweep)
+- **พารามิเตอร์:**
+  | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
+  | :--- | :--- | :---: | :--- |
+  | `binPath` | `string` | optional | พาธหรือชื่อของ Bin หรือไอเทมที่ต้องการลบ |
+  | `nodeId` | `string` | optional | NodeId เฉพาะเจาะจงของไอเทมที่ต้องการลบ |
+  | `pattern` | `string` | optional | Wildcard หรือ Glob pattern สำหรับกวาดล้างไอเทมใน Bin เช่น `"S*"`, `"HIGHLIGHTS_*"` |
+  | `cleanSequences` | `boolean` | optional | กวาดล้าง Sequence ทั้งหมดใน Bin เป้าหมายทิ้งทันที โดยปลอดภัยไม่แตะต้องฟุตเทจ |
+  | `cleanHighlights` | `boolean` | optional | กวาดล้างโฟลเดอร์ `HIGHLIGHTS_` ทั้งหมดใน Bin เป้าหมายทิ้งทันที |
+  | `force` | `boolean` | optional | ลบ Bin พร้อมของข้างในทั้งหมดแม้จะไม่ใช่โฟลเดอร์ว่าง (`default: true`) |
+  | `onlyEmpty` | `boolean` | optional | ลบเฉพาะเมื่อ Bin ว่างเปล่า (`default: false`) |
+  | `items` | `array` | optional | ส่งลบหลายรายการพร้อมกันใน 1 คำสั่ง: `[{ binPath, nodeId, pattern, force }]` |
+- **ตัวอย่างการเรียกใช้:**
+  - **Native MCP:**
+    ```json
+    // กวาด Sequence ไฮไลท์ S* ทั้งหมดทิ้ง:
+    { "binPath": "ก.หนัง/<ชื่อเรื่อง>", "pattern": "S*" }
+
+    // ลบโฟลเดอร์ Bin พร้อมของข้างใน:
+    { "binPath": "ก.หนัง/<ชื่อเรื่อง>/HIGHLIGHTS_<ชื่อเรื่อง>", "force": true }
+    ```
+  - **Universal CLI:**
+    ```powershell
+    node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_delete_bin --arg binPath="ก.หนัง/<ชื่อเรื่อง>" --arg pattern="S*"
+    node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_delete_bin --arg binPath="ก.หนัง/<ชื่อเรื่อง>/HIGHLIGHTS_<ชื่อเรื่อง>" --arg force=true
+    ```
+
+### 7.8 `autolab_pr_move_item` *(นามแฝง: `autolab_pr_bin_move`)*
+- **หน้าที่:** ย้ายคลิป, Sequence หรือ Sub-bin ไปยัง Bin ปลายทาง มาพร้อม `autoCreateTarget: true` (สร้าง Bin ปลายทางอัตโนมัติหากยังไม่มี)
+- **พารามิเตอร์:**
+  | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
+  | :--- | :--- | :---: | :--- |
+  | `from` | `string` | optional | ชื่อคลิป, Sub-bin หรือคำค้นต้นทาง |
+  | `to` | `string` | **required** | พาธหรือชื่อ Bin ปลายทาง |
+  | `nodeId` | `string` | optional | NodeId เจาะจงของไอเทมต้นทาง |
+  | `fromBin` | `string` | optional | พาธ Bin ต้นทางเพื่อจำกัดวงค้นหา |
+  | `autoCreateTarget` | `boolean` | optional | สร้าง Bin ปลายทางอัตโนมัติหากยังไม่มี (`default: true`) |
+  | `items` | `array` | optional | ย้ายหลายไอเทมพร้อมกัน: `[{ from, to, fromBin, autoCreateTarget }]` |
+- **ตัวอย่างการเรียกใช้:**
+  - **Native MCP:**
+    ```json
+    {
+      "from": "<ชื่อไฟล์คลิป>.mp4",
+      "to": "ก.หนัง/<ชื่อเรื่อง>/ep1",
+      "autoCreateTarget": true
+    }
+    ```
+  - **Universal CLI:**
+    ```powershell
+    node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_move_item --arg from="<ชื่อไฟล์คลิป>.mp4" --arg to="ก.หนัง/<ชื่อเรื่อง>/ep1"
+    ```
+
+### 7.9 `autolab_pr_bin_tree` *(นามแฝง: `autolab_pr_find_bin`)*
+- **หน้าที่:** ส่องดูโครงสร้างผัง Bin และคลิปแบบ Bounded Tree พร้อม `nodeId`, `kind` (`BIN`, `CLIP`, `SEQUENCE`) และ `childCount` ป้องกัน Context Explosion 100%
+- **พารามิเตอร์:**
+  | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
+  | :--- | :--- | :---: | :--- |
+  | `binPath` | `string` | optional | พาธหรือชื่อ Bin ที่ต้องการส่อง (หากไม่ระบุจะส่องจาก Root โปรเจกต์) |
+  | `query` | `string` | optional | คำค้นหาชื่อหรือพาธ Bin (นามแฝงของ `binPath`) |
+  | `maxDepth` | `number` | optional | ความลึกสูงสุดในการส่อง (`default: 3`) |
+  | `includeClips` | `boolean` | optional | รวมคลิปและ Sequence ในผลลัพธ์ (`default: true`) |
+- **ตัวอย่างการเรียกใช้:**
+  - **Native MCP:**
+    ```json
+    { "binPath": "ก.หนัง/<ชื่อเรื่อง>", "includeClips": true, "maxDepth": 3 }
+    ```
+  - **Universal CLI:**
+    ```powershell
+    node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_bin_tree --arg binPath="ก.หนัง/<ชื่อเรื่อง>"
+    ```
+
 

@@ -1,15 +1,15 @@
 ---
 name: autolab-premiere
-description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension (34 AutoLab UI, pipeline & production tools) and Adobe Premiere Pro MCP (432 native timeline/project tools · v1.24.1). Use whenever the user asks to inspect Premiere Pro bins/movies, run Auto Highlights, load clips into Auto Frame Queue, assign .mogrt Frames & Promo banners per bin, tune frame scale/position ('🎯 จัดกรอบ') with AI Vision PNG verification, run AI Auto-Name (Variety mode), run Name Refiner ('✂️ ย่อชื่อที่ยาว' + '✅ Apply All'), run the single-call high-speed af_pipeline, batch-export sequences to Adobe Media Encoder, or build a personalized production workflow skill."
+description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension (38 AutoLab UI, pipeline & production tools · 41 with aliases) and Adobe Premiere Pro MCP (434 native timeline/project tools · v1.24.1). Use whenever the user asks to inspect Premiere Pro bins/movies, run Auto Highlights, load clips into Auto Frame Queue, assign .mogrt Frames & Promo banners per bin, tune frame scale/position ('🎯 จัดกรอบ') with AI Vision PNG verification, run AI Auto-Name (Variety mode), run Name Refiner ('✂️ ย่อชื่อที่ยาว' + '✅ Apply All'), run the single-call high-speed af_pipeline, batch-export sequences to Adobe Media Encoder, manage Premiere Pro bins/items, or build a personalized production workflow skill."
 ---
 
 # AutoLab & Adobe Premiere Pro Autonomous Control Skill (`autolab-premiere`)
-# คู่มือมาตรฐานการควบคุม AutoLab (34 Tools) และ Adobe Premiere Pro (432 Tools) แบบไร้คนคุม 100%
+# คู่มือมาตรฐานการควบคุม AutoLab (38 Tools · 41 Aliases) และ Adobe Premiere Pro (434 Tools) แบบไร้คนคุม 100%
 
 สกิลนี้เป็นคู่มือปฏิบัติการหลักสำหรับเอเจนต์ AI ทุกค่าย (Claude, Cursor, Codex, Antigravity, Windsurf, DeepSeek Harness, OpenClaw) ในการควบคุม **AutoLab CEP Extension** ร่วมกับ **Adobe Premiere Pro** ผ่านสะพานเชื่อมคู่ขนานในเครื่อง (`AutoLab/js/core/mcp_bridge.js` ที่พอร์ต `17890` และ `%TEMP%\premiere-mcp-bridge`):
 
-1. **`autolab` MCP (`34 Tools`)** — ควบคุมทุกหน้าจอ ทุกปุ่ม และทุกคิวงานของโปรแกรม AutoLab โดยตรงด้วยความเร็ว `1–7ms` (`Auto Highlights`, `Auto Frame Queue`, คำสั่งรวบยอดความเร็วสูง `af_pipeline`, `🎯 จัดกรอบ Live Frame Tuner`, `✨ AI Auto-Name`, `💬 Name Refiner ✂️ ย่อชื่อที่ยาว`, `START Batch`, ตรวจสอบ Bin & ตรวจจับเลขตอน `pr_inspect`, เตรียมโฟลเดอร์ `pr_prepare_ep`, และส่งคิว `pr_export_ame`)
-2. **`premiere-pro` MCP (`432 Tools · v1.24.1`)** — ควบคุม Adobe Premiere Pro เชิงลึก (สำรวจโปรเจกต์/Bin, จัดการ Sequence/Track, ตัดต่อคลิป, ปรับขนาด/ตำแหน่ง, ใส่เอฟเฟกต์/สี Lumetri, ปรับแต่งเสียง/คีย์เฟรม, มาร์กเกอร์/ซับไตเติล, แคปภาพหน้าจอ Program Monitor และส่งออกไฟล์ผ่าน Media Encoder)
+1. **`autolab` MCP (`38 Tools · 41 with aliases`)** — ควบคุมทุกหน้าจอ ทุกปุ่ม และทุกคิวงานของโปรแกรม AutoLab โดยตรงด้วยความเร็ว `1–7ms` (`Auto Highlights`, `Auto Frame Queue`, คำสั่งรวบยอดความเร็วสูง `af_pipeline`, `🎯 จัดกรอบ Live Frame Tuner`, `✨ AI Auto-Name`, `💬 Name Refiner ✂️ ย่อชื่อที่ยาว`, `START Batch`, ตรวจสอบ Bin & ตรวจจับเลขตอน `pr_inspect`, ส่องผัง Bin กะทัดรัด `pr_bin_tree`, สร้าง Bin แบบ `mkdir -p` `pr_create_bin`, ย้ายคลิปพร้อมสร้างโฟลเดอร์ปลายทาง `pr_move_item`, ลบ Bin & รูด Sequence ไฮไลท์ทิ้งยกชุด `pr_delete_bin`, เตรียมโฟลเดอร์ `pr_prepare_ep`, และส่งคิว `pr_export_ame`)
+2. **`premiere-pro` MCP (`434 Tools · v1.24.1`)** — ควบคุม Adobe Premiere Pro เชิงลึก (สำรวจโปรเจกต์/Bin, จัดการ Sequence/Track, ตัดต่อคลิป, ปรับขนาด/ตำแหน่ง, ใส่เอฟเฟกต์/สี Lumetri, ปรับแต่งเสียง/คีย์เฟรม, มาร์กเกอร์/ซับไตเติล, แคปภาพหน้าจอ Program Monitor และส่งออกไฟล์ผ่าน Media Encoder)
 
 > [!CAUTION]
 > **🛡️ IRONCLAD OPERATOR & AUTONOMOUS CHAINING PROTOCOL (ZERO CODE READING / ZERO HESITATION):**
@@ -88,15 +88,12 @@ var roBin = findBin(root, "รอ");
 10. **ระบบล้างรหัสฉากอัตโนมัติ (Zero Leaked S-Prefixes):**
    - **รหัสฉากต้องไม่หลุดไปหน้าจอ:** ชื่อดิบจาก Auto Highlights มี `S01_`, `S04_` ติดมาเสมอ ระบบ Core Engine จะทำการดักตัดคำนำหน้า `S01..S99` ทิ้งอัตโนมัติทันทีที่เข้าคิว
    - **ห้ามข้าม Auto-Name:** ในคำสั่ง `autolab_af_pipeline` จะล็อคให้รัน `✨ AI Auto-Name` พ่วง `✂️ Name Refiner` อยู่ในวงจรเสมอ เพื่อเปลี่ยนชื่อดิบให้กลายเป็นพาดหัวภาษาไทยที่น่าสนใจและยาวไม่เกิน 17 ตัวอักษรเสมอ 100%
-11. **การจับคู่โฟลเดอร์บน Disk และการสร้างโฟลเดอร์ใหม่ (Strict Prefix Matching & Zero Hijacking):**
-   - **รูปแบบโฟลเดอร์:** โครงสร้างโฟลเดอร์คือ `<ชื่อเรื่องหลัก>[ - - <ข้อความโน้ตหรือป้ายสถานะ>]` การจับคู่โฟลเดอร์บน Disk ต้องดู **ชื่อเรื่องหลักส่วนหน้า (Prefix ก่อนเครื่องหมาย `-` หรือ `- -`)** เท่านั้น ห้ามนำชื่อเรื่องที่จะตัดไปจับคู่กับข้อความ Note/Memo ด้านหลังเด็ดขาด (โฟลเดอร์ที่มี Note ต่อท้าย ยังคงเป็นของเรื่องหลักส่วนหน้า ห้ามแตะ ห้ามเคลม และห้าม Rename เด็ดขาด)
-   - **โฟลเดอร์ไม่มีก็สร้างเลย:** หากบน Disk ยังไม่มีโฟลเดอร์ที่ชื่อหลักขึ้นต้นด้วยชื่อเรื่องนั้นตรงๆ ➔ ถือเป็นเรื่องใหม่ที่ยังไม่มีโฟลเดอร์ ให้สร้างโฟลเดอร์ใหม่ชื่อคลีน (`<ชื่อเรื่อง>`) ทันที (หรือปล่อยให้ `pr_export_ame` สร้างให้อัตโนมัติ) แล้วลุยต่อจนจบ ห้ามหยุดถาม และห้ามแย่ง/Rename โฟลเดอร์เรื่องอื่นมาใช้เด็ดขาด! (การ Rename ป้ายสถานะ อนุญาตเฉพาะโฟลเดอร์ของเรื่องตัวเองที่มี `- - จะหมด` ต่อท้ายเท่านั้น)
 
 ---
 
-## 🗂️ 2. สารบัญเครื่องมือ AutoLab MCP ทั้ง 34 คำสั่ง (Complete 34-Tool Quick Map)
+## 🗂️ 2. สารบัญเครื่องมือ AutoLab MCP ทั้ง 38 คำสั่ง (Complete 38-Tool Quick Map · 41 with aliases)
 
-> 📖 ดูตารางพารามิเตอร์ทุกฟิลด์และตัวอย่าง JSON ครบทั้ง 34 คำสั่งได้ที่: [`references/02-autolab-30-tools-reference.md`](references/02-autolab-30-tools-reference.md)
+> 📖 ดูตารางพารามิเตอร์ทุกฟิลด์และตัวอย่าง JSON ครบทั้ง 38 คำสั่งได้ที่: [`references/02-autolab-30-tools-reference.md`](references/02-autolab-30-tools-reference.md)
 
 | หมวดหมู่ (Category) | ชื่อเครื่องมือ (Exact Tool Names) | หน้าที่หลัก (Primary Responsibility) |
 | :--- | :--- | :--- |
@@ -106,7 +103,7 @@ var roBin = findBin(root, "รอ");
 | **D. Live Frame Tuner `🎯 จัดกรอบ` (4)** | `autolab_af_tuner_start`<br>`autolab_af_tuner_auto_fit`<br>`autolab_af_tuner_adjust`<br>`autolab_af_tuner_apply` | สร้างซีเควนซ์ `_AutoLab_Preview_` ใน Premiere Pro, วัดขอบดำด้วย FFmpeg `cropdetect`, ปรับจูน `scale`/`posX`/`posY`, ส่งออกภาพ `.png` ให้ AI Vision ตรวจดู และบันทึกค่าเข้า Bin |
 | **E. AI Naming & Refiner `✂️ ย่อชื่อ` (4)** | `autolab_af_configure_naming`<br>`autolab_af_run_autoname`<br>`autolab_af_run_name_refiner`<br>`autolab_af_set_clip_title` | ตั้งโหมด `variety`, กด `✨ AI Auto-Name` ถอดเสียง+คิดชื่อคลิปไวรัล (รองรับ `autoRefine: true`), กด `💬 Name Refiner` ➔ `✂️ ย่อชื่อที่ยาว` (> 17 ตัวอักษร) ➔ `✅ Apply All`, และแก้ไขข้อความพาดหัว 1-2 บรรทัด |
 | **F. Topbar, Fast Pipeline & `START` (5)** | `autolab_af_configure_topbar`<br>`autolab_af_pipeline`<br>`autolab_af_start_queue`<br>`autolab_af_batch_status`<br>`autolab_af_cancel_queue` | ตั้งค่าความละเอียด `1080x1920`, เวลาป้ายโปรโมทมาตรฐาน (`promoStart: 5`, `promoInterval: 0`), คำสั่งรวบยอดความเร็วสูง `autolab_af_pipeline` (ครบจบใน 1 คำสั่ง), และกดปุ่ม `START` สร้างซีเควนซ์ |
-| **G. Production Helpers & Escape Hatches (5)** | `autolab_pr_inspect`<br>`autolab_pr_prepare_ep`<br>`autolab_pr_export_ame`<br>`autolab_call_js`<br>`autolab_call_jsx` | ส่องดูโครงสร้าง Bin & ดึงชื่อไฟล์ใน `รอ` พร้อมตรวจจับเลขตอนอัตโนมัติ (`pr_inspect`), เตรียมโฟลเดอร์ Disk + สร้าง Bin `epX` + ย้ายฟุตเทจจาก `รอ` (`pr_prepare_ep`), ส่งออกทุก Sequence เข้าคิว Adobe Media Encoder (`pr_export_ame`), และรัน JS / ExtendScript โดยตรง |
+| **G. Production Helpers, Bin Management & Escape Hatches (9 + 3 aliases)** | `autolab_pr_inspect`<br>`autolab_pr_prepare_ep`<br>`autolab_pr_create_bin`<br>`autolab_pr_delete_bin`<br>`autolab_pr_move_item`<br>`autolab_pr_bin_tree`<br>`autolab_pr_export_ame`<br>`autolab_call_js`<br>`autolab_call_jsx`<br>*(Aliases: `autolab_pr_bin_move`, `autolab_pr_bin_clean`, `autolab_pr_find_bin`)* | ส่องดูโครงสร้าง Bin & ดึงชื่อไฟล์ใน `รอ` พร้อมตรวจจับเลขตอนอัตโนมัติ (`pr_inspect`), ส่องผัง Bin & คลิปแบบ Bounded ไม่ล้น Context (`pr_bin_tree`), สร้าง Bin Recursive `mkdir -p` (`pr_create_bin`), ย้ายคลิป/Sequence พร้อมสร้าง Bin ปลายทางอัตโนมัติ (`pr_move_item`), ลบ Bin / กวาดรูด Sequence ไฮไลท์ทิ้งยกชุดด้วย Batch Sweep <150ms (`pr_delete_bin`), เตรียมโฟลเดอร์ Disk + สร้าง Bin `epX` + ย้ายฟุตเทจ (`pr_prepare_ep`), ส่งออกทุก Sequence เข้าคิว Adobe Media Encoder (`pr_export_ame`), และรัน JS / ExtendScript โดยตรง |
 
 ---
 
@@ -138,6 +135,64 @@ var roBin = findBin(root, "รอ");
      ]
    }
    ```
+
+### Step 1.5: บริหารจัดการและจัดระเบียบ Bin ใน Premiere Pro (Production Bin Management)
+
+ชุดคำสั่งสำหรับสร้าง, ย้าย, ลบ, และส่องดูผัง Bin & คลิปใน Premiere Pro โดยตรง (ไม่ต้องพึ่ง terminal script และไม่ต้องวนลูป):
+
+#### 1. ส่องดูผัง Bin & คลิปแบบ Bounded (`autolab_pr_bin_tree`):
+- **Native MCP:**
+  ```json
+  // Tool: autolab_pr_bin_tree
+  { "binPath": "ก.หนัง/<ชื่อเรื่อง>", "includeClips": true, "maxDepth": 3 }
+  ```
+- **Universal CLI:**
+  ```powershell
+  node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_bin_tree --arg binPath="ก.หนัง/<ชื่อเรื่อง>"
+  ```
+
+#### 2. สร้าง Bin ใหม่แบบ Recursive `mkdir -p` (`autolab_pr_create_bin`):
+- **Native MCP:**
+  ```json
+  // Tool: autolab_pr_create_bin
+  { "binPath": "ก.หนัง/<ชื่อเรื่อง>/ep1" }
+  ```
+- **Universal CLI:**
+  ```powershell
+  node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_create_bin --arg binPath="ก.หนัง/<ชื่อเรื่อง>/ep1"
+  ```
+
+#### 3. ย้ายคลิป/Sequence พร้อมสร้าง Bin ปลายทางอัตโนมัติ (`autolab_pr_move_item`):
+- **Native MCP:**
+  ```json
+  // Tool: autolab_pr_move_item
+  {
+    "from": "<ชื่อไฟล์คลิป>.mp4",
+    "to": "ก.หนัง/<ชื่อเรื่อง>/ep1",
+    "autoCreateTarget": true
+  }
+  ```
+- **Universal CLI:**
+  ```powershell
+  node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_move_item --arg from="<ชื่อไฟล์คลิป>.mp4" --arg to="ก.หนัง/<ชื่อเรื่อง>/ep1"
+  ```
+
+#### 4. ลบ Bin หรือกวาด Sequence ไฮไลท์ทิ้งยกชุดด้วย High-Speed Batch Sweep (`autolab_pr_delete_bin`):
+- รูดลงถังขยะใบเดียว ลบเสร็จใน `<150ms` (รองรับ wildcard `pattern: "S*"` และ `cleanSequences: true`):
+- **Native MCP:**
+  ```json
+  // Tool: autolab_pr_delete_bin
+  // ท่ากวาด Sequence S* ทั้งหมดใน Bin ทิ้งในคำสั่งเดียว:
+  { "binPath": "ก.หนัง/<ชื่อเรื่อง>", "pattern": "S*" }
+
+  // ท่าลบ Bin ทั้งโฟลเดอร์:
+  { "binPath": "ก.หนัง/<ชื่อเรื่อง>/HIGHLIGHTS_<ชื่อเรื่อง>", "force": true }
+  ```
+- **Universal CLI:**
+  ```powershell
+  node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_delete_bin --arg binPath="ก.หนัง/<ชื่อเรื่อง>" --arg pattern="S*"
+  node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_delete_bin --arg binPath="ก.หนัง/<ชื่อเรื่อง>/HIGHLIGHTS_<ชื่อเรื่อง>" --arg force=true
+  ```
 
 ### Step 2: ตัดไฮไลท์อัตโนมัติ (Auto Highlights) *(ข้ามไป Step 3 ได้หากมีคลิป/Sequence ใน Bin พร้อมแล้ว)*
 ```json
