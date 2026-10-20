@@ -1,6 +1,6 @@
 {
   "name": "dsh-autolab-premiere",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "DeepSeek Harness bundle for AutoLab CEP + Adobe Premiere Pro: wires the 34 AutoLab and 432 Premiere Pro MCP tools, turns the operator iron rules into hard guards, and contributes the official autolab-premiere skill.",
   "type": "module",
   "main": "./index.js",
