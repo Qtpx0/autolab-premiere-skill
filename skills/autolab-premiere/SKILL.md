@@ -11,6 +11,10 @@ description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension
 1. **`autolab` MCP (`34 Tools`)** — ควบคุมทุกหน้าจอ ทุกปุ่ม และทุกคิวงานของโปรแกรม AutoLab โดยตรงด้วยความเร็ว `1–7ms` (`Auto Highlights`, `Auto Frame Queue`, คำสั่งรวบยอดความเร็วสูง `af_pipeline`, `🎯 จัดกรอบ Live Frame Tuner`, `✨ AI Auto-Name`, `💬 Name Refiner ✂️ ย่อชื่อที่ยาว`, `START Batch`, ตรวจสอบ Bin & ตรวจจับเลขตอน `pr_inspect`, เตรียมโฟลเดอร์ `pr_prepare_ep`, และส่งคิว `pr_export_ame`)
 2. **`premiere-pro` MCP (`432 Tools · v1.24.1`)** — ควบคุม Adobe Premiere Pro เชิงลึก (สำรวจโปรเจกต์/Bin, จัดการ Sequence/Track, ตัดต่อคลิป, ปรับขนาด/ตำแหน่ง, ใส่เอฟเฟกต์/สี Lumetri, ปรับแต่งเสียง/คีย์เฟรม, มาร์กเกอร์/ซับไตเติล, แคปภาพหน้าจอ Program Monitor และส่งออกไฟล์ผ่าน Media Encoder)
 
+> [!CAUTION]
+> **🛡️ IRONCLAD OPERATOR PROTOCOL (ZERO CODE READING / ONE-SHOT EXECUTION):**
+> When executing Premiere operations (Auto Frame, Highlights, Queues), the Agent is strictly an **OPERATOR**. It is STRICTLY FORBIDDEN to read `AutoLab/js/**` source files or inspect implementation code before/after calling tools. Never write manual regex via `call_js`. Execute the pipeline in **exactly 1 tool call** (`autolab_af_pipeline`) and report live status immediately.
+
 ---
 
 ## 🚨 1. กฎเหล็กห้ามฝ่าฝืน (Non-Negotiable Operational Rules)
@@ -44,6 +48,9 @@ description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension
        3. `longClipsOver17Chars === 0` (ชื่อคลิปไม่ยาวเกิน 17 ตัวอักษร ไม่ล้นกรอบโปรโม)
        4. `duration > 0s` (ฟุตเทจสมบูรณ์ ไม่มีคลิปเสีย)
      - **รายงานผล:** สรุป Compact Audit Card 3 บรรทัดพร้อมตัวเลขจริงให้ผู้ใช้เห็นทันที!
+10. **ระบบล้างรหัสฉากอัตโนมัติ (Zero Leaked S-Prefixes):**
+   - **รหัสฉากต้องไม่หลุดไปหน้าจอ:** ชื่อดิบจาก Auto Highlights มี `S01_`, `S04_` ติดมาเสมอ ระบบ Core Engine จะทำการดักตัดคำนำหน้า `S01..S99` ทิ้งอัตโนมัติทันทีที่เข้าคิว
+   - **ห้ามข้าม Auto-Name:** ในคำสั่ง `autolab_af_pipeline` จะล็อคให้รัน `✨ AI Auto-Name` พ่วง `✂️ Name Refiner` อยู่ในวงจรเสมอ เพื่อเปลี่ยนชื่อดิบให้กลายเป็นพาดหัวภาษาไทยที่น่าสนใจและยาวไม่เกิน 17 ตัวอักษรเสมอ 100%
 
 ---
 
@@ -108,6 +115,21 @@ description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension
   "startQueue": true
 }
 ```
+
+#### 🚀 กรณีที่ C: รันหลายเรื่อง/หลาย Bin พร้อมกัน (Multi-Bin Batch Pipeline สำหรับงานระดับสิบถึงร้อย Bin)
+คำสั่งเดียวจบสำหรับคิวยักษ์ที่ต้องทำพร้อมกันหลายเรื่อง แต่ละเรื่องมีกรอบและโปรโมต่างกัน:
+```json
+// Tool: autolab_af_pipeline
+{
+  "bins": [
+    { "binPath": "ก.หนัง/ไทบ้านเดอะซีรีย์/HIGHLIGHTS_ไทบ้านเดอะซีรีย์", "frame": "กรอบหนัง 02", "promo": "หนัง IF_Q" },
+    { "binPath": "ก.หนัง/TASTE (2025) เด็กเจนแซ่บ/ep6/HIGHLIGHTS_ep6", "frame": "กรอบหนัง 01", "promo": "หนัง IF_Q" }
+  ],
+  "autoFit": true,
+  "startNow": true
+}
+```
+*(ระบบจะดึงทุก Bin เข้าคิว ➔ ผูกกรอบ/โปรโมแยกตาม Bin ➔ สแกนวัดขนาดและขอบดำทุก Bin อัตโนมัติ ➔ รัน AI Auto-Name ตัด S ออก ➔ ย่อชื่อผ่าน Name Refiner ➔ กดปุ่ม START ในคำสั่งเดียวจบ)*
 
 #### 🎯 กรณีที่ B: เรื่องใหม่ที่ยังไม่มีพรีเซ็ตสเกล (ไม่มี `Master Profile`) — **วัดช่องใส `.mogrt` + สแกนขอบดำวิดีโออัตโนมัติระดับพิกเซล (`~0.2–0.4s`)**
 - **วิธีที่ 1: รันรวดเดียวใน `autolab_af_pipeline` (ส่งแค่ `frame` กับ `promo` โดยไม่ต้องส่ง `profileName` และไม่ต้องเดา `scale`)**

@@ -106,6 +106,29 @@ flowchart LR
 
 > 💡 **หมายเหตุ:** ในหน้าต่าง AutoLab Premiere Pro ผู้ใช้สามารถคลิกปุ่ม **`⚡ ผูกเข้า AI ในเครื่องอัตโนมัติ`** เพียง 1 คลิก ระบบจะหยอดคอนฟิกลงไฟล์ของทุกค่ายข้างต้นให้ทันทีโดยอัตโนมัติ
 
+### 3.3 การตั้งค่าสิทธิ์ให้ AI รันอัตโนมัติ 100% ไม่ต้องเด้งถามกวนใจ (Zero-Prompt Auto-Execution Setup)
+
+หากโปรแกรม AI (เช่น Antigravity หรือ Cursor) เด้งหน้าต่างถามสิทธิ์ซ้ำซาก (*"Allow using this MCP tool?"*) ทุกขั้นตอน ทำให้เสียเวลาทำงาน สามารถตั้งค่าให้ระบบอนุมัติอัตโนมัติ 100% ถาวรได้ทันที:
+
+* **Google Antigravity:**  
+  เปิดไฟล์ `C:\Users\<USER>\.gemini\config\config.json` แล้วเพิ่มสิทธิ์ Wildcard ในส่วน `globalPermissionGrants`:
+  ```json
+  "globalPermissionGrants": {
+    "allow": [
+      "command(*)",
+      "mcp(autolab/*)",
+      "mcp(premiere-pro/*)"
+    ]
+  }
+  ```
+  *(หรือเมื่อมีหน้าต่างเด้งถาม ให้กดเลือกข้อ `4 Yes, and always allow` ระบบจะบันทึกให้อัตโนมัติทันที)*
+
+* **Cursor IDE:**  
+  เปิดการตั้งค่า **Cursor Settings > Features > MCP** และเปิดสถานะ **Always Allow** สำหรับ Server `autolab` และ `premiere-pro`
+
+* **Anthropic Claude Desktop:**  
+  Claude Desktop จะอนุญาตคำสั่ง MCP ท้องถิ่น (Local Stdio) ตามที่กำหนดในคอนฟิกโดยอัตโนมัติอยู่แล้ว
+
 ---
 
 ## 4. การใช้งานผ่าน CLI โดยตรงสำหรับ Terminal Agents (Codex, DSH, Terminal)
