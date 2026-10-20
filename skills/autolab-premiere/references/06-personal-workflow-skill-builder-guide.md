@@ -35,9 +35,10 @@ flowchart LR
 
 ---
 
-### 🔍 Phase 1: AI สำรวจข้อมูลจริงในเครื่องผู้ใช้ก่อนถาม (Zero-Guessing Auto-Discovery)
+### 🔍 Phase 1: AI สำรวจและจัดกลุ่มข้อมูลจริงในเครื่องผู้ใช้ก่อนถาม (Zero-Guessing Auto-Discovery & Smart Clustering)
 
-ก่อนเริ่มถามคำถาม ให้ AI รันคำสั่งสำรวจข้อมูลที่มีอยู่ในโปรแกรม AutoLab และ Premiere Pro ของผู้ใช้ขึ้นมาแสดงให้ผู้ใช้เห็นก่อน (เพื่อที่ผู้ใช้จะได้ไม่ต้องพิมพ์ชื่อพรีเซ็ตหรือชื่อกรอบเอง):
+**ผู้ใช้ทั่วไปและพนักงานตัดต่อไม่ใช่ Dev — ห้ามให้ผู้ใช้พิมพ์ชื่อไฟล์หรือคิดโครงสร้างระบบเองเด็ดขาด!**
+ก่อนเริ่มถามคำถาม ให้ AI รันคำสั่งสำรวจข้อมูลที่มีอยู่ในโปรแกรม AutoLab และ Premiere Pro ของผู้ใช้ แล้ว **จัดกลุ่ม (Cluster)** ขึ้นมาแสดงให้ผู้ใช้เห็นภาพทันที:
 
 1. **ดึงรายชื่อชุดพรีเซ็ตหลัก (`masterProfiles`), กรอบ (`frames`), ป้ายโปรโมท (`promos`), และค่าสเกล (`transforms`) ที่ผู้ใช้มีอยู่ในเครื่อง:**
    ```json
@@ -49,18 +50,24 @@ flowchart LR
    // เรียก Tool: autolab_get_status
    {}
    ```
-3. **แสดงผลสิ่งที่ตรวจพบให้ผู้ใช้ดูอย่างเป็นระเบียบ:**
-   > *"ผมตรวจพบชุดพรีเซ็ตและเทมเพลตใน AutoLab ของคุณดังนี้ครับ:*
+3. **AI วิเคราะห์และจัดกลุ่มป้ายโปรโมท (`promos`) + กรอบ (`frames`) อัตโนมัติก่อนแสดงให้ผู้ใช้ดู:**
+   - **ตรวจจับการแยกหมวดงาน (Content Category Prefix):** เช่น มีไฟล์ที่ขึ้นต้นด้วย `รายการ ...` คู่กับ `หนัง ...` หรือไม่?
+   - **ตรวจจับการแยกคนตัด / เพจ / เครื่องที่ใช้ร่วมกัน (Shared-PC Owner / Page Suffix):** เช่น มีรหัสต่อท้ายชื่อป้ายโปรโมทอย่าง `_Q` คู่กับ `_C`, หรือ `_A` คู่กับ `_B`, หรือชื่อพนักงานหลายคนในคอมเครื่องเดียวกันหรือไม่?
+   - **ตรวจจับแบรนด์สปอนเซอร์ (Sponsor Brand):** เช่น `IF`, `UFA`, ฯลฯ
+4. **แสดงผลสิ่งที่ตรวจพบแบบจัดกลุ่มเข้าใจง่ายให้ผู้ใช้ดู:**
+   > *"ผมสแกนเทมเพลตใน AutoLab เครื่องนี้เรียบร้อยแล้ว พบว่าเครื่องนี้มีเทมเพลตแยกตามหมวดงานและผู้ใช้งานดังนี้ครับ:*
    > - *ชุดพรีเซ็ตหลัก (Master Profiles): `[รายชื่อที่ตรวจพบ]`*
-   > - *กรอบ `.mogrt` (Frames): `[รายชื่อที่ตรวจพบ]`*
-   > - *ป้ายโปรโมท `.mogrt` (Promos): `[รายชื่อที่ตรวจพบ]`*
-   > *เดี๋ยวผมขอถามข้อมูลเวิร์กโฟลว์ของคุณสั้นๆ 6 ข้อ เพื่อสร้างสกิลอัตโนมัติประจำตัวให้นะครับ"*
+   > - *กรอบ `.mogrt` (Frames): `[แยกกลุ่มกรอบหนัง / กรอบรายการ]`*
+   > - *ป้ายโปรโมท `.mogrt` (Promos):*
+   >   - *กลุ่มงานหนัง: `[เช่น หนัง IF_Q, หนัง IF_C]`*
+   >   - *กลุ่มงานรายการ: `[เช่น รายการ IF_Q, รายการ IF_C]`*
+   > *เดี๋ยวผมช่วยวางระบบแยกโฟลเดอร์และเลือกป้ายโปรโมทอัตโนมัติให้เลย คุณแค่ตอบยืนยันสั้นๆ ตามตัวเลือกด้านล่างนี้ครับ"*
 
 ---
 
-### 💬 Phase 2: AI สัมภาษณ์ผู้ใช้ทีละหมวด (6 คำถามมาตรฐาน พร้อมคำอธิบายเข้าใจง่าย)
+### 💬 Phase 2: AI สัมภาษณ์พร้อมเสนอระบบสำเร็จรูปให้ผู้ใช้เลือกง่ายๆ (6 หมวดมาตรฐาน + ระบบคอมใช้ร่วมกันหลายคน/หลายโปรโม)
 
-ให้ AI ถามผู้ใช้ทีละหมวด (หรือถามเป็นชุดที่เข้าใจง่าย) โดยยกตัวอย่างให้ผู้ใช้เห็นภาพชัดเจน:
+ให้ AI ถามผู้ใช้ด้วยภาษาคนทั่วไป พร้อม **เสนอทางเลือกสำเร็จรูป (Recommended Blueprint)** ให้ผู้ใช้แค่ตอบตกลงหรือระบุคำค้นสั้นๆ:
 
 #### 📌 คำถามหมวดที่ 1: โฟลเดอร์เก็บคลิปบน Disk และการเช็คสต็อก (Disk Folder & Stock Rules)
 - **สิ่งที่ AI ต้องถามผู้ใช้:**
@@ -85,11 +92,22 @@ flowchart LR
      - *งานประเภทไหนที่ **ไม่ต้องใส่ Speed** (`enableSpeed: false` — เช่น รายการทีวี/วาไรตี้)?*
      - *งานประเภทไหนที่ **ต้องเปิด Speed Assist** (`enableSpeed: true` — เช่น หนัง/ละคร/ซีรีส์)? และใช้ค่า Speed เท่าไหร่ครับ (เช่น ค่ามาตรฐานยอดนิยม: `Speed 1.15×`, `tone -2`, `cents 3`, เปิด `maintainPitch`)?"*
 
-#### 📌 คำถามหมวดที่ 4: การผูกชุดพรีเซ็ต (`Master Profile`), กรอบ `.mogrt`, ป้ายโปรโมท และเวลาป้ายโปรโมท
-- **สิ่งที่ AI ต้องถามผู้ใช้ (อ้างอิงจากรายชื่อที่ดึงได้ใน Phase 1):**
-  1. *"จากรายการพรีเซ็ตและกรอบในเครื่องของคุณ งานแต่ละประเภท (หรือแต่ละเพจ) ให้จับคู่กับ `Master Profile` หรือ `กรอบ` + `ป้ายโปรโมท` ตัวไหนบ้างครับ?"*
-  2. *"จังหวะเวลาแสดงป้ายโปรโมทด้านบน (Topbar) ใช้ค่ามาตรฐานของ AutoLab คือ **`เริ่มวินาทีที่ 5 - ลูป 0 (ลากยาวจนจบคลิป)`** (`promoStart: 5, promoInterval: 0`) เลยไหมครับ?"*
-  3. *"กรณีเจอหนังหรือคลิปเรื่องใหม่ที่ยังไม่มีพรีเซ็ตสเกลในระบบ ให้ AI กด `🎯 จัดกรอบ` (`af_tuner_auto_fit`) วัดขอบดำและใช้สายตา AI Vision ตรวจภาพตัวอย่าง `.png` เพื่อจัดกึ่งกลางให้เองอัตโนมัติเลยไหมครับ?"*
+#### 📌 คำถามหมวดที่ 4: การวางระบบเลือกป้ายโปรโมท & กรอบอัตโนมัติ (กรณีคอมใช้ร่วมกันหลายคน / ตัดหลายเพจ / มีหลายโปรโม)
+> [!IMPORTANT]
+> **เมื่อ AI เห็นว่าในเครื่องมีป้ายโปรโมทหลายตัว (เช่น แยกรหัสคน `_Q` / `_C` หรือแยก `หนัง` / `รายการ`) ห้ามถามคำถามกว้างๆ ให้ User งง!** ให้ AI **เสนอระบบแยกอัตโนมัติจากชื่อโฟลเดอร์ (2D Folder-Tag Routing System)** ให้ User เลือกยืนยันทันที:
+
+- **สิ่งที่ AI ต้องเสนอและถามผู้ใช้:**
+  1. **วิธีแยกคนตัด / เพจ บนคอมเครื่องเดียวกัน (Shared-Machine Owner/Page Tagging):**
+     - *"ในเครื่องนี้มีป้ายโปรโมทแยกเป็นรหัส (เช่น `_Q` กับ `_C`) ผมขอวางระบบแยกอัตโนมัติจากชื่อโฟลเดอร์ให้แบบนี้เลยไหมครับ:*
+       - *ถ้าชื่อโฟลเดอร์/Bin **เป็นชื่อเรื่องปกติ** (ไม่มีคำต่อท้าย) ➔ ให้ถือเป็นงานของ **คนหลัก (เช่น รหัส `_Q`)** อัตโนมัติ*
+       - *ถ้าชื่อโฟลเดอร์/Bin **มีคำต่อท้ายระบุชื่อคนที่ 2 หรือเพจที่ 2** (เช่น ต่อท้ายว่า `- คอม`, `_C`, หรือชื่อคน) ➔ ให้สลับไปใช้ป้ายโปรโมทของ **คนที่ 2 (เช่น รหัส `_C`)** อัตโนมัติทันที*
+       - *(คุณใช้คำต่อท้ายโฟลเดอร์ว่าอะไรสำหรับคนที่ 2 / เพจที่ 2 ครับ? เช่น `คอม`, `C`, หรือชื่อพนักงาน?)"*
+  2. **วิธีแยกป้ายโปรโมท `หนัง` vs `รายการ` อัตโนมัติ (Content Category Routing):**
+     - *"ถ้าโฟลเดอร์เรื่องนั้นอยู่ในหมวด `ก.หนัง` (หรือเป็นหนัง/ละคร/ซีรีส์) ให้ระบบเลือกป้ายโปรโมทที่ขึ้นต้นด้วย **`หนัง ...`** (เช่น `หนัง IF_Q` / `หนัง IF_C`) และถ้าเป็นรายการทีวี ให้เลือก **`รายการ ...`** (เช่น `รายการ IF_Q` / `รายการ IF_C`) อัตโนมัติเลยใช่ไหมครับ?"*
+     - *"ดังนั้น เวลาคุณสั่งงานสั้นๆ เช่น **'ใส่กรอบเรื่องไทบ้าน ใช้แบรนเนอร์ IF กรอบหนัง 2'** ผมจะดูชื่อโฟลเดอร์แล้วแปลงจากคำว่า `'IF'` เป็นชื่อไฟล์เต็มเป๊ะ (เช่น `'หนัง IF_Q'`) ส่งเข้าโปรแกรมให้เอง 100% โดยไม่หยิบผิดเพจครับ!"*
+  3. **จังหวะเวลาป้ายโปรโมท & ระบบจัดกรอบอัตโนมัติ (`⚡ Auto Scale` / `af_tuner_auto_fit`):**
+     - *"จังหวะเวลาแสดงป้ายโปรโมท ใช้ค่ามาตรฐานของ AutoLab คือ **`เริ่มวินาทีที่ 5 - ลูป 0 (ลากยาวจนจบคลิป)`** (`promoStart: 5, promoInterval: 0`) เลยไหมครับ?"*
+     - *"กรณีเจอหนังเรื่องใหม่ที่ยังไม่มี `Master Profile` ให้ AI ใช้ระบบ **`af_tuner_auto_fit` (วัดช่องใส `.mogrt` + สแกนตัดขอบดำวิดีโอ 3 ช่วงเวลาอัตโนมัติระดับพิกเซล)** คำนวณสเกลพอดีกรอบให้ทันทีโดยไม่ต้องตั้งพรีเซ็ตก่อนเลยใช่ไหมครับ?"*
 
 #### 📌 คำถามหมวดที่ 5: กฎการตั้งชื่อคลิป (`✨ AI Auto-Name` + `💬 Name Refiner`)
 - **สิ่งที่ AI ต้องถามผู้ใช้:**
@@ -98,23 +116,23 @@ flowchart LR
 #### 📌 คำถามหมวดที่ 6: การส่งออก (`Adobe Media Encoder`) และความเร็วในการทำงาน (`af_pipeline`)
 - **สิ่งที่ AI ต้องถามผู้ใช้:**
   1. *"เมื่อ Auto Frame สร้างซีเควนซ์ใส่กรอบเสร็จทั้งหมดแล้ว ให้ส่งเข้าคิว **Adobe Media Encoder** (`autolab_pr_export_ame`) ไปยังโฟลเดอร์ปลายทางบน Disk ทันทีเลยไหมครับ?"*
-  2. *"เวลาสั่งตัดเรื่องที่มีพรีเซ็ตอยู่แล้ว ต้องการให้ AI รันด้วยโหมดความเร็วสูงสุด **`autolab_af_pipeline`** (ดึงเข้าคิว + ผูกพรีเซ็ต + ตั้งค่า 5-0 + ตั้งชื่อ AI + ย่อชื่อ + กด START รวดเดียวจบโดยไม่หยุดถามกลางทาง) เลยไหมครับ?"*
+  2. *"เวลาสั่งตัดเรื่องที่มีพรีเซ็ตอยู่แล้ว (หรือระบุกรอบ+โปรโมมาให้) ต้องการให้ AI รันด้วยโหมดความเร็วสูงสุด **`autolab_af_pipeline`** (ดึงเข้าคิว + ผูกกรอบ/วัดสเกลอัตโนมัติ + ตั้งค่า 5-0 + ตั้งชื่อ AI + ย่อชื่อ + กด START รวดเดียวจบโดยไม่หยุดถามกลางทาง) เลยไหมครับ?"*
 
 ---
 
-### 📝 Phase 3 & 4: แม่แบบไฟล์ `SKILL.md` สำหรับสร้างสกิลประจำตัวให้ผู้ใช้ (Personal Skill Template)
+### 📝 Phase 3 & 4: แม่แบบไฟล์ `SKILL.md` สำหรับสร้างสกิลประจำตัวให้ผู้ใช้ (Personal & Shared-PC Skill Template)
 
 เมื่อผู้ใช้ตอบคำถามครบแล้ว ให้ AI นำข้อมูลของผู้ใช้มาเติมลงในแม่แบบด้านล่างนี้ แล้วสร้างไฟล์ที่ `.agents/skills/<ชื่อสกิลของผู้ใช้>/SKILL.md` ทันที:
 
 ````markdown
 ---
 name: my-premiere-production-workflow
-description: Personal autonomous production workflow for Adobe Premiere Pro and AutoLab CEP Extension. Covers personal disk stock folders, Premiere bin organization (waiting bins, episodic epX sub-bins, HIGHLIGHTS_ cleanup), Auto Highlights presets (TV shows vs Movies/Series speed assist rules), Master Profile & Frame/Promo .mogrt mapping, AI Vision frame tuning, single-call af_pipeline execution (5-0 promo standard, Variety AI Auto-Name + <=17 chars Name Refiner), and batch export to Adobe Media Encoder Queue.
+description: Personal and shared-machine autonomous production workflow for Adobe Premiere Pro and AutoLab CEP Extension. Covers personal disk stock folders, Premiere bin organization (waiting bins, episodic epX sub-bins, HIGHLIGHTS_ cleanup), Auto Highlights presets (TV shows vs Movies/Series speed assist rules), 2D Multi-User / Multi-Promo Routing Matrix (Category x Owner/Page tag), automatic MOGRT aperture + black-bar auto-fit scaling, single-call af_pipeline execution (5-0 promo standard, Variety AI Auto-Name + <=17 chars Name Refiner), and batch export to Adobe Media Encoder Queue.
 ---
 
-# สกิลเวิร์กโฟลว์ตัดต่ออัตโนมัติประจำตัว (`my-premiere-production-workflow`)
+# สกิลเวิร์กโฟลว์ตัดต่ออัตโนมัติประจำเครื่อง (`my-premiere-production-workflow`)
 
-สกิลนี้เป็นคู่มือปฏิบัติการเฉพาะเครื่องที่ทำงานร่วมกับเครื่องมือมาตรฐานใน `autolab-premiere` (33 AutoLab Tools + 432 Premiere Pro Tools)
+สกิลนี้เป็นคู่มือปฏิบัติการเฉพาะเครื่องที่ทำงานร่วมกับเครื่องมือมาตรฐานใน `autolab-premiere` (34 AutoLab Tools + 432 Premiere Pro Tools)
 
 ---
 
@@ -146,18 +164,24 @@ description: Personal autonomous production workflow for Adobe Premiere Pro and 
 
 ---
 
-## 🎯 3. กฎการเลือกพรีเซ็ต กรอบ ป้ายโปรโมท (`5 - 0`) และการรัน `af_pipeline`
+## 🎯 3. ตารางจับคู่ป้ายโปรโมท 2 มิติ (Multi-User / Multi-Promo Routing Matrix) & การจัดกรอบอัตโนมัติ
 
-1. **ตารางจับคู่พรีเซ็ตประจำตัว:**
-   - **งานรายการ:** Master Profile = `"<ชื่อพรีเซ็ตรายการ>"`, Frame = `"<ชื่อกรอบ>"`, Promo = `"<ชื่อป้ายโปรโมท>"`
-   - **งานหนัง/ซีรีส์:**
-     - ตรวจสอบ `matchedProfiles` / `autolab_list_templates` สดทุกครั้ง
-     - หากมี Master Profile ของเรื่องนั้นแล้ว: ใช้ `profileName` ของเรื่องนั้นได้เลย
-     - หากยังไม่มี Master Profile: ใช้ Frame = `"<กรอบหนังมาตรฐาน>"`, Promo = `"<ป้ายโปรโมทหนังมาตรฐาน>"` แล้วรัน `autolab_af_tuner_auto_fit` + ส่องภาพ `.png` ด้วย AI Vision ก่อนกด `autolab_af_tuner_apply`
-2. **ค่ามาตรฐาน Topbar & ป้ายโปรโมท:**
-   - ขนาด `1080x1920`, `promoStart: 5` (เริ่มวิที่ 5), `promoInterval: 0` (ลากจนจบคลิป), `injectHeadline: true`, `autoCutState: 0` (ปิด AutoCut เสมอ)
-3. **โหมดความเร็วสูงสุดคำสั่งเดียว (`autolab_af_pipeline`):**
-   - สำหรับเรื่องที่มี Master Profile หรือจัดกรอบเสร็จแล้ว ให้เรียก `autolab_af_pipeline` คำสั่งเดียวเพื่อทำงานรวดเดียวจบ (ดึงคลิปเฉพาะ Sequences โดยไม่เอากล่อง `ไฟล์ต้นฉบับ` ➔ ผูกพรีเซ็ต ➔ ตั้งค่า Topbar `5 - 0` ➔ รัน `✨ AI Auto-Name` โหมด `variety` ➔ รัน `💬 Name Refiner` ย่อชื่อเกิน 17 ตัวอักษร ➔ กด `START`)
+> **กฎเหล็กสำหรับ AI Agent:** ห้ามส่งชื่อป้ายโปรโมทแบบย่อ (เช่น `"IF"`) เข้า MCP เด็ดขาด! ต้องดูชื่อโฟลเดอร์/Bin แล้วแปลงเป็น **ชื่อไฟล์ `.mogrt` เต็มเป๊ะ** ตามตารางด้านล่างนี้เสมอ:
+
+### 3.1 ตารางแยกป้ายโปรโมทตาม `[ประเภทงาน]` × `[รหัสคนตัด / เพจบนชื่อโฟลเดอร์]`
+| เงื่อนไขชื่อโฟลเดอร์ / Bin ใน Premiere Pro | ประเภทงาน | ผู้ใช้ / เพจ | ชื่อป้ายโปรโมทเต็มที่ต้องส่งเข้า MCP (`promo`) | กรอบเริ่มต้น (`frame`) |
+| :--- | :--- | :--- | :--- | :--- |
+| อยู่ในหมวด `ก.หนัง` (หรือเป็นหนัง/ซีรีส์) และ **ไม่มี** คำต่อท้าย `<เช่น คอม / C>` | หนัง / ซีรีส์ | คนหลัก (`<เช่น Q>`) | `"<เช่น หนัง IF_Q>"` | `"<เช่น กรอบหนัง 02>"` (หรือตามสั่ง) |
+| อยู่ในหมวด `ก.หนัง` (หรือเป็นหนัง/ซีรีส์) และ **มี** คำต่อท้าย `<เช่น คอม / C>` | หนัง / ซีรีส์ | คนที่ 2 (`<เช่น C>`) | `"<เช่น หนัง IF_C>"` | `"<เช่น กรอบหนัง 02>"` (หรือตามสั่ง) |
+| งานรายการทีวี และ **ไม่มี** คำต่อท้าย `<เช่น คอม / C>` | รายการ | คนหลัก (`<เช่น Q>`) | `"<เช่น รายการ IF_Q>"` | ตาม Master Profile รายการ |
+| งานรายการทีวี และ **มี** คำต่อท้าย `<เช่น คอม / C>` | รายการ | คนที่ 2 (`<เช่น C>`) | `"<เช่น รายการ IF_C>"` | ตาม Master Profile รายการ |
+
+### 3.2 การเลือกใช้ Master Profile vs ระบบวัดกรอบอัตโนมัติ (`af_tuner_auto_fit` / `⚡ Auto Scale`)
+- **กรณีเรื่องนั้นมี `Master Profile` อยู่แล้ว:** ใช้ `profileName` ของเรื่องนั้น (และหากตัดลงเพจคนที่ 2 ให้ส่ง `promo` ทับตามตารางข้อ 3.1)
+- **กรณีเรื่องใหม่ที่ยังไม่มี `Master Profile` (หรือผู้ใช้ระบุแค่ชื่อกรอบ เช่น `"กรอบหนัง 02"`):**
+  - ไม่ต้องเดาค่า `scale` เองเด็ดขาด! ให้เรียก `autolab_af_tuner_auto_fit` (หรือส่ง `autoFit: true` ใน `autolab_af_pipeline`) เพื่อให้ระบบวัดช่องใส `.mogrt` + สแกนตัดขอบดำวิดีโอ 3 ช่วงเวลา (`120s`, `360s`, `720s`) คำนวณสเกลพอดีกรอบระดับพิกเซลให้อัตโนมัติทันที
+- **ค่ามาตรฐาน Topbar & ป้ายโปรโมท:**
+  - ขนาด `1080x1920`, `promoStart: 5` (เริ่มวิที่ 5), `promoInterval: 0` (ลากจนจบคลิป), `injectHeadline: true`, `autoCutState: 0` (ปิด AutoCut เสมอ)
 
 ---
 
@@ -165,29 +189,30 @@ description: Personal autonomous production workflow for Adobe Premiere Pro and 
 
 1. **เช็คสต็อกบน Disk (โดยไม่กวน Premiere Pro):**
    ```powershell
-   node tools/autolab-mcp/index.js --check-disk "<คำค้น>" --dir "<พาธโฟลเดอร์บน Disk>" --exclude "จบแล้ว,ลงแล้ว"
+   node AutoLab/mcp/autolab-mcp.js --check-disk "<คำค้น>" --dir "<พาธโฟลเดอร์บน Disk>" --exclude "จบแล้ว,ลงแล้ว"
    ```
 2. **สำรวจ Bin และพรีเซ็ตของเรื่องที่จะตัด:**
    ```powershell
-   node tools/autolab-mcp/index.js --inspect "<ชื่อเรื่อง>" --dir "<พาธโฟลเดอร์บน Disk>" --exclude "จบแล้ว,ลงแล้ว"
+   node AutoLab/mcp/autolab-mcp.js --inspect "<ชื่อเรื่อง>" --dir "<พาธโฟลเดอร์บน Disk>" --exclude "จบแล้ว,ลงแล้ว"
    ```
 3. **เตรียมโฟลเดอร์บน Disk และเตรียม Bin `epX` ใน Premiere Pro:**
    ```powershell
-   node tools/autolab-mcp/index.js --call pr_prepare_ep --arg binName="<ชื่อ Bin>" --arg epName="<epX>" --arg sourceSubBin="รอ,รอตัด" --arg createDiskDir="<พาธปลายทางบน Disk>" --arg removeOldHighlights=true
+   node AutoLab/mcp/autolab-mcp.js --call pr_prepare_ep --arg binName="<ชื่อ Bin>" --arg epName="<epX>" --arg sourceSubBin="รอ,รอตัด" --arg createDiskDir="<พาธปลายทางบน Disk>" --arg removeOldHighlights=true
    ```
 4. **ตั้งค่าและรัน Auto Highlights:**
    ```powershell
-   node tools/autolab-mcp/index.js --call ah_configure --arg preset=movie
-   node tools/autolab-mcp/index.js --call ah_queue_add --arg binPath="<พาธ Bin>" --arg clearFirst=true
-   node tools/autolab-mcp/index.js --call ah_run --arg wait=true
+   node AutoLab/mcp/autolab-mcp.js --call ah_configure --arg preset=movie
+   node AutoLab/mcp/autolab-mcp.js --call ah_queue_add --arg binPath="<พาธ Bin>" --arg clearFirst=true
+   node AutoLab/mcp/autolab-mcp.js --call ah_run --arg wait=true
    ```
-5. **รัน Auto Frame Pipeline รวดเดียวจบ (`af_pipeline`):**
+5. **รัน Auto Frame Pipeline รวดเดียวจบ (`af_pipeline` — รองรับทั้งมี Master Profile และวัดกรอบใหม่ `autoFit=true`):**
    ```powershell
-   node tools/autolab-mcp/index.js --call af_pipeline --arg binPath="<พาธ HIGHLIGHTS_>" --arg profileName="<ชื่อพรีเซ็ต>" --arg promoStart=5 --arg promoInterval=0 --arg startQueue=true
+   # กรณีเรื่องใหม่ไม่มีพรีเซ็ต (ส่งชื่อเต็มของ frame และ promo ตามตาราง Routing Matrix + autoFit=true):
+   node AutoLab/mcp/autolab-mcp.js --call af_pipeline --arg binPath="<พาธ HIGHLIGHTS_>" --arg frame="<ชื่อกรอบเต็ม>" --arg promo="<ชื่อป้ายโปรโมทเต็มตามตารางข้อ 3.1>" --arg autoFit=true --arg promoStart=5 --arg promoInterval=0 --arg startQueue=true
    ```
 6. **ส่งออกทุก Sequence เข้าคิว Adobe Media Encoder (`pr_export_ame`):**
    ```powershell
-   node tools/autolab-mcp/index.js --call pr_export_ame --arg highlightsBinPath="<พาธ HIGHLIGHTS_>" --arg outputDir="<พาธปลายทางบน Disk>"
+   node AutoLab/mcp/autolab-mcp.js --call pr_export_ame --arg highlightsBinPath="<พาธ HIGHLIGHTS_>" --arg outputDir="<พาธปลายทางบน Disk>"
    ```
 ````
 
