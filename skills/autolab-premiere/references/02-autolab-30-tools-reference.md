@@ -161,7 +161,7 @@
   {
     "minDuration": 45,
     "maxDuration": 120,
-    "targetCount": 10,
+    "targetCount": 100,
     "engineMode": "hybrid",
     "contentMode": "movie"
   }
