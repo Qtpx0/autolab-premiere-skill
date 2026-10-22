@@ -41,6 +41,7 @@ ok(
 );
 ok('allows the documented CLI fallback', call('pwsh', { command: 'node "C:\\Program Files (x86)\\Common Files\\Adobe\\CEP\\extensions\\AutoLab\\mcp\\autolab-mcp.js" --call pr_inspect' }) === undefined);
 ok('allows autolab_call_jsx for state repair', call('mcp__autolab__call_jsx', { script: 'app.project.rootItem' }) === undefined);
+ok('allows pr_move_item for pulling from raw pool', call('mcp__autolab__pr_move_item', { fromBin: 'Show/รอ', to: 'Show - Page2' }) === undefined);
 ok('allows unrelated shell work', call('pwsh', { command: 'node -e "console.log(1+1)"' }) === undefined);
 
 // ── rule 3: engine must be Gemini Direct Audio ────────────────────────────────
@@ -114,6 +115,7 @@ plugin.apply(fakeCtx, { prompt: { extra: 'EXTRA-MARK' } });
 const withExtra = registered.sections[1];
 ok('prompt.extra is appended', typeof withExtra?.text === 'string' && withExtra.text.includes('EXTRA-MARK'));
 ok('prompt.extra keeps the shipped contract', typeof withExtra?.text === 'string' && withExtra.text.includes('Operator Contract'));
+ok('shipped contract includes Rule 11 Central Raw Pool routing', typeof withExtra?.text === 'string' && withExtra.text.includes('Central Raw Pool'));
 
 // ── report ───────────────────────────────────────────────────────────────────
 if (failures.length > 0) {
