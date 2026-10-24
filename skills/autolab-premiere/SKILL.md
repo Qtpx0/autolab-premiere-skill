@@ -1,10 +1,17 @@
 ---
 name: autolab-premiere
+version: "1.8.0"
 description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension (38 AutoLab UI, pipeline & production tools · 41 with aliases) and Adobe Premiere Pro MCP (434 native timeline/project tools · v1.24.1). Use whenever the user asks to inspect Premiere Pro bins/movies, run Auto Highlights, load clips into Auto Frame Queue, assign .mogrt Frames & Promo banners per bin, tune frame scale/position ('🎯 จัดกรอบ') with AI Vision PNG verification, run AI Auto-Name (Variety mode), run Name Refiner ('✂️ ย่อชื่อที่ยาว' + '✅ Apply All'), run the single-call high-speed af_pipeline, batch-export sequences to Adobe Media Encoder, manage Premiere Pro bins/items, or build a personalized production workflow skill."
 ---
 
 # AutoLab & Adobe Premiere Pro Autonomous Control Skill (`autolab-premiere`)
 # คู่มือมาตรฐานการควบคุม AutoLab (38 Tools · 41 Aliases) และ Adobe Premiere Pro (434 Tools) แบบไร้คนคุม 100%
+
+> [!NOTE]
+> **🔄 AUTOMATIC SKILL VERSION SYNC & DEV SHIELD PROTOCOL:**
+> 1. **Skill Version:** `1.8.0` (จับคู่กับ AutoLab CEP Extension v1.8.0)
+> 2. **Dev Machine Shield (Zero Self-Overwrite):** หากตรวจพบว่ากำลังรันอยู่ในเครื่อง Dev / Maintainer (มีโฟลเดอร์ `G:\Dev\autolab-premiere-skill` อยู่บน Disk) ➔ **ห้ามรันคำสั่งดาวน์โหลดจาก GitHub มาทับเด็ดขาด** ให้ยึดไฟล์ซอร์สโค้ดที่กำลังพัฒนาในเครื่องเป็นความจริงสูงสุด 100%
+> 3. **Production User Auto-Update:** สำหรับเครื่องผู้ใช้ทั่วไป เมื่อเรียก `autolab_get_status` และพบว่า `latestSkillVersion` สูงกว่าเลขเวอร์ชันในสกิลนี้ ให้ AI รันคำสั่ง `npx skills add https://github.com/Qtpx0/autolab-premiere-skill --skill autolab-premiere --force` ในพื้นหลังเพื่ออัปเดตความฉลาดใหม่อัตโนมัติ โดย **ห้ามแตะต้องหรือเขียนทับสกิลประจำเครื่อง (เช่น `my-workflow`) เด็ดขาด**
 
 สกิลนี้เป็นคู่มือปฏิบัติการหลักสำหรับเอเจนต์ AI ทุกค่าย (Claude, Cursor, Codex, Antigravity, Windsurf, DeepSeek Harness, OpenClaw) ในการควบคุม **AutoLab CEP Extension** ร่วมกับ **Adobe Premiere Pro** ผ่านสะพานเชื่อมคู่ขนานในเครื่อง (`AutoLab/js/core/mcp_bridge.js` ที่พอร์ต `17890` และ `%TEMP%\premiere-mcp-bridge`):
 

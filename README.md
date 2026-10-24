@@ -7,6 +7,7 @@
 **ติดมือและสมองให้เอเจนต์ AI ควบคุม Adobe Premiere Pro และ AutoLab แบบไร้คนคุม 100% — ครบทั้ง 30 เครื่องมือคุมหน้าจอ AutoLab, 432 เครื่องมือคุมไทม์ไลน์ Premiere Pro, ระบบจัดกรอบตรวจภาพจริงด้วย AI Vision, และสะพานเชื่อมอัตโนมัติแบบไม่ต้องตั้งค่า**
 
 [![AutoLab Studio](https://img.shields.io/badge/AutoLab-Official%20Premiere%20Pro%20Assistant-FF6B00.svg?style=flat-square&logo=adobe-premiere-pro)](https://babydunx1.github.io/AutoLab-Release/)
+[![Skill Version: v1.8.0](https://img.shields.io/badge/skill%20version-v1.8.0-orange.svg)](#)
 [![Tools: 462 (30 AutoLab + 432 Premiere)](https://img.shields.io/badge/tools-462%20(30%20AutoLab%20%2B%20432%20Premiere)-00C2FF.svg)](#tool-catalog--สารบัญเครื่องมือทั้งหมด-462-คำสั่ง)
 [![Premiere MCP: v1.24.1](https://img.shields.io/badge/Premiere%20MCP-v1.24.1-8B5CF6.svg)](skills/autolab-premiere/references/05-premiere-pro-432-tools-catalog.md)
 [![Bridge: Port 17890 + CEP Queue](https://img.shields.io/badge/bridge-Port%2017890%20%2B%20CEP%20Queue-10B981.svg)](skills/autolab-premiere/references/01-connection-and-bridge.md)
@@ -125,7 +126,7 @@ Or inside **Adobe Premiere Pro → AutoLab → `🔌 API & MCP`**, click **`📋
 
 ```text
 ติดตั้งและอ่านคู่มือควบคุม AutoLab Premiere Pro ด้วยคำสั่ง:
-npx skills add https://github.com/Qtpx0/autolab-premiere-skill --skill autolab-premiere
+npx skills add https://github.com/Qtpx0/autolab-premiere-skill --skill autolab-premiere --force
 (หรืออ่านคู่มือจาก https://github.com/Qtpx0/autolab-premiere-skill)
 จากนั้นเช็คสถานะการเชื่อมต่อด้วยเครื่องมือ autolab_get_status และ get_project_info
 ```
