@@ -14,23 +14,20 @@
    { "view": "auto_highlights" }
    ```
 2. **ตั้งค่าพารามิเตอร์การตัดไฮไลท์ (`autolab_ah_configure`):**
-   - เลือกโหมดการวิเคราะห์ (`engineMode`):
-     - `"hybrid"` *(แนะนำสำหรับหนัง/ละคร/ซิตคอม)*: วิเคราะห์ทั้งบทพูด (Semantic/Dialogue) ร่วมกับระดับพลังงานเสียงและจังหวะภาพ
-     - `"transcript"`: วิเคราะห์จากเนื้อหาบทพูดเป็นหลัก
-   - เลือกประเภทเนื้อหา (`contentMode`):
-     - `"movie"`: สำหรับภาพยนตร์ ละคร ซีรีส์ ซิตคอม
-     - `"podcast"`: สำหรับรายการทอล์กโชว์ สัมภาษณ์ พอดแคสต์
-   - กำหนดความยาวคลิปขั้นต่ำ (`minDuration`), สูงสุด (`maxDuration`) และจำนวนคลิปเป้าหมาย (`targetCount`):
+   - **ใช้พรีเซ็ตลัดตามประเภทงาน (`preset`):**
+     - `"movie"` *(สำหรับภาพยนตร์ / ละคร / ซีรีส์)*: ตั้งค่า `engineMode: "gemini_audio"` (`Cloud AI Direct Audio`), `targetCount: 100`, `duration: "0.5-1.5"` (`60-90s`), `resolution: "1920x1080"`, และเปิด **Speed Assist (`1.15×`, `tone -2`, `cents 3`, `maintainPitch: true`)** อัตโนมัติ
+     - `"show"` *(สำหรับรายการทีวี / ซิตคอม / วาไรตี้ / พอดแคสต์)*: ตั้งค่า `engineMode: "gemini_audio"`, `targetCount: 100`, `duration: "0.5-1.5"` (`60-90s`), `resolution: "1920x1080"`, และ **ปิด Speed Assist (`enableSpeed: false`)** อัตโนมัติ
+   - **กฎเหล็ก:** ต้องใช้ `engineMode: "gemini_audio"` (`⚡ Cloud AI Direct Audio`) เสมอ — ห้ามใช้ `whisper`, `hybrid`, หรือ `transcript` เด็ดขาด!
    ```json
    // Tool: autolab_ah_configure
+   // สำหรับงานหนัง/ซีรีส์:
    {
-     "minDuration": 45,
-     "maxDuration": 120,
-     "targetCount": 10,
-     "engineMode": "hybrid",
-     "contentMode": "movie",
-     "enableAudioMaster": true,
-     "enableAntiCopyrightShield": false
+     "preset": "movie"
+   }
+
+   // สำหรับงานรายการทีวี:
+   {
+     "preset": "show"
    }
    ```
 3. **ดึงไฟล์หนังต้นฉบับจาก Bin เข้าคิว Auto Highlights (`autolab_ah_queue_add`):**

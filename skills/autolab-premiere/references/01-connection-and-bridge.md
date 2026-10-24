@@ -14,8 +14,8 @@ flowchart LR
     Agent["🤖 AI Agent<br/>(Claude / Cursor / Codex / Antigravity)"]
     
     subgraph MCP ["📦 Bundled MCP Servers (AutoLab/mcp/)"]
-        AL_MCP["autolab-mcp.js<br/>(30 AutoLab Tools)"]
-        PR_MCP["premiere-pro-mcp/runtime/index.js<br/>(432 Premiere Pro Tools · v1.24.1)"]
+        AL_MCP["autolab-mcp.js<br/>(38 AutoLab Tools · 41 with aliases)"]
+        PR_MCP["premiere-pro-mcp/runtime/index.js<br/>(434 Premiere Pro Tools · v1.24.1)"]
     end
 
     subgraph Transport ["⚡ Local Zero-Config Transport"]
@@ -36,14 +36,14 @@ flowchart LR
 ```
 
 ### 1.1 Engine A: AutoLab Loopback HTTP RPC (`http://127.0.0.1:17890`)
-- **หน้าที่:** รับคำสั่งทั้ง **30 Tools** จาก `AutoLab/mcp/autolab-mcp.js` เพื่อควบคุมหน้าจอ AutoLab UI, คิวงาน Auto Frame, Auto Highlights, Live Frame Tuner (`🎯 จัดกรอบ`), AI Auto-Name, และ Name Refiner (`✂️ ย่อชื่อที่ยาว`)
+- **หน้าที่:** รับคำสั่งทั้ง **38 Tools (41 รวม Aliases)** จาก `AutoLab/mcp/autolab-mcp.js` เพื่อควบคุมหน้าจอ AutoLab UI, คิวงาน Auto Frame, Auto Highlights, Live Frame Tuner (`🎯 จัดกรอบ`), AI Auto-Name, Name Refiner (`✂️ ย่อชื่อที่ยาว`), และ 7 Native Bin Management Tools
 - **กลไกค้นหาพอร์ตอัตโนมัติ (Zero-Config Port Discovery):**
   - พอร์ตเริ่มต้นคือ `17890` (หากพอร์ตชนจะขยับไป `17891..17895` อัตโนมัติ)
   - บันทึกข้อมูลพอร์ตและสถานะล่าสุดลงใน `%TEMP%\autolab-mcp-bridge\autolab-bridge-info.json` ทุกๆ 2 วินาที
   - มีระบบสำรอง (**Atomic File Queue Fallback**): หาก HTTP ถูกบล็อกโดย Firewall เครื่องลูกข่าย `autolab-mcp.js` จะสลับไปส่งคำสั่งผ่านไฟล์ `req_<id>.json` / `res_<id>.json` ใน `%TEMP%\autolab-mcp-bridge` อัตโนมัติโดยที่งานไม่สะดุด
 
 ### 1.2 Engine B: Premiere Pro ExtendScript File Bridge (`%TEMP%\premiere-mcp-bridge`)
-- **หน้าที่:** รับคำสั่งทั้ง **432 Tools** จาก `AutoLab/mcp/premiere-pro-mcp/runtime/index.js` (`v1.24.1`)
+- **หน้าที่:** รับคำสั่งทั้ง **434 Tools** จาก `AutoLab/mcp/premiere-pro-mcp/runtime/index.js` (`v1.24.1`)
 - **กลไก Single-Flight Queue & ES3 Polyfill:**
   - `mcp_bridge.js` สแกนไฟล์ `command_<uuid>.jsx` ใน `%TEMP%\premiere-mcp-bridge` ทุกๆ 200ms
   - ฉีด **`JSON.stringify` polyfill สำหรับ ExtendScript ES3** เข้าไปก่อนรันทุกคำสั่ง (แก้ปัญหา ExtendScript ของ Premiere Pro ไม่มี `JSON.stringify` มาตรฐาน)
@@ -57,8 +57,8 @@ flowchart LR
 
 | ส่วนประกอบ (Component) | ตำแหน่งไฟล์บน Windows (Standard Installed Path) |
 | :--- | :--- |
-| **AutoLab MCP Server (30 Tools)** | `C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js` |
-| **Premiere Pro MCP Server (432 Tools)** | `C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\premiere-pro-mcp\runtime\index.js` |
+| **AutoLab MCP Server (38 Tools · 41 with aliases)** | `C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js` |
+| **Premiere Pro MCP Server (434 Tools)** | `C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\premiere-pro-mcp\runtime\index.js` |
 | **AutoLab Bridge Info JSON** | `%TEMP%\autolab-mcp-bridge\autolab-bridge-info.json` |
 | **Premiere Pro Bridge Directory** | `%TEMP%\premiere-mcp-bridge` |
 

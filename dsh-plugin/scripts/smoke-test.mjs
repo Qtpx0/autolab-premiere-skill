@@ -68,6 +68,10 @@ ok(
 ok('pr_prepare_ep is allowed', call('mcp__autolab__pr_prepare_ep', { items: [{ show: 'x' }] }) === undefined);
 ok('recovery clears the gate', state.recovered === true && state.needsRecovery === false);
 ok('export is allowed again after recovery', call('mcp__autolab__pr_export_ame', { highlightsBinPath: 'ก.หนัง/x/HIGHLIGHTS_x' }) === undefined);
+observeResult(state, { content: [{ type: 'text', text: '{"queryAudit":["x -> found:true | bin:x | status:NEEDS_RECOVERY | waiting:1 | recoverable:1 | needsRecovery:true"]}' }] });
+ok('compact queryAudit needsRecovery:true also arms the gate', state.needsRecovery === true);
+observeResult(state, { content: [{ type: 'text', text: '{"ok":true,"removedHighlightsBins":["HIGHLIGHTS_x"],"movedClips":["ep2.mp4"]}' }] });
+ok('pr_prepare_ep result payload clears the gate', state.recovered === true && state.needsRecovery === false);
 
 // ── fresh state: the gate fails open ──────────────────────────────────────────
 const cold = createGuard({}, createState());

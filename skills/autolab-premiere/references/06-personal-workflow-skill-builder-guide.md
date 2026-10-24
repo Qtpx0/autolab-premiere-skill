@@ -9,7 +9,7 @@
 
 | มิติเปรียบเทียบ | 1. สกิลมาตรฐานกลาง (`autolab-premiere`) | 2. สกิลเวิร์กโฟลว์ประจำตัว (`<my-premiere-workflow>`) |
 | :--- | :--- | :--- |
-| **หน้าที่หลัก** | คู่มือการใช้เครื่องมือ MCP ทั้ง 33 + 432 คำสั่ง (`Engine Manual`) | สูตรการทำงานและโฟลเดอร์เฉพาะเครื่องของผู้ใช้ (`Personal Autopilot SOP`) |
+| **หน้าที่หลัก** | คู่มือการใช้เครื่องมือ MCP ทั้ง 38 (41 รวม Aliases) + 434 คำสั่ง (`Engine Manual`) | สูตรการทำงานและโฟลเดอร์เฉพาะเครื่องของผู้ใช้ (`Personal Autopilot SOP`) |
 | **สิ่งที่เก็บไว้ข้างใน** | ชื่อคำสั่ง, พารามิเตอร์, วิธีเรียก `af_pipeline`, `🎯 จัดกรอบ`, `✂️ ย่อชื่อ` | พาธโฟลเดอร์จริงบน Disk, ชื่อ Bin ใน Premiere, ชื่อพรีเซ็ต/กรอบประจำช่อง, กฎตั้งค่า Speed |
 | **การอัปเดตเวอร์ชัน** | ดึงอัปเดต (`git pull`) จากรีโปกลางได้ตลอดโดยไม่ทับข้อมูลส่วนตัว | เก็บแยกในโฟลเดอร์สกิลของเครื่องตนเอง (ปลอดภัย ไม่รั่วไหลสู่สาธารณะ) |
 
@@ -45,11 +45,12 @@ flowchart LR
    // เรียก Tool: autolab_list_templates
    {}
    ```
-2. **ดึงรายชื่อ Root Bin ใน Premiere Pro (เพื่อดูว่าผู้ใช้จัดหมวดหมู่ไว้อย่างไร เช่น `ก.หนัง`, `ข.รายการ`, `เป็นต่อ`, `นิ๊กกี้`):**
+2. **ดึงรายชื่อ Root Bin ใน Premiere Pro (เพื่อดูว่าผู้ใช้จัดหมวดหมู่ไว้อย่างไร เช่น หมวดหนัง, หมวดรายการ, หรือแยกตามชื่อเรื่อง):**
    ```json
-   // เรียก Tool: autolab_call_jsx
+   // เรียก Tool: autolab_pr_bin_tree
    {
-     "script": "var names=[]; for(var i=0; i<app.project.rootItem.children.numItems; i++){ var it=app.project.rootItem.children[i]; if(it.type===2) names.push(it.name); } JSON.stringify(names);"
+     "maxDepth": 2,
+     "includeClips": false
    }
    ```
 3. **เช็คสถานะหน้าจอปัจจุบันใน AutoLab (ถ้าเปิด Premiere Pro อยู่):**
@@ -63,7 +64,7 @@ flowchart LR
    - **ตรวจจับแบรนด์สปอนเซอร์ (Sponsor Brand):** เช่น `BrandA`, `BrandB`, ฯลฯ
 5. **แสดงผลสิ่งที่ตรวจพบแบบจัดกลุ่มเข้าใจง่ายให้ผู้ใช้ดู:**
    > *"ผมสแกนเทมเพลตและโปรเจกต์ในเครื่องนี้เรียบร้อยแล้ว พบข้อมูลโครงสร้างดังนี้ครับ:*
-   > - *หมวดโฟลเดอร์หลักใน Premiere Pro (Root Bins): `[เช่น ก.หนัง, ข.รายการ, เป็นต่อ]`*
+   > - *หมวดโฟลเดอร์หลักใน Premiere Pro (Root Bins): `[เช่น หมวดหนัง, หมวดรายการ, หรือรายชื่อเรื่อง]`*
    > - *ชุดพรีเซ็ตหลัก (Master Profiles): `[รายชื่อที่ตรวจพบ]`*
    > - *กรอบ `.mogrt` (Frames): `[แยกกลุ่มกรอบตามหมวดหมู่]`*
    > - *ป้ายโปรโมท `.mogrt` (Promos):*
@@ -144,7 +145,7 @@ description: "Personal and shared-machine production workflow for AutoLab CEP + 
 
 # สกิลเวิร์กโฟลว์ตัดต่ออัตโนมัติประจำเครื่อง (`my-premiere-production-workflow`)
 
-สกิลนี้เป็นคู่มือปฏิบัติการเฉพาะเครื่องที่ทำงานร่วมกับเครื่องมือมาตรฐานใน `autolab-premiere` (34 AutoLab Tools + 432 Premiere Pro Tools)
+สกิลนี้เป็นคู่มือปฏิบัติการเฉพาะเครื่องที่ทำงานร่วมกับเครื่องมือมาตรฐานใน `autolab-premiere` (38 AutoLab Tools · 41 with aliases + 434 Premiere Pro Tools)
 
 ---
 
@@ -154,8 +155,8 @@ description: "Personal and shared-machine production workflow for AutoLab CEP + 
 
 ```yaml
 diskRoot: "<พาธโฟลเดอร์หลักบน Disk เช่น D:\Clips\Output หรือ E:\Work\Videos>"
-categoryBin: "<ชื่อ Root Bin ใน Premiere Pro เช่น หนัง หรือ รายการ>"
-excludeDirs: "จบแล้ว,ลงแล้ว"
+categoryBin: "<ชื่อ Root Bin ใน Premiere Pro เช่น หมวดหนัง หรือ หมวดรายการ>"
+excludeDirs: "<โฟลเดอร์ที่ต้องการข้ามเมื่อเช็คสต็อก เช่น ลงแล้ว,จบแล้ว>"
 waitingSubBin: "<ชื่อ Sub-bin พักฟุตดิบกลาง เช่น รอ หรือ รอตัด>"
 lowStockThreshold: 15
 ```
@@ -166,8 +167,8 @@ lowStockThreshold: 15
 
 ### 1.1 ค่าคอนฟิกหลักประจำเครื่อง
 - **โฟลเดอร์หลักสำหรับเก็บคลิปที่ตัดเสร็จแล้ว (`diskRoot`):** `<ใส่พาธโฟลเดอร์หลักของผู้ใช้ เช่น D:\Clips\Output>`
-- **Root Bin หลักใน Premiere Pro (`categoryBin`):** `<ชื่อ Root Bin เช่น หนัง หรือ รายการ>`
-- **โฟลเดอร์ที่ต้องข้ามไม่สแกนเมื่อเช็คสต็อก (`excludeDirs`):** `จบแล้ว,ลงแล้ว`
+- **Root Bin หลักใน Premiere Pro (`categoryBin`):** `<ชื่อ Root Bin เช่น หมวดหนัง หรือ หมวดรายการ>`
+- **โฟลเดอร์ที่ต้องข้ามไม่สแกนเมื่อเช็คสต็อก (`excludeDirs`):** `<เช่น ลงแล้ว,จบแล้ว>`
 - **Sub-bin คลังพักฟุตดิบกลาง (`sourceSubBin`):** `<เช่น รอ หรือ รอตัด>`
 - **ป้ายแจ้งเตือนสต็อกใกล้หมดที่ต้องเปลี่ยนชื่อออกก่อนตัด:** `<เช่น - - จะหมด>`
 
@@ -235,20 +236,20 @@ lowStockThreshold: 15
    // Tool: autolab_pr_inspect
    {
      "diskRoot": "<พาธโฟลเดอร์บน Disk>",
-     "categoryBin": "<ชื่อ Root Bin เช่น ก.หนัง>",
-     "excludeDirs": "จบแล้ว,ลงแล้ว"
+     "categoryBin": "<ชื่อ Root Bin หมวดงาน>",
+     "excludeDirs": "<โฟลเดอร์ที่ต้องการข้าม เช่น ลงแล้ว,จบแล้ว>"
    }
    ```
-   *(หรือรันผ่าน CLI: `node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --check-disk --dir "<พาธโฟลเดอร์บน Disk>" --exclude "จบแล้ว,ลงแล้ว"` — ห้ามใส่คำค้นกรอง เพื่อให้ระบบสแกนสต็อกครบทุกเรื่อง)*
+   *(หรือรันผ่าน CLI: `node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --check-disk --dir "<พาธโฟลเดอร์บน Disk>" --exclude "<โฟลเดอร์ที่ต้องการข้าม>"` — ห้ามใส่คำค้นกรอง เพื่อให้ระบบสแกนสต็อกครบทุกเรื่อง)*
 
 2. **สำรวจ Bin และตรวจหาเลขตอนที่ค้างในโฟลเดอร์พักไฟล์ (ล็อกเฉพาะหมวด ไม่ปนกับหมวดอื่น):**
    ```json
    // Tool: autolab_pr_inspect
    {
      "query": "<ชื่อเรื่องหรือคำค้น>",
-     "categoryBin": "<ชื่อ Root Bin เช่น ก.หนัง>",
+     "categoryBin": "<ชื่อ Root Bin หมวดงาน>",
      "diskRoot": "<พาธโฟลเดอร์บน Disk>",
-     "excludeDirs": "จบแล้ว,ลงแล้ว"
+     "excludeDirs": "<โฟลเดอร์ที่ต้องการข้าม เช่น ลงแล้ว,จบแล้ว>"
    }
    ```
 
@@ -271,8 +272,8 @@ lowStockThreshold: 15
    // 2. ดึงฟุตเทจเข้าคิว (Tool: autolab_ah_queue_add)
    { "binPath": "<พาธ Bin>", "clearFirst": true }
 
-   // 3. เริ่มตัด (Tool: autolab_ah_run)
-   { "wait": false }
+   // 3. เริ่มตัดจนเสร็จ (Tool: autolab_ah_run)
+   { "wait": true }
    ```
 
 5. **รัน Auto Frame Pipeline รวดเดียวจบ (`af_pipeline`):**

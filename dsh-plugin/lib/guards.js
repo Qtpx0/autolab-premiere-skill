@@ -38,7 +38,7 @@ export const DEFAULT_PROMPT = `
 4. เจอ \`needsRecovery: true\` (ฟุตเทจยังอยู่ใน \`ไฟล์ต้นฉบับ\`) → ห้าม export sequence เก่า ต้องรัน \`pr_prepare_ep\` (\`recoverFromOriginalFirst\`) แล้วตัดใหม่
 5. ห้ามอ่าน \`output.txt\` ที่ค้างจาก session เก่า
 6. รายงานความคืบหน้า 1 บรรทัดก่อนเริ่มแต่ละ step
-7. ขอบเขตคำสั่งเช็คสต็อก: ถ้าสั่ง "เช็ครายการ" ให้ตรวจเฉพาะ root \`0.ตัดต่อแล้ว\` (ใส่ excludeDirs: "จบแล้ว,ลงแล้ว,หนัง") ห้ามไปสแกนโฟลเดอร์หนังเด็ดขาด! จะสแกนหนังก็ต่อเมื่อสั่งคำว่า "หนัง" หรือ "ทั้งหมด" เท่านั้น
+7. ขอบเขตคำสั่งเช็คสต็อก: ถ้าสั่ง "เช็ครายการ" ให้ตรวจเฉพาะโฟลเดอร์หมวดรายการตามสกิลประจำเครื่อง (ใส่ excludeDirs ข้ามโฟลเดอร์ที่โพสต์ไปแล้ว/โฟลเดอร์หมวดอื่นตามสกิลประจำเครื่อง) ห้ามไปสแกนโฟลเดอร์หมวดหนังเด็ดขาด! จะสแกนหมวดหนังก็ต่อเมื่อสั่งคำว่า "หนัง" หรือ "ทั้งหมด" เท่านั้น
 8. Auto Frame & Auto Scale: เมื่อเรียกใช้ Master Profile หรือใส่ Frame/Promo ให้ส่ง \`autoFit: true\` เสมอเป็นค่าเริ่มต้น เพื่อให้ระบบ Auto Scale วัดช่องใสและสแกนขอบดำจัดขนาดมิลลิเมตรให้อัตโนมัติ (เว้นแต่ผู้ใช้สั่งล็อกสเกลตายตัว ค่อยส่ง \`autoFit: false\`)
 9. Inspection Query Audit: ตรวจสอบฟิลด์ \`queryAudit\` ในผลลัพธ์ของ \`pr_inspect\` เสมอ; หากเรื่องใดขึ้น \`found: false\` แต่มี \`closestBins\` ให้ถามผู้ใช้สั้นๆ 1 บรรทัดเพื่อยืนยันชื่อเรื่อง ห้ามมโนสรุปว่าไม่มีบินเด็ดขาด!
 10. Zero-Delay Disk Creation & Strict Prefix Matching: การจับคู่โฟลเดอร์บน Disk ต้องดู "ชื่อเรื่องหลักส่วนหน้า" (Prefix ก่อนเครื่องหมาย - หรือ - -) เท่านั้น ห้ามนำชื่อเรื่องที่จะตัดไปจับคู่กับข้อความ Note/Memo ด้านหลังเด็ดขาด (โฟลเดอร์ที่มี Note ต่อท้าย ยังคงเป็นของเรื่องหลักส่วนหน้า ห้ามแตะ ห้ามเคลม และห้าม Rename เด็ดขาด); หากบน Disk ยังไม่มีโฟลเดอร์ที่ขึ้นต้นด้วยชื่อเรื่องนั้นตรงๆ ➔ ถือว่าเป็นเรื่องใหม่ที่ยังไม่มีโฟลเดอร์ ให้สร้างโฟลเดอร์ใหม่ชื่อคลีน (<ชื่อเรื่อง>) ทันที แล้วลุยต่อจนจบ ห้ามหยุดถาม และห้ามแย่ง/Rename โฟลเดอร์เรื่องอื่นมาใช้เด็ดขาด! (การ Rename ป้ายสถานะ อนุญาตเฉพาะโฟลเดอร์ของเรื่องตัวเองที่มี "- - จะหมด" ต่อท้ายเท่านั้น)
@@ -158,7 +158,7 @@ function evaluate({ fullName, raw, args, command, rules, shells, state }) {
   if (rules.banRawPremiereInspection !== false && INSPECTION_TOOLS.test(raw)) {
     return deny(
       `ห้ามใช้ ${raw} สำหรับเช็คสต็อกหรือส่อง Bin — ใช้ pr_inspect (เร็ว ~100 เท่า, output ไม่ล้น): ` +
-        `{"queries":["<ชื่อเรื่อง>"],"categoryBin":"ก.หนัง"} ` +
+        `{"queries":["<ชื่อเรื่อง>"],"categoryBin":"<หมวดหมู่>"} ` +
         `(ปิดชั่วคราว: config.rules.banRawPremiereInspection: false)`,
     );
   }
@@ -291,13 +291,13 @@ export function observeResult(state, payload) {
   state.observedResults += 1;
   // A serialized payload escapes inner quotes, so the marker matches with or
   // without a leading backslash: `"needsRecovery":true` and `\"needsRecovery\":true`.
-  if (/\\?"needsRecovery\\?"\s*:\s*true/i.test(text)) {
+  if (/\\?"?needsRecovery\\?"?\s*:\s*true/i.test(text)) {
     state.needsRecovery = true;
     state.recovered = false;
-  } else if (/\\?"needsRecovery\\?"\s*:\s*false/i.test(text)) {
+  } else if (/\\?"?needsRecovery\\?"?\s*:\s*false/i.test(text)) {
     state.needsRecovery = false;
   }
-  if (/recoverFromOriginalFirst|recoveredFromOriginal/i.test(text)) {
+  if (/recoverFromOriginalFirst|recoveredFromOriginal|removedHighlightsBins|recoveredClips/i.test(text)) {
     state.recovered = true;
     state.needsRecovery = false;
   }

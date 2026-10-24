@@ -142,38 +142,40 @@
   | `nodeId` | `string` | optional | รหัสคลิปเมื่อต้องการลบด้วย `remove_clip` |
 
 ### 2.3 `autolab_ah_configure`
-- **หน้าที่:** ตั้งค่าพารามิเตอร์ของระบบ Auto Highlights ทั้งหมด (ความยาวขั้นต่ำ/สูงสุด, จำนวนคลิปไฮไลท์ที่ต้องการ, โหมดวิเคราะห์ `hybrid`/`transcript`, ประเภทเนื้อหา `movie`/`podcast`, ความเร็ว Speed, Pitch, Audio Master และระบบป้องกันลิขสิทธิ์ Anti-Copyright Shield)
+- **หน้าที่:** ตั้งค่าพารามิเตอร์ของระบบ Auto Highlights ทั้งหมด (พรีเซ็ตลัด `preset: "movie"` หรือ `"show"`, โหมดวิเคราะห์ `engineMode: "gemini_audio"` Cloud AI Direct Audio, จำนวนคลิปไฮไลท์ `targetCount: 100`, ความยาว `duration: "0.5-1.5"`, ความเร็ว Speed Assist `1.15x`, Pitch `tone -2 / cents 3` และความละเอียด `1920x1080`)
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
   | :--- | :--- | :---: | :--- |
-  | `minDuration` | `number` | optional | ความยาวคลิปไฮไลท์ขั้นต่ำ (วินาที) เช่น `45` |
-  | `maxDuration` | `number` | optional | ความยาวคลิปไฮไลท์สูงสุด (วินาที) เช่น `120` |
-  | `targetCount` | `number` | optional | จำนวนคลิปไฮไลท์ที่ต้องการให้ตัดออกมาต่อเรื่อง เช่น `10` |
-  | `engineMode` | `string` (`"hybrid"` \| `"transcript"`) | optional | โหมดวิเคราะห์ (`"hybrid"` ผสมเสียง+บทพูด, `"transcript"` เน้นบทพูด) |
-  | `contentMode` | `string` (`"movie"` \| `"podcast"`) | optional | ประเภทเนื้อหา (`"movie"` หนัง/ละคร/รายการ, `"podcast"` รายการคุย) |
-  | `enableSpeed` | `boolean` | optional | เปิด/ปิดการเร่งความเร็วคลิปอัตโนมัติ |
-  | `speedPercent` | `number` | optional | เปอร์เซ็นต์ความเร็ว เช่น `105` |
-  | `pitchSemitones` | `number` | optional | ปรับระดับเสียง (Semitones) |
-  | `pitchCents` | `number` | optional | ปรับระดับเสียงละเอียด (Cents) |
-  | `enableAudioMaster` | `boolean` | optional | เปิด/ปิดการปรับแต่งเสียงพูดให้ดังคมชัดอัตโนมัติ |
-  | `enableAntiCopyrightShield` | `boolean` | optional | เปิด/ปิดเกราะป้องกันลิขสิทธิ์อัตโนมัติ |
+  | `preset` | `string` (`"movie"` \| `"show"`) | optional | พรีเซ็ตลัด: `"movie"` (เปิด Speed `1.15x`, `tone -2`, `cents 3`, `100 shots`, `60-90s`) หรือ `"show"` (ปิด Speed, `100 shots`, `60-90s`) |
+  | `engineMode` | `string` (`"gemini_audio"`) | optional | โหมดวิเคราะห์เสียงตรงด้วย Cloud AI Direct Audio (**ใช้ `"gemini_audio"` เสมอ — ห้ามใช้ `whisper`, `hybrid`, หรือ `transcript`**) |
+  | `targetCount` / `shotCount` | `number` | optional | จำนวนคลิปไฮไลท์เป้าหมาย (`default: 100`) |
+  | `duration` | `string` | optional | ช่วงความยาวคลิป เช่น `"0.5-1.5"` (`60-90s`) |
+  | `minDuration` | `number` | optional | ความยาวคลิปไฮไลท์ขั้นต่ำ (วินาที) เช่น `60` |
+  | `maxDuration` | `number` | optional | ความยาวคลิปไฮไลท์สูงสุด (วินาที) เช่น `90` |
+  | `style` | `string` | optional | สไตล์การตัด เช่น `"mixed"` |
+  | `aggressiveness` | `number` | optional | ความดุดันของการคัดช็อต (`default: 3`) |
+  | `resolution` | `string` | optional | ความละเอียด Sequence เช่น `"1920x1080"` |
+  | `enableSpeed` | `boolean` | optional | เปิด/ปิดการเร่งความเร็วคลิปอัตโนมัติ (หนัง=`true`, รายการ=`false`) |
+  | `speedPercent` | `number` | optional | เปอร์เซ็นต์ความเร็ว เช่น `115` (`1.15x`) |
+  | `pitchSemitones` | `number` | optional | ปรับระดับเสียง Semitones เช่น `-2` |
+  | `pitchCents` | `number` | optional | ปรับระดับเสียงละเอียด Cents เช่น `3` |
+  | `maintainPitch` | `boolean` | optional | รักษาระดับเสียงพูดเมื่อเร่งสปีด (`default: true`) |
 - **ตัวอย่างการเรียกใช้:**
   ```json
-  {
-    "minDuration": 45,
-    "maxDuration": 120,
-    "targetCount": 100,
-    "engineMode": "hybrid",
-    "contentMode": "movie"
-  }
+  // งานหนัง/ซีรีส์ (เปิด Speed 1.15x อัตโนมัติ):
+  { "preset": "movie" }
+
+  // งานรายการทีวี (ปิด Speed อัตโนมัติ):
+  { "preset": "show" }
   ```
 
 ### 2.4 `autolab_ah_run`
-- **หน้าที่:** กดเริ่มสแกนไฟล์หนัง ถอดเสียง คัดเลือกซีนเด็ดด้วย AI และตัดสร้าง Sub-Sequence ไฮไลท์ใน Premiere Pro จนเสร็จ
+- **หน้าที่:** กดเริ่มสแกนไฟล์หนัง ถอดเสียง คัดเลือกซีนเด็ดด้วย AI และตัดสร้าง Sub-Sequence ไฮไลท์ใน Premiere Pro จนเสร็จ พร้อมคืนค่าสรุป QA (`completed`, `totalClipsProcessed`, `totalShotsCreated`, `successCount`, `errorCount`, `outputBinPath`, `deliveryConfirmed`, `sampleShots`)
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
   | :--- | :--- | :---: | :--- |
   | `wait` | `boolean` | optional | รอจนกว่าจะตัดไฮไลท์เสร็จทั้งหมดค่อยคืนค่า (`default: true`) |
+  | `verbose` | `boolean` | optional | คืนรายการ `shots` ทั้งหมดครบทุกตัว (`default: false` เพื่อความกระชับ) |
 
 ### 2.5 `autolab_ah_status`
 - **หน้าที่:** ดูความคืบหน้าแบบสดๆ (Live Progress) และสถานะของแต่ละคลิปในคิว Auto Highlights
@@ -491,22 +493,22 @@
 
 <a id="cat-g"></a>
 
-## 7. หมวด G: คำสั่งตรวจสอบ Bin / เตรียมตอน / ส่งออก Media Encoder และคำสั่งขั้นสูง (5 Tools)
+## 7. หมวด G: คำสั่งจัดการ Bin / ตรวจสอบ / เตรียมตอน / ส่งออก Media Encoder และคำสั่งขั้นสูง (9 Tools + 3 Aliases)
 
 ### 7.1 `autolab_pr_inspect`
-- **หน้าที่:** ตรวจสอบโครงสร้างโฟลเดอร์/Bin ใน Premiere Pro แบบเจาะจง (รองรับทั้งเรื่องเดียวหรือหลายเรื่องพร้อมกันผ่าน `queries: [...]`) หรือสแกนทั้งโปรเจกต์: ดูจำนวนคลิป, ดู Sub-bin ทั้งหมด, และดึงรายการไฟล์ฟุตเทจที่ยังไม่ได้ตัด (`readyToCut`) พร้อมตรวจจับเลขตอนอัตโนมัติ (`detectedEp: "ep3"`, `"ep4"`) ช่วยให้ AI รู้ได้ทันที 100% ว่าต้องตัดต่อตอนไหนโดยไม่ต้องเดา
+- **หน้าที่:** ตรวจสอบโครงสร้างโฟลเดอร์/Bin ใน Premiere Pro แบบเจาะจง (รองรับทั้งเรื่องเดียวหรือหลายเรื่องพร้อมกันผ่าน `queries: [...]`) หรือสแกนสต็อกบน Disk: ดูจำนวนคลิป, ดู Sub-bin ทั้งหมด, แยกแยะไฟล์ฟุตเทจใหม่ใน `รอ` (`binUncut`) ออกจากไฟล์ที่ตัดไปแล้วใน `ไฟล์ต้นฉบับ` (`binRecoverable` / `needsRecovery`), ดึงรายการไฟล์ฟุตเทจที่ยังไม่ได้ตัด (`readyToCut`) พร้อมตรวจจับเลขตอนอัตโนมัติ (`detectedEp: "ep3"`, `"ep4"`) และคืนผลตรวจสอบรายคำค้น (`queryAudit`)
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
   | :--- | :--- | :---: | :--- |
-  | `categoryBin` | `string` | optional | ชื่อหรือคำค้นของ Root Bin ใน Premiere Pro (เช่น `"ก.หนัง"`, `"ข.รายการ"`, `"Anime"`) เพื่อล็อกเป้าสแกนเฉพาะหมวดนั้น 100% ไม่ปนกับหมวดอื่น และช่วยให้คืนผลลัพธ์เร็วระดับ 0.05 วินาที |
+  | `categoryBin` | `string` | optional | ชื่อหรือคำค้นของ Root Bin ใน Premiere Pro (เช่น `"Movies"`, `"TV_Shows"`, `"Anime"`) เพื่อล็อกเป้าสแกนเฉพาะหมวดนั้น 100% ไม่ปนกับหมวดอื่น และช่วยให้คืนผลลัพธ์เร็วระดับ 0.05 วินาที |
   | `rootBin` | `string` | optional | นามแฝง (Alias) ของ `categoryBin` |
   | `binName` | `string` | optional | ชื่อหรือพาธเต็มของ Bin ใน Premiere Pro ที่ต้องการส่องเจาะจง (เช่น `"Movies/Series_A"`) |
   | `binPath` | `string` | optional | นามแฝง (Alias) ของ `binName` |
-  | `query` | `string` | optional | คำค้นหาชื่อหรือพาธของ Bin (หากไม่ระบุจะสแกนภาพรวมทั้งโปรเจกต์) |
-  | `queries` | `array` | optional | รายชื่อเรื่องหลายเรื่องพร้อมกัน เช่น `["ทองเนื้อเก้า", "หลักสูตร"]` |
-  | `diskRoot` | `string` | optional | โฟลเดอร์บน Disk ที่ต้องการสแกนนับจำนวนไฟล์ `.mp4` และสรุปสต็อก (`totalRemaining` + `lowStockShows`) ควบคู่กัน |
+  | `query` | `string` | optional | คำค้นหาชื่อหรือพาธของ Bin |
+  | `queries` | `array` | optional | รายชื่อเรื่องหลายเรื่องพร้อมกัน เช่น `["Series_A", "Series_B"]` |
+  | `diskRoot` / `diskPath` | `string` | optional | โฟลเดอร์บน Disk ที่ต้องการสแกนนับจำนวนไฟล์ `.mp4` และสรุปสต็อก (`totalRemaining` + `lowStockShows`) ควบคู่กัน |
   | `diskFilter` | `string` | optional | คำกรองชื่อโฟลเดอร์บน Disk |
-  | `excludeDirs` | `string` | optional | รายชื่อโฟลเดอร์ที่ต้องการยกเว้นคั่นด้วยจุลภาค เช่น `"จบแล้ว,ลงแล้ว"` |
+  | `excludeDirs` | `string` | optional | รายชื่อโฟลเดอร์ที่ต้องการยกเว้นคั่นด้วยจุลภาค (ตามที่ตั้งค่าในสกิลประจำเครื่อง เช่น `"ลงแล้ว,จบแล้ว"`) |
   | `lowStockThreshold` | `number` | optional | เกณฑ์สต็อกต่ำสำหรับสรุป `lowStockShows` ใน `diskSummary` (`default: 15`) |
   | `scanPremiere` | `boolean` | optional | บังคับให้สแกนเจาะจงใน Premiere Pro แม้จะไม่ได้ระบุ `query` (`default: false`) |
   | `includeShows` | `boolean` | optional | คืนค่าก้อน `shows` สรุปรายเรื่องแบบละเอียด (`default: false` — ตัดออกเป็นค่าเริ่มต้นเพื่อลดขนาด JSON ให้สั้นกระชับ ไม่เด้งเข้า `output.txt`) |
@@ -525,12 +527,13 @@
     },
     "diskFolders": [ ... ],
     "readyToCutCount": 1,
-    "readyToCut": [ ... ]
+    "readyToCut": [ ... ],
+    "queryAudit": [ ... ]
   }
   ```
 
 ### 7.2 `autolab_pr_prepare_ep`
-- **หน้าที่:** เตรียมความพร้อมก่อนเริ่มตัดในคำสั่งเดียว (รองรับทั้งเรื่องเดียวหรือหลายเรื่องพร้อมกันผ่าน `items: [...]`): เปลี่ยนชื่อโฟลเดอร์บน Disk, สร้างโฟลเดอร์ย่อยสำหรับตอนใหม่ (`ep1`, `ep2`...) บน Disk, ลบ Bin `HIGHLIGHTS_` ของตอนเก่าที่ส่งออกไปแล้วใน Premiere Pro, สร้าง Sub-bin `epX` ใน Premiere Pro และย้ายไฟล์ฟุตเทจจาก Sub-bin พักไฟล์ออกมาเตรียมตัด
+- **หน้าที่:** เตรียมความพร้อมก่อนเริ่มตัดในคำสั่งเดียว (รองรับทั้งเรื่องเดียวหรือหลายเรื่องพร้อมกันผ่าน `items: [...]`): เปลี่ยนชื่อโฟลเดอร์บน Disk, สร้างโฟลเดอร์ย่อยสำหรับตอนใหม่ (`ep1`, `ep2`...) บน Disk, ลบ Bin `HIGHLIGHTS_` ของตอนเก่าที่ส่งออกไปแล้วใน Premiere Pro, สร้าง Sub-bin `epX` ใน Premiere Pro และย้ายไฟล์ฟุตเทจ 1 คลิปจาก Sub-bin พักไฟล์ (`รอ`) ออกมาเตรียมตัด (หรือดึงจาก `HIGHLIGHTS_/ไฟล์ต้นฉบับ` เมื่อใน `รอ` ไม่มีคลิปใหม่รออยู่)
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
   | :--- | :--- | :---: | :--- |
@@ -542,7 +545,9 @@
   | `renameDiskTo` | `string` | optional | พาธโฟลเดอร์ใหม่บน Disk หลังเปลี่ยนชื่อ |
   | `createDiskDir` | `string` | optional | พาธโฟลเดอร์ปลายทางบน Disk ที่ต้องการสร้างไว้รอรับไฟล์ Export |
   | `removeOldHighlights` | `boolean` | optional | ลบ Bin `HIGHLIGHTS_` เก่าในโฟลเดอร์เป้าหมายก่อนเริ่มตัด (`default: true`) |
-  | `recoverFromOriginalFirst` | `boolean` | optional | ดึงไฟล์ฟุตเทจตัวเต็มจาก `HIGHLIGHTS_/ไฟล์ต้นฉบับ` กลับออกมาก่อนลบ `HIGHLIGHTS_` (`default: false`) |
+  | `recoverFromOriginalFirst` | `boolean` | optional | ดึงไฟล์ฟุตเทจตัวเต็มจาก `HIGHLIGHTS_/ไฟล์ต้นฉบับ` กลับออกมาก่อนลบ `HIGHLIGHTS_` เมื่อไม่มีคลิปใหม่ใน `รอ` (`default: true`) |
+  | `forceRecoverOriginal` | `boolean` | optional | บังคับกู้ไฟล์จาก `HIGHLIGHTS_/ไฟล์ต้นฉบับ` แม้จะมีคลิปใหม่ใน `รอ` (`default: false` เพื่อป้องกันไม่ให้คลิปเก่าไปปนกับคลิปใหม่) |
+  | `items` | `array` | optional | ส่งเตรียมหลายเรื่องพร้อมกันใน 1 คำสั่ง |
 
 ### 7.3 `autolab_pr_export_ame`
 - **หน้าที่:** ส่งออกทุก Sequence ใน Bin `HIGHLIGHTS_` เข้าคิว **Adobe Media Encoder** แบบยกชุดในคำสั่งเดียว
@@ -572,21 +577,21 @@
   | `timeoutMs` | `number` | optional | เวลารอสูงสุดมิลลิวินาที (`default: 60000`) |
 
 ### 7.6 `autolab_pr_create_bin`
-- **หน้าที่:** สร้าง Bin ใหม่แบบ Recursive `mkdir -p` (รองรับพาธลึก เช่น `"ก.หนัง/Show/ep1"` หรือ `parentBin` + `name`) ไม่เกิด Error หาก Bin มีอยู่แล้ว
+- **หน้าที่:** สร้าง Bin ใหม่แบบ Recursive `mkdir -p` (รองรับพาธลึก เช่น `"หมวดหมู่/Show/ep1"` หรือ `parentBin` + `name`) ไม่เกิด Error หาก Bin มีอยู่แล้ว
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
   | :--- | :--- | :---: | :--- |
-  | `binPath` | `string` | optional | พาธเต็มหรือสัมพัทธ์ของ Bin ที่ต้องการสร้าง (เช่น `"ก.หนัง/เรื่อง/ep1"`) |
+  | `binPath` | `string` | optional | พาธเต็มหรือสัมพัทธ์ของ Bin ที่ต้องการสร้าง (เช่น `"หมวดหมู่/เรื่อง/ep1"`) |
   | `parentBin` | `string` | optional | พาธของ Bin แม่ (ใช้คู่กับ `name`) |
   | `name` | `string` | optional | ชื่อ Bin ที่ต้องการสร้าง |
 - **ตัวอย่างการเรียกใช้:**
   - **Native MCP:**
     ```json
-    { "binPath": "ก.หนัง/<ชื่อเรื่อง>/ep1" }
+    { "binPath": "<หมวดหมู่>/<ชื่อเรื่อง>/ep1" }
     ```
   - **Universal CLI:**
     ```powershell
-    node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_create_bin --arg binPath="ก.หนัง/<ชื่อเรื่อง>/ep1"
+    node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_create_bin --arg binPath="<หมวดหมู่>/<ชื่อเรื่อง>/ep1"
     ```
 
 ### 7.7 `autolab_pr_delete_bin` *(นามแฝง: `autolab_pr_bin_clean`)*
@@ -594,7 +599,7 @@
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
   | :--- | :--- | :---: | :--- |
-  | `binPath` | `string` | optional | พาธหรือชื่อของ Bin หรือไอเทมที่ต้องการลบ |
+  | `binPath` / `binName` | `string` | optional | พาธหรือชื่อของ Bin หรือไอเทมที่ต้องการลบ |
   | `nodeId` | `string` | optional | NodeId เฉพาะเจาะจงของไอเทมที่ต้องการลบ |
   | `pattern` | `string` | optional | Wildcard หรือ Glob pattern สำหรับกวาดล้างไอเทมใน Bin เช่น `"S*"`, `"HIGHLIGHTS_*"` |
   | `cleanSequences` | `boolean` | optional | กวาดล้าง Sequence ทั้งหมดใน Bin เป้าหมายทิ้งทันที โดยปลอดภัยไม่แตะต้องฟุตเทจ |
@@ -606,15 +611,15 @@
   - **Native MCP:**
     ```json
     // กวาด Sequence ไฮไลท์ S* ทั้งหมดทิ้ง:
-    { "binPath": "ก.หนัง/<ชื่อเรื่อง>", "pattern": "S*" }
+    { "binPath": "<หมวดหมู่>/<ชื่อเรื่อง>", "pattern": "S*" }
 
     // ลบโฟลเดอร์ Bin พร้อมของข้างใน:
-    { "binPath": "ก.หนัง/<ชื่อเรื่อง>/HIGHLIGHTS_<ชื่อเรื่อง>", "force": true }
+    { "binPath": "<หมวดหมู่>/<ชื่อเรื่อง>/HIGHLIGHTS_<ชื่อเรื่อง>", "force": true }
     ```
   - **Universal CLI:**
     ```powershell
-    node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_delete_bin --arg binPath="ก.หนัง/<ชื่อเรื่อง>" --arg pattern="S*"
-    node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_delete_bin --arg binPath="ก.หนัง/<ชื่อเรื่อง>/HIGHLIGHTS_<ชื่อเรื่อง>" --arg force=true
+    node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_delete_bin --arg binPath="<หมวดหมู่>/<ชื่อเรื่อง>" --arg pattern="S*"
+    node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_delete_bin --arg binPath="<หมวดหมู่>/<ชื่อเรื่อง>/HIGHLIGHTS_<ชื่อเรื่อง>" --arg force=true
     ```
 
 ### 7.8 `autolab_pr_move_item` *(นามแฝง: `autolab_pr_bin_move`)*
@@ -633,13 +638,13 @@
     ```json
     {
       "from": "<ชื่อไฟล์คลิป>.mp4",
-      "to": "ก.หนัง/<ชื่อเรื่อง>/ep1",
+      "to": "<หมวดหมู่>/<ชื่อเรื่อง>/ep1",
       "autoCreateTarget": true
     }
     ```
   - **Universal CLI:**
     ```powershell
-    node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_move_item --arg from="<ชื่อไฟล์คลิป>.mp4" --arg to="ก.หนัง/<ชื่อเรื่อง>/ep1"
+    node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_move_item --arg from="<ชื่อไฟล์คลิป>.mp4" --arg to="<หมวดหมู่>/<ชื่อเรื่อง>/ep1"
     ```
 
 ### 7.9 `autolab_pr_bin_tree` *(นามแฝง: `autolab_pr_find_bin`)*
@@ -647,18 +652,21 @@
 - **พารามิเตอร์:**
   | ชื่อพารามิเตอร์ | ชนิดข้อมูล | บังคับ | คำอธิบาย |
   | :--- | :--- | :---: | :--- |
-  | `binPath` | `string` | optional | พาธหรือชื่อ Bin ที่ต้องการส่อง (หากไม่ระบุจะส่องจาก Root โปรเจกต์) |
+  | `binPath` / `binName` | `string` | optional | พาธหรือชื่อ Bin ที่ต้องการส่อง (หากไม่ระบุจะส่องจาก Root โปรเจกต์) |
   | `query` | `string` | optional | คำค้นหาชื่อหรือพาธ Bin (นามแฝงของ `binPath`) |
   | `maxDepth` | `number` | optional | ความลึกสูงสุดในการส่อง (`default: 3`) |
-  | `includeClips` | `boolean` | optional | รวมคลิปและ Sequence ในผลลัพธ์ (`default: true`) |
+  | `includeClips` | `boolean` | optional | รวมคลิปในผลลัพธ์ (`default: true`) |
+  | `includeSequences` | `boolean` | optional | แสดงรายการ Sequence ย่อยใน `HIGHLIGHTS_*` ทั้งหมด (`default: false` — สรุปเป็น `sequenceCount` เพื่อความกระชับ) |
+  | `includeSystemBins` | `boolean` | optional | แสดงโฟลเดอร์ระบบภายในของ Premiere/AutoLab (`default: false`) |
+  | `verbose` | `boolean` | optional | แสดงรายการทุกไอเทมแบบไม่ย่อ (`default: false`) |
 - **ตัวอย่างการเรียกใช้:**
   - **Native MCP:**
     ```json
-    { "binPath": "ก.หนัง/<ชื่อเรื่อง>", "includeClips": true, "maxDepth": 3 }
+    { "binPath": "<หมวดหมู่>/<ชื่อเรื่อง>", "includeClips": true, "maxDepth": 3 }
     ```
   - **Universal CLI:**
     ```powershell
-    node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_bin_tree --arg binPath="ก.หนัง/<ชื่อเรื่อง>"
+    node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_bin_tree --arg binPath="<หมวดหมู่>/<ชื่อเรื่อง>"
     ```
 
 

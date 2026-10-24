@@ -1,7 +1,7 @@
 /**
  * dsh-autolab-premiere — DeepSeek Harness bundle for AutoLab CEP + Adobe Premiere Pro.
  *
- * The MCP rows in `cordis.patch.yml` put 34 AutoLab tools and 432 Premiere Pro
+ * The MCP rows in `cordis.patch.yml` put 38 AutoLab tools (41 with aliases) and 434 Premiere Pro
  * tools in front of the model. This host plugin adds the part a skill cannot:
  *
  *   1. Guards  — the SKILL.md iron rules become denials the model cannot talk

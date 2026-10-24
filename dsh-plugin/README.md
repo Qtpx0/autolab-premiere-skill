@@ -1,15 +1,15 @@
 # dsh-autolab-premiere
 
 DeepSeek Harness bundle for **AutoLab CEP Extension + Adobe Premiere Pro**.
-ต่อ MCP ครบทั้ง **34 AutoLab tools** และ **432 Premiere Pro tools** เข้า DSH พร้อมแปลง
+ต่อ MCP ครบทั้ง **38 AutoLab tools (41 รวม aliases)** และ **434 Premiere Pro tools** เข้า DSH พร้อมแปลง
 "กฎเหล็ก" ของสกิลให้เป็น **guard ที่บังคับได้จริง** — skill บอกว่าห้ามทำ X, bundle นี้ทำให้ทำ X ไม่ได้
 
 ## มีอะไรในกล่อง
 
 | ส่วน | กลไก | ทำอะไร |
 | :--- | :--- | :--- |
-| `mcp-autolab` | `@deepseek-ai/dsh-mcp-client` (stdio) | 34 AutoLab tools ผ่าน HTTP RPC ไปยัง CEP bridge (`1–7 ms`, พอร์ตอ่านสดจาก `autolab-bridge-info.json`) |
-| `mcp-premiere-pro` | `@deepseek-ai/dsh-mcp-client` (stdio) | 432 Premiere Pro tools ผ่าน CEP file queue (`%TEMP%\premiere-mcp-bridge`) |
+| `mcp-autolab` | `@deepseek-ai/dsh-mcp-client` (stdio) | 38 AutoLab tools (41 รวม aliases) ผ่าน HTTP RPC ไปยัง CEP bridge (`1–7 ms`, พอร์ตอ่านสดจาก `autolab-bridge-info.json`) |
+| `mcp-premiere-pro` | `@deepseek-ai/dsh-mcp-client` (stdio) | 434 Premiere Pro tools ผ่าน CEP file queue (`%TEMP%\premiere-mcp-bridge`) |
 | `autolab-premiere` | host plugin (`index.js`) | guard + operator contract + bundled skill |
 
 เครื่องมือจะโผล่ในชื่อ `mcp__autolab__pr_inspect`, `mcp__premiere-pro__list_project_items` ตามแบบแผนของ DSH

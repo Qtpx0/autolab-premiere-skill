@@ -127,8 +127,8 @@ var roBin = findBin(root, "รอ");
    // Tool: autolab_pr_inspect
    {
      "diskRoot": "<พาธโฟลเดอร์บน Disk>",
-     "categoryBin": "<ชื่อ Root Bin เช่น ก.หนัง หรือ ข.รายการ>",
-     "excludeDirs": "จบแล้ว,ลงแล้ว"
+     "categoryBin": "<ชื่อ Root Bin หมวดงานใน Premiere Pro>",
+     "excludeDirs": "<โฟลเดอร์ที่ต้องการข้าม เช่น ลงแล้ว,จบแล้ว>"
    }
    ```
    *(หรือใส่ `query: "<ชื่อเรื่อง>"` หรือ `queries: [...]` เพื่อส่องดูไฟล์ใน `รอ` และตรวจจับเลขตอน `detectedEp`; ระบบจะคืนฟิลด์ `queryAudit` แจกแจงสถานะรายคำค้นพร้อม `closestBins` หากชื่อเรื่องสะกดใกล้เคียง)*
@@ -155,22 +155,22 @@ var roBin = findBin(root, "รอ");
 - **Native MCP:**
   ```json
   // Tool: autolab_pr_bin_tree
-  { "binPath": "ก.หนัง/<ชื่อเรื่อง>", "includeClips": true, "maxDepth": 3 }
+  { "binPath": "<หมวดหมู่>/<ชื่อเรื่อง>", "includeClips": true, "maxDepth": 3 }
   ```
 - **Universal CLI:**
   ```powershell
-  node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_bin_tree --arg binPath="ก.หนัง/<ชื่อเรื่อง>"
+  node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_bin_tree --arg binPath="<หมวดหมู่>/<ชื่อเรื่อง>"
   ```
 
 #### 2. สร้าง Bin ใหม่แบบ Recursive `mkdir -p` (`autolab_pr_create_bin`):
 - **Native MCP:**
   ```json
   // Tool: autolab_pr_create_bin
-  { "binPath": "ก.หนัง/<ชื่อเรื่อง>/ep1" }
+  { "binPath": "<หมวดหมู่>/<ชื่อเรื่อง>/ep1" }
   ```
 - **Universal CLI:**
   ```powershell
-  node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_create_bin --arg binPath="ก.หนัง/<ชื่อเรื่อง>/ep1"
+  node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_create_bin --arg binPath="<หมวดหมู่>/<ชื่อเรื่อง>/ep1"
   ```
 
 #### 3. ย้ายคลิป/Sequence พร้อมสร้าง Bin ปลายทางอัตโนมัติ (`autolab_pr_move_item`):
@@ -179,13 +179,13 @@ var roBin = findBin(root, "รอ");
   // Tool: autolab_pr_move_item
   {
     "from": "<ชื่อไฟล์คลิป>.mp4",
-    "to": "ก.หนัง/<ชื่อเรื่อง>/ep1",
+    "to": "<หมวดหมู่>/<ชื่อเรื่อง>/ep1",
     "autoCreateTarget": true
   }
   ```
 - **Universal CLI:**
   ```powershell
-  node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_move_item --arg from="<ชื่อไฟล์คลิป>.mp4" --arg to="ก.หนัง/<ชื่อเรื่อง>/ep1"
+  node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_move_item --arg from="<ชื่อไฟล์คลิป>.mp4" --arg to="<หมวดหมู่>/<ชื่อเรื่อง>/ep1"
   ```
 
 #### 4. ลบ Bin หรือกวาด Sequence ไฮไลท์ทิ้งยกชุดด้วย High-Speed Batch Sweep (`autolab_pr_delete_bin`):
@@ -194,15 +194,15 @@ var roBin = findBin(root, "รอ");
   ```json
   // Tool: autolab_pr_delete_bin
   // ท่ากวาด Sequence S* ทั้งหมดใน Bin ทิ้งในคำสั่งเดียว:
-  { "binPath": "ก.หนัง/<ชื่อเรื่อง>", "pattern": "S*" }
+  { "binPath": "<หมวดหมู่>/<ชื่อเรื่อง>", "pattern": "S*" }
 
   // ท่าลบ Bin ทั้งโฟลเดอร์:
-  { "binPath": "ก.หนัง/<ชื่อเรื่อง>/HIGHLIGHTS_<ชื่อเรื่อง>", "force": true }
+  { "binPath": "<หมวดหมู่>/<ชื่อเรื่อง>/HIGHLIGHTS_<ชื่อเรื่อง>", "force": true }
   ```
 - **Universal CLI:**
   ```powershell
-  node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_delete_bin --arg binPath="ก.หนัง/<ชื่อเรื่อง>" --arg pattern="S*"
-  node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_delete_bin --arg binPath="ก.หนัง/<ชื่อเรื่อง>/HIGHLIGHTS_<ชื่อเรื่อง>" --arg force=true
+  node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_delete_bin --arg binPath="<หมวดหมู่>/<ชื่อเรื่อง>" --arg pattern="S*"
+  node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --call pr_delete_bin --arg binPath="<หมวดหมู่>/<ชื่อเรื่อง>/HIGHLIGHTS_<ชื่อเรื่อง>" --arg force=true
   ```
 
 ### Step 2: ตัดไฮไลท์อัตโนมัติ (Auto Highlights) *(ข้ามไป Step 3 ได้หากมีคลิป/Sequence ใน Bin พร้อมแล้ว)*
@@ -338,9 +338,9 @@ var roBin = findBin(root, "รอ");
 เมื่อต้องการดูรายละเอียดพารามิเตอร์ของเครื่องมือเฉพาะส่วน ให้เปิดอ่านไฟล์ในโฟลเดอร์ `references/` ตามรายการนี้:
 
 1. **[`references/01-connection-and-bridge.md`](references/01-connection-and-bridge.md)** — สถาปัตยกรรม Dual Bridge (`http://127.0.0.1:17890` & `%TEMP%\premiere-mcp-bridge`), การรันผ่าน CLI โดยตรง (`--status`, `--list-tools`, `--call`), และตารางแก้ปัญหา
-2. **[`references/02-autolab-30-tools-reference.md`](references/02-autolab-30-tools-reference.md)** — **คู่มืออ้างอิงครบทั้ง 33 Tools ของ `autolab` MCP** (รวม `autolab_af_pipeline`, `autolab_pr_prepare_ep`, `autolab_pr_export_ame`) พร้อมตารางพารามิเตอร์ทุกฟิลด์และตัวอย่าง JSON
+2. **[`references/02-autolab-30-tools-reference.md`](references/02-autolab-30-tools-reference.md)** — **คู่มืออ้างอิงครบทั้ง 38 Tools (41 รวม Aliases) ของ `autolab` MCP** (รวม `autolab_af_pipeline`, `autolab_pr_prepare_ep`, `autolab_pr_export_ame`, และ 7 Native Bin Tools) พร้อมตารางพารามิเตอร์ทุกฟิลด์และตัวอย่าง JSON
 3. **[`references/03-auto-frame-and-vision-sop.md`](references/03-auto-frame-and-vision-sop.md)** — คู่มือปฏิบัติการเชิงลึกของ Auto Frame Queue, การจัดกรอบด้วย AI Vision (`🎯 จัดกรอบ`), และการตั้ง/ย่อชื่อคลิปไวรัล
 4. **[`references/04-auto-highlights-and-jumpcut-sop.md`](references/04-auto-highlights-and-jumpcut-sop.md)** — คู่มือปฏิบัติการเชิงลึกของ Auto Highlights และ Auto Jump Cut
-5. **[`references/05-premiere-pro-432-tools-catalog.md`](references/05-premiere-pro-432-tools-catalog.md)** — **สารบัญและแคตตาล็อกครบทั้ง 432 Tools ของ `premiere-pro` MCP (`v1.24.1`)** แยกตาม 8 หมวดหมู่พร้อมพารามิเตอร์ทุกตัว
+5. **[`references/05-premiere-pro-432-tools-catalog.md`](references/05-premiere-pro-432-tools-catalog.md)** — **สารบัญและแคตตาล็อกครบทั้ง 434 Tools ของ `premiere-pro` MCP (`v1.24.1`)** แยกตาม 8 หมวดหมู่พร้อมพารามิเตอร์ทุกตัว
 6. **[`references/06-personal-workflow-skill-builder-guide.md`](references/06-personal-workflow-skill-builder-guide.md)** — **คู่มือจับมือทำสำหรับให้ AI สัมภาษณ์ผู้ใช้ สำรวจพรีเซ็ตในเครื่อง และสร้างสกิลเวิร์กโฟลว์ประจำตัว (`SKILL.md`) ให้อัตโนมัติ**
 

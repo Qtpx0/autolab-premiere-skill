@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "AutoLab Premiere Operator",
-    "description": "Wires the AutoLab CEP (34 tools) and Premiere Pro (432 tools) MCP servers into DeepSeek Harness, enforces the operator iron rules as hard guards, and contributes the official autolab-premiere skill."
+    "description": "Wires the AutoLab CEP (38 tools · 41 with aliases) and Premiere Pro (434 tools) MCP servers into DeepSeek Harness, enforces the operator iron rules as hard guards, and contributes the official autolab-premiere skill."
   }
 }
