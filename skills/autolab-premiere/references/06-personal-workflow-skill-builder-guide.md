@@ -236,7 +236,7 @@ lowStockThreshold: 15
 
 > 💡 **กฎสำคัญ:** ในโปรแกรม AI (Antigravity / Cursor) ให้เรียก **Native MCP Tools** โดยตรงเสมอ (รวดเร็ว 1-5ms ไม่ต้องรัน Terminal) หากจำเป็นต้องรันผ่าน Terminal ให้ใช้พาธติดตั้งสากล: `node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js"`
 
-1. **เช็คสต็อกบน Disk (จัดอันดับเรื่องที่เหลือน้อยสุด โดยไม่ต้องเปิด Premiere Pro):**
+1. **เช็คสต็อกบน Disk (จัดอันดับเรื่องที่เหลือน้อยสุด พร้อมสแกน Premiere Pro อัตโนมัติเฉพาะเรื่องที่ใกล้หมด):**
    ```json
    // Tool: autolab_pr_inspect
    {
@@ -245,7 +245,7 @@ lowStockThreshold: 15
      "excludeDirs": "<โฟลเดอร์ที่ต้องการข้าม เช่น ลงแล้ว,จบแล้ว>"
    }
    ```
-   *(หรือรันผ่าน CLI: `node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --check-disk --dir "<พาธโฟลเดอร์บน Disk>" --exclude "<โฟลเดอร์ที่ต้องการข้าม>"` — ห้ามใส่คำค้นกรอง เพื่อให้ระบบสแกนสต็อกครบทุกเรื่อง)*
+   *(💡 **v1.8.2 Smart Auto-Scoping:** เมื่อส่ง `diskRoot` พร้อม `categoryBin` ระบบจะสแกนเฉพาะเรื่องที่สต็อกใกล้หมด `lowStockShows` (<= 15 คลิป) ใน Premiere Pro อัตโนมัติใน `< 0.2s` ตัดปัญหาเรื่องที่มีสต็อกเยอะไม่ให้หลุดเข้าไปใน `readyToCut`! หรือรันผ่าน CLI: `node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --check-disk --dir "<พาธโฟลเดอร์บน Disk>" --exclude "<โฟลเดอร์ที่ต้องการข้าม>" --arg categoryBin="<หมวดงาน>"`)*
 
 2. **สำรวจ Bin และตรวจหาเลขตอนที่ค้างในโฟลเดอร์พักไฟล์ (ล็อกเฉพาะหมวด ไม่ปนกับหมวดอื่น):**
    ```json
@@ -303,6 +303,7 @@ lowStockThreshold: 15
      "outputDir": "<พาธปลายทางบน Disk>"
    }
    ```
+   *(💡 **v1.8.2 Zero-Delay Auto-Render:** คำสั่ง `pr_export_ame` ตั้งค่า `startQueue: true` อัตโนมัติ จะสั่งให้ Media Encoder เริ่มเรนเดอร์ทันทีใน `0ms` ผ่าน `app.encoder.startBatch()` โดยไม่ต้องกดปุ่ม Start Queue เอง หรือรอตัวนับถอยหลัง 2 นาที)*
 ````
 
 ---

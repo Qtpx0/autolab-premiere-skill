@@ -1,6 +1,6 @@
 ---
 name: autolab-premiere
-version: "1.8.1"
+version: "1.8.2"
 description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension (38 AutoLab UI, pipeline & production tools · 41 with aliases) and Adobe Premiere Pro MCP (434 native timeline/project tools · v1.24.1). Use whenever the user asks to inspect Premiere Pro bins/movies, run Auto Highlights, load clips into Auto Frame Queue, assign .mogrt Frames & Promo banners per bin, tune frame scale/position ('🎯 จัดกรอบ') with AI Vision PNG verification, run AI Auto-Name (Variety mode), run Name Refiner ('✂️ ย่อชื่อที่ยาว' + '✅ Apply All'), run the single-call high-speed af_pipeline, batch-export sequences to Adobe Media Encoder, manage Premiere Pro bins/items, or build a personalized production workflow skill."
 ---
 
@@ -132,7 +132,7 @@ var roBin = findBin(root, "รอ");
      "excludeDirs": "<โฟลเดอร์ที่ต้องการข้าม เช่น ลงแล้ว,จบแล้ว>"
    }
    ```
-   *(หรือใส่ `query: "<ชื่อเรื่อง>"` หรือ `queries: [...]` เพื่อส่องดูไฟล์ใน `รอ` และตรวจจับเลขตอน `detectedEp`; ระบบจะคืนฟิลด์ `queryAudit` แจกแจงสถานะรายคำค้นพร้อม `closestBins` หากชื่อเรื่องสะกดใกล้เคียง)*
+   *(💡 **v1.8.2 Smart Auto-Scoping:** เมื่อส่ง `diskRoot` ควบคู่ `categoryBin` โดยไม่ใส่ `queries` ระบบจะสแกน Disk และคัดกรองเฉพาะเรื่องที่สต็อกใกล้หมด `lowStockShows` (<= 15 คลิป) นำไปสแกนใน Premiere Pro อัตโนมัติใน `< 0.2s` ป้องกันไม่ให้เรื่องที่มีสต็อกเยอะหลุดเข้ามาใน `readyToCut` 100%! หรือใส่ `query: "<ชื่อเรื่อง>"` หรือ `queries: [...]` เพื่อส่องดูไฟล์ใน `รอ` และตรวจจับเลขตอน `detectedEp` เจาะจงรายเรื่อง; ระบบจะคืนฟิลด์ `queryAudit` แจกแจงสถานะรายคำค้นพร้อม `closestBins` หากชื่อเรื่องสะกดใกล้เคียง)*
 3. **เตรียมโฟลเดอร์บน Disk คู่กับสร้าง Sub-bin ตอนใหม่ (`ep1`, `ep2`...) และย้ายไฟล์จาก Sub-bin พักไฟล์ในคำสั่งเดียว (รองรับส่ง `items: [...]` หลายเรื่องพร้อมกัน):**
    ```json
    // Tool: autolab_pr_prepare_ep
@@ -313,6 +313,7 @@ var roBin = findBin(root, "รอ");
   "outputDir": "D:\\OutputClips\\ชื่อเรื่อง\\ep1"
 }
 ```
+*(💡 **v1.8.2 Zero-Delay Auto-Render:** คำสั่ง `pr_export_ame` ตั้งค่า `startQueue: true` เป็นดีฟอลต์ จะส่งทุก Sequence เข้าคิว AME พร้อมสั่งให้ Media Encoder เริ่มเรนเดอร์ทันทีใน `0ms` ผ่าน `app.encoder.startBatch()` โดยไม่ต้องคลิกปุ่ม Start Queue เอง หรือรอตัวนับถอยหลัง Idle Countdown 2 นาที)*
 
 ---
 

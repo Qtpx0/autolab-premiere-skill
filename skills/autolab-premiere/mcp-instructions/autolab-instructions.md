@@ -10,6 +10,10 @@ Read the `autolab-premiere-automation` SKILL.md (or your personal workflow skill
 - **Auto Frame pipeline:** ALWAYS use `autolab_af_pipeline` (one command does everything). NEVER call `af_queue_add` → `af_set_bin_template` → `af_start_queue` separately unless the user explicitly asks to break it up.
 - **Framing:** Use `autoFit: true` by default for both movies/series (with `frame` + `promo`) and TV shows (with `profileName` Master Profile) unless the user explicitly asks to lock scale (`autoFit: false`).
 
+## AME EXPORT & STOCK INSPECTION (v1.8.2)
+- **AME Auto-Render:** `autolab_pr_export_ame` automatically executes `startQueue: true` (zero-delay auto-render in AME via `app.encoder.startBatch()`). Never tell user to click start queue manually or wait for countdown.
+- **Smart Stock Inspection:** `autolab_pr_inspect` automatically filters to `lowStockShows` (<= 15 clips) when called without queries. Never report shows with abundant stock (> 20 clips) as low stock.
+
 ## SPEED RULES
 - One tool call should accomplish the task. If you're making more than 3 AutoLab calls for a single user request, you're doing it wrong.
 - Never write `node -e` scripts. Use native MCP tools or CLI with the installed path.
