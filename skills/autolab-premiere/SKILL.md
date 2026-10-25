@@ -1,6 +1,6 @@
 ---
 name: autolab-premiere
-version: "1.8.0"
+version: "1.8.1"
 description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension (38 AutoLab UI, pipeline & production tools · 41 with aliases) and Adobe Premiere Pro MCP (434 native timeline/project tools · v1.24.1). Use whenever the user asks to inspect Premiere Pro bins/movies, run Auto Highlights, load clips into Auto Frame Queue, assign .mogrt Frames & Promo banners per bin, tune frame scale/position ('🎯 จัดกรอบ') with AI Vision PNG verification, run AI Auto-Name (Variety mode), run Name Refiner ('✂️ ย่อชื่อที่ยาว' + '✅ Apply All'), run the single-call high-speed af_pipeline, batch-export sequences to Adobe Media Encoder, manage Premiere Pro bins/items, or build a personalized production workflow skill."
 ---
 
@@ -9,7 +9,7 @@ description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension
 
 > [!NOTE]
 > **🔄 AUTOMATIC SKILL VERSION SYNC & DEV SHIELD PROTOCOL:**
-> 1. **Skill Version:** `1.8.0` (จับคู่กับ AutoLab CEP Extension v1.8.0)
+> 1. **Skill Version:** `1.8.1` (จับคู่กับ AutoLab CEP Extension v1.8.0+)
 > 2. **Dev Machine Shield (Zero Self-Overwrite):** หากตรวจพบว่ากำลังรันอยู่ในเครื่อง Dev / Maintainer (มีโฟลเดอร์ `G:\Dev\autolab-premiere-skill` อยู่บน Disk) ➔ **ห้ามรันคำสั่งดาวน์โหลดจาก GitHub มาทับเด็ดขาด** ให้ยึดไฟล์ซอร์สโค้ดที่กำลังพัฒนาในเครื่องเป็นความจริงสูงสุด 100%
 > 3. **Production User Auto-Update:** สำหรับเครื่องผู้ใช้ทั่วไป เมื่อเรียก `autolab_get_status` และพบว่า `latestSkillVersion` สูงกว่าเลขเวอร์ชันในสกิลนี้ ให้ AI รันคำสั่ง `npx skills add https://github.com/Qtpx0/autolab-premiere-skill --skill autolab-premiere --force` ในพื้นหลังเพื่ออัปเดตความฉลาดใหม่อัตโนมัติ โดย **ห้ามแตะต้องหรือเขียนทับสกิลประจำเครื่อง (เช่น `my-workflow`) เด็ดขาด**
 
@@ -113,7 +113,7 @@ var roBin = findBin(root, "รอ");
 | **B. Auto Highlights (6)** | `autolab_ah_queue_add`<br>`autolab_ah_queue_manage`<br>`autolab_ah_configure`<br>`autolab_ah_run`<br>`autolab_ah_status`<br>`autolab_ah_cancel` | ดึงไฟล์หนังจาก Bin เข้าคิวไฮไลท์, ตั้งค่าโหมด `gemini_audio`, `100 Shots`, `60-90s`, ตั้งค่า `Speed Assist` (`preset: "movie"` หรือ `"show"`), และสั่งสแกนตัดสร้าง Sub-Sequences อัตโนมัติ |
 | **C. Auto Frame Queue (4)** | `autolab_af_queue_add`<br>`autolab_af_queue_inspect`<br>`autolab_af_set_bin_template`<br>`autolab_af_queue_manage` | ดึงคลิป/Sequence จาก Bin เข้าคิวแยกกลุ่มตาม Bin (บล็อก Sub-bin `ไฟล์ต้นฉบับ` อัตโนมัติ), ตรวจสอบคิวและความยาวชื่อไทย (> 17 ตัวอักษร), ผูก Master Profile / กรอบ `.mogrt` (`frame`) และป้ายโปรโมท (`promo`) |
 | **D. Live Frame Tuner `🎯 จัดกรอบ` (4)** | `autolab_af_tuner_start`<br>`autolab_af_tuner_auto_fit`<br>`autolab_af_tuner_adjust`<br>`autolab_af_tuner_apply` | สร้างซีเควนซ์ `_AutoLab_Preview_` ใน Premiere Pro, วัดขอบดำด้วย FFmpeg `cropdetect`, ปรับจูน `scale`/`posX`/`posY`, ส่งออกภาพ `.png` ให้ AI Vision ตรวจดู และบันทึกค่าเข้า Bin |
-| **E. AI Naming & Refiner `✂️ ย่อชื่อ` (4)** | `autolab_af_configure_naming`<br>`autolab_af_run_autoname`<br>`autolab_af_run_name_refiner`<br>`autolab_af_set_clip_title` | ตั้งโหมด `variety`, กด `✨ AI Auto-Name` ถอดเสียง+คิดชื่อคลิปไวรัล (รองรับ `autoRefine: true`), กด `💬 Name Refiner` ➔ `✂️ ย่อชื่อที่ยาว` (> 17 ตัวอักษร) ➔ `✅ Apply All`, และแก้ไขข้อความพาดหัว 1-2 บรรทัด |
+| **E. AI Naming & Refiner `✂️ ย่อชื่อ` (4)** | `autolab_af_configure_naming`<br>`autolab_af_run_autoname`<br>`autolab_af_run_name_refiner`<br>`autolab_af_set_clip_title` | ตั้งโหมด `variety`, กด `✨ AI Auto-Name` ถอดเสียง+คิดชื่อคลิปไวรัล (รองรับ `autoRefine: true`), กด `💬 Name Refiner` ➔ `✂️ ย่อชื่อที่ยาว` (> 17 ตัวอักษร) ➔ `✅ Apply All`, และแก้ไขข้อความพาดหัว 1-2 บรรทัด / ใส่ชื่อหนังบรรทัด 2 + ปรับขนาดฟอนต์บรรทัด 2 ยก Bin (`binKey`, `line2`, `fontSizeL2`) |
 | **F. Topbar, Fast Pipeline & `START` (5)** | `autolab_af_configure_topbar`<br>`autolab_af_pipeline`<br>`autolab_af_start_queue`<br>`autolab_af_batch_status`<br>`autolab_af_cancel_queue` | ตั้งค่าความละเอียด `1080x1920`, เวลาป้ายโปรโมทมาตรฐาน (`promoStart: 5`, `promoInterval: 0`), คำสั่งรวบยอดความเร็วสูง `autolab_af_pipeline` (ครบจบใน 1 คำสั่ง), และกดปุ่ม `START` สร้างซีเควนซ์ |
 | **G. Production Helpers, Bin Management & Escape Hatches (9 + 3 aliases)** | `autolab_pr_inspect`<br>`autolab_pr_prepare_ep`<br>`autolab_pr_create_bin`<br>`autolab_pr_delete_bin`<br>`autolab_pr_move_item`<br>`autolab_pr_bin_tree`<br>`autolab_pr_export_ame`<br>`autolab_call_js`<br>`autolab_call_jsx`<br>*(Aliases: `autolab_pr_bin_move`, `autolab_pr_bin_clean`, `autolab_pr_find_bin`)* | ส่องดูโครงสร้าง Bin & ดึงชื่อไฟล์ใน `รอ` พร้อมตรวจจับเลขตอนอัตโนมัติ (`pr_inspect`), ส่องผัง Bin & คลิปแบบ Bounded ไม่ล้น Context (`pr_bin_tree`), สร้าง Bin Recursive `mkdir -p` (`pr_create_bin`), ย้ายคลิป/Sequence พร้อมสร้าง Bin ปลายทางอัตโนมัติ (`pr_move_item`), ลบ Bin / กวาดรูด Sequence ไฮไลท์ทิ้งยกชุดด้วย Batch Sweep <150ms (`pr_delete_bin`), เตรียมโฟลเดอร์ Disk + สร้าง Bin `epX` + ย้ายฟุตเทจ (`pr_prepare_ep`), ส่งออกทุก Sequence เข้าคิว Adobe Media Encoder (`pr_export_ame`), และรัน JS / ExtendScript โดยตรง |
 
