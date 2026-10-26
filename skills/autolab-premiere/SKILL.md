@@ -1,6 +1,6 @@
 ---
 name: autolab-premiere
-version: "1.8.2"
+version: "1.8.3"
 description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension (38 AutoLab UI, pipeline & production tools · 41 with aliases) and Adobe Premiere Pro MCP (434 native timeline/project tools · v1.24.1). Use whenever the user asks to inspect Premiere Pro bins/movies, run Auto Highlights, load clips into Auto Frame Queue, assign .mogrt Frames & Promo banners per bin, tune frame scale/position ('🎯 จัดกรอบ') with AI Vision PNG verification, run AI Auto-Name (Variety mode), run Name Refiner ('✂️ ย่อชื่อที่ยาว' + '✅ Apply All'), run the single-call high-speed af_pipeline, batch-export sequences to Adobe Media Encoder, manage Premiere Pro bins/items, or build a personalized production workflow skill."
 ---
 
@@ -9,11 +9,11 @@ description: "Official bilingual (TH/EN) control skill for AutoLab CEP Extension
 
 > [!NOTE]
 > **🔄 AUTOMATIC SKILL VERSION SYNC, DEV SHIELD & EXISTING USER MIGRATION PROTOCOL:**
-> 1. **Skill Version:** `1.8.2` (จับคู่กับ AutoLab CEP Extension v1.8.2+)
+> 1. **Skill Version:** `1.8.3` (จับคู่กับ AutoLab CEP Extension v1.8.2+)
 > 2. **Dev Machine Shield (Zero Self-Overwrite):** หากตรวจพบว่ากำลังรันอยู่ในเครื่อง Dev / Maintainer (มีโฟลเดอร์ `G:\Dev\autolab-premiere-skill` อยู่บน Disk) ➔ **ห้ามรันคำสั่งดาวน์โหลดจาก GitHub มาทับเด็ดขาด** ให้ยึดไฟล์ซอร์สโค้ดที่กำลังพัฒนาในเครื่องเป็นความจริงสูงสุด 100%
 > 3. **Production User Auto-Update & Non-Destructive Personal Skill Migration (สำหรับคนใช้ก่อนๆ):**
 >    - เมื่อเรียก `autolab_get_status` และพบว่า `latestSkillVersion` สูงกว่าเลขเวอร์ชันในสกิลนี้ ให้ AI รันคำสั่ง `npx skills add https://github.com/Qtpx0/autolab-premiere-skill --skill autolab-premiere --force` ในพื้นหลังเพื่ออัปเดตสกิลกลางอัตโนมัติ
->    - **การอัปเกรดสกิลประจำตัวและ `GEMINI.md` ของคนใช้ก่อนๆ (Non-Destructive Surgical Patch):** หากผู้ใช้สร้างสกิลประจำเครื่องไว้ก่อนหน้านี้แล้ว (เช่น `my-premiere-production-workflow`) และยังไม่มีป้าย `ruleVersion: "1.8.2"` ให้ AI **ใช้ `edit_file` อัปเกรดเฉพาะหัวข้อกฎ Engine มาตรฐาน** (เช่น กฎเช็คสต็อก 1 คำสั่งจบ `< 1s` `lowStockThreshold: 25, scanPremiere: true`, ห้ามเรียก `pr_bin_tree`/Shell ตอนเช็คสต็อก, กฎตาราง `Standard Stock Dashboard Table`, กฎ `Central Raw Pool ➔ Work Bin`, และ `autoFit: true`) พร้อมอัปเดตไฟล์ `GEMINI.md` และ `mcp/autolab/instructions.md` ให้เป็นเวอร์ชันล่าสุดทันที **โดยห้ามลบหรือเขียนทับพาธโฟลเดอร์ส่วนตัวและตารางจับคู่ป้ายโปรโมทของผู้ใช้เด็ดขาด!** (ดูรายละเอียดใน [`references/06-personal-workflow-skill-builder-guide.md`](references/06-personal-workflow-skill-builder-guide.md))
+>    - **การอัปเกรดสกิลประจำตัวและ `GEMINI.md` ของคนใช้ก่อนๆ (Non-Destructive Surgical Patch):** หากผู้ใช้สร้างสกิลประจำเครื่องไว้ก่อนหน้านี้แล้ว (เช่น `my-premiere-production-workflow`) และยังไม่มีป้าย `ruleVersion: "1.8.3"` ให้ AI **ใช้ `edit_file` อัปเกรดเฉพาะหัวข้อกฎ Engine มาตรฐาน** (เช่น กฎเช็คสต็อก 1 คำสั่งจบ `< 1s` `lowStockThreshold: 25, scanPremiere: true`, ห้ามเรียก `pr_bin_tree`/Shell ตอนเช็คสต็อก, กฎตาราง `Standard Stock Dashboard Table`, กฎ `Central Raw Pool ➔ Work Bin` พร้อม 1-Call JSX Fuzzy Import จาก `rawDiskRoot`, ห้ามอ่านไฟล์ `.json` schema, และ `autoFit: true`) พร้อมอัปเดตไฟล์ `GEMINI.md` และ `mcp/autolab/instructions.md` ให้เป็นเวอร์ชันล่าสุดทันที **โดยห้ามลบหรือเขียนทับพาธโฟลเดอร์ส่วนตัวและตารางจับคู่ป้ายโปรโมทของผู้ใช้เด็ดขาด!** (ดูรายละเอียดใน [`references/06-personal-workflow-skill-builder-guide.md`](references/06-personal-workflow-skill-builder-guide.md))
 
 สกิลนี้เป็นคู่มือปฏิบัติการหลักสำหรับเอเจนต์ AI ทุกค่าย (Claude, Cursor, Codex, Antigravity, Windsurf, DeepSeek Harness, OpenClaw) ในการควบคุม **AutoLab CEP Extension** ร่วมกับ **Adobe Premiere Pro** ผ่านสะพานเชื่อมคู่ขนานในเครื่อง (`AutoLab/js/core/mcp_bridge.js` ที่พอร์ต `17890` และ `%TEMP%\premiere-mcp-bridge`):
 
@@ -143,7 +143,7 @@ var roBin = findBin(root, "รอ");
    }
    ```
    *(💡 **v1.8.2 One-Call Smart Auto-Scoping:** เมื่อส่ง `diskRoot` ควบคู่ `categoryBin` + `lowStockThreshold: 25` + `scanPremiere: true` โดยไม่ใส่ `queries` ระบบจะคืน `diskFolders` ครบทุกเรื่องบน Disk พร้อมยอดซับโฟลเดอร์ (`[epX:count]` / `[คิว:X,คอม:Y]`) และคัดกรองเฉพาะเรื่องที่สต็อกใกล้หมด (`<= 25` คลิป) ไปตรวจสถานะ Premiere Pro ใน `queryAudit` + `readyToCut` อัตโนมัติใน `< 0.1s` ขนาด Output กะทัดรัด ~1.8 KB ไม่ล้นลง `output.txt` แน่นอน 100%! **⛔ ห้ามเรียก `pr_bin_tree` กวาดทั้งหมวดงาน และห้ามรันคำสั่ง Shell นับไฟล์บน Disk ซ้ำซ้อนเด็ดขาด!** หากต้องการส่องไฟล์เจาะจงรายเรื่อง ค่อยใส่ `query: "<ชื่อเรื่อง>"` หรือ `queries: [...]`)*
-2. **สำรวจสถานะพาเนลและเทมเพลต (เรียกเมื่อจะเริ่มตัดต่อ/ใส่กรอบ):** เรียก `autolab_get_status({})` และ `autolab_list_templates({})` เพื่อดูสถานะพาเนลและรายชื่อ `masterProfiles` / `frames` / `promos` ในเครื่อง
+2. **ห้ามเรียก `autolab_list_templates({})` หรือเปิดอ่านไฟล์ Schema `.json` ตอนสั่งตัดเด็ดขาด:** หากผู้ใช้มีสกิลประจำเครื่อง (หรือระบุชื่อกรอบและป้ายโปรโมทไว้แล้ว) ให้ใช้ชื่อจากตารางสกิลประจำเครื่องส่งเข้า `autolab_af_pipeline` ทันที (เรียก `autolab_list_templates` เฉพาะตอนสร้างสกิลประจำตัวครั้งแรก หรือเมื่อผู้ใช้ถามหารายชื่อเทมเพลตเท่านั้น!)
 3. **เตรียมโฟลเดอร์บน Disk คู่กับสร้าง Sub-bin ตอนใหม่ (`ep1`, `ep2`...) และย้ายไฟล์จาก Sub-bin พักไฟล์ในคำสั่งเดียว (รองรับส่ง `items: [...]` หลายเรื่องพร้อมกัน):**
    ```json
    // Tool: autolab_pr_prepare_ep

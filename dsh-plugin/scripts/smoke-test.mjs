@@ -53,8 +53,9 @@ ok('allows a preset that sets the engine itself', call('mcp__autolab__ah_configu
 ok('denies autoCut on a movie preset', Boolean(call('mcp__autolab__ah_configure', { preset: 'movie', autoCutState: 1 })));
 ok('allows autoCut 0 on a movie preset', call('mcp__autolab__ah_configure', { preset: 'movie', autoCutState: 0 }) === undefined);
 
-// ── rule 6: a leftover output.txt is never read ───────────────────────────────
+// ── rule 6: a leftover output.txt or redundant mcp/autolab/*.json is never read ─
 ok('denies reading output.txt', Boolean(call('read', { file_path: 'G:\\Dev\\pi\\output.txt' })));
+ok('denies reading mcp/autolab/*.json schema files', Boolean(call('read_file', { path: 'C:\\Users\\user\\.gemini\\antigravity\\mcp\\autolab\\autolab_call_jsx.json' })));
 ok('allows reading a normal file', call('read', { file_path: 'G:\\Dev\\pi\\SKILL.md' }) === undefined);
 
 // ── rule 5: the stale-export gate ─────────────────────────────────────────────

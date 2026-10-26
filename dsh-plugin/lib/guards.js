@@ -42,8 +42,8 @@ export const DEFAULT_PROMPT = `
 8. Auto Frame & Auto Scale: เมื่อเรียกใช้ Master Profile หรือใส่ Frame/Promo ให้ส่ง \`autoFit: true\` เสมอเป็นค่าเริ่มต้น เพื่อให้ระบบ Auto Scale วัดช่องใสและสแกนขอบดำจัดขนาดมิลลิเมตรให้อัตโนมัติ (เว้นแต่ผู้ใช้สั่งล็อกสเกลตายตัว ค่อยส่ง \`autoFit: false\`)
 9. Inspection Query Audit & Status Interpretation: ตรวจสอบฟิลด์ \`queryAudit\` ในผลลัพธ์ของ \`pr_inspect\` เสมอ; หากเรื่องใดขึ้น \`found: false\` แต่มี \`closestBins\` ให้ถามผู้ใช้สั้นๆ 1 บรรทัดเพื่อยืนยันชื่อเรื่อง ห้ามมโนสรุปว่าไม่มีบินเด็ดขาด! ทั้งนี้ ตอนเช็คสต็อก เฉพาะเรื่องที่ \`waiting > 0\` (\`readyToCut\`) เท่านั้นที่แปลว่ามีฟุตเทจดิบใหม่พร้อมตัดทันที ส่วนเรื่องที่ \`waiting: 0\` (แม้จะขึ้น \`ALL_CUT\` หรือ \`NEEDS_RECOVERY\` ที่มี \`recoverable > 0\`) แปลว่าฟุตเทจถูกตัดผ่าน Auto Highlights และย้ายเก็บเข้า \`ไฟล์ต้นฉบับ\` ไปหมดแล้ว (ไม่มีฟุตดิบใหม่รอตัด) ต้องรายงานว่าตัดครบแล้ว/ต้องโหลดฟุตเทจใหม่มาเติม ห้ามสรุปหลอกว่าพร้อมตัดใหม่เด็ดขาด (กู้ไฟล์จาก \`ไฟล์ต้นฉบับ\` เมื่อผู้ใช้สั่งให้กู้มาตัดซ้ำเท่านั้น)
 10. Zero-Delay Disk Creation & Strict Prefix Matching: การจับคู่โฟลเดอร์บน Disk ต้องดู "ชื่อเรื่องหลักส่วนหน้า" (Prefix ก่อนเครื่องหมาย - หรือ - -) เท่านั้น ห้ามนำชื่อเรื่องที่จะตัดไปจับคู่กับข้อความ Note/Memo ด้านหลังเด็ดขาด (โฟลเดอร์ที่มี Note ต่อท้าย ยังคงเป็นของเรื่องหลักส่วนหน้า ห้ามแตะ ห้ามเคลม และห้าม Rename เด็ดขาด); หากบน Disk ยังไม่มีโฟลเดอร์ที่ขึ้นต้นด้วยชื่อเรื่องนั้นตรงๆ ➔ ถือว่าเป็นเรื่องใหม่ที่ยังไม่มีโฟลเดอร์ ให้สร้างโฟลเดอร์ใหม่ชื่อคลีน (<ชื่อเรื่อง>) ทันที แล้วลุยต่อจนจบ ห้ามหยุดถาม และห้ามแย่ง/Rename โฟลเดอร์เรื่องอื่นมาใช้เด็ดขาด! (การ Rename ป้ายสถานะ อนุญาตเฉพาะโฟลเดอร์ของเรื่องตัวเองที่มี "- - จะหมด" ต่อท้ายเท่านั้น)
-11. Central Raw Pool ➔ Work Bin & 3-Tier Pull Routing: ฟุตดิบรวมอยู่ที่ <เรื่อง>/<stagingBin> เสมอ; เมื่อสั่งตัดเพจย่อย (<เรื่อง> - <เพจ/คนตัด>) หรือตอนย่อย (epX) ให้ไล่ดึง 3 ชั้น: (1) เช็คใน Work Bin ก่อน (2) หากว่างให้ใช้ pr_move_item ดึงคลิป 1 ตอนจาก <เรื่อง>/<stagingBin> มาที่ Work Bin ปลายทาง (3) หากในคลังกลางว่างเปล่าและมีคลังไฟล์ตัวเต็มในเครื่อง (rawDiskRoot) ให้เจาะดูเฉพาะโฟลเดอร์เรื่องนั้น (<rawDiskRoot>\\*<เรื่อง>* ห้ามสแกนทั้งไดรฟ์ตอนเช็คสต็อก!) หากพบไฟล์ตอนถัดไปให้ Import เข้า Work Bin ด้วย autolab_call_jsx (app.project.importFiles) แล้วตัดต่อทันที แต่หากหมดแล้วให้หยุดรายงานทันที ห้ามเดาหรือสลับไปดึงเรื่องอื่น; ห้ามตัดในคลังกลาง และลบ HIGHLIGHTS_ เฉพาะใน Work Bin ตัวเองเท่านั้น!
-ก่อนเริ่มงาน Premiere ให้โหลดสกิล \`autolab-premiere\` (กลาง) หรือสกิลเวิร์กโฟลว์ประจำเครื่องก่อนเสมอ
+11. Central Raw Pool ➔ Work Bin & Deterministic 3-Tier Pull Routing (Single-Inspect Truth & 1-Call JSX Fuzzy Import): ฟุตดิบรวมอยู่ที่ <เรื่อง>/<stagingBin> เสมอ; เมื่อสั่งตัดเพจย่อย (<เรื่อง> - <เพจ/คนตัด>) หรือตอนย่อย (epX) ให้ยิง pr_inspect เพียง 1 ครั้ง แล้วไล่ดึง 3 ชั้น: (1) เช็คใน Work Bin ก่อน (2) หากว่างให้ใช้ pr_prepare_ep หรือ pr_move_item ดึงคลิป 1 ตอนจาก <เรื่อง>/<stagingBin> มาที่ Work Bin ปลายทาง (3) หากไม่พบใน Premiere Pro หรือในคลังกลางว่างเปล่า (waiting: 0) และมีคลังไฟล์ตัวเต็มในเครื่อง (rawDiskRoot) ห้ามยิง pr_bin_tree ซ้ำใน Premiere และห้ามรัน PowerShell ค้นไฟล์ใน rawDiskRoot เด็ดขาด! ให้ยิง autolab_call_jsx ({"script": "..."}) เพียง 1 คำสั่งเดียวเพื่อค้นหาโฟลเดอร์เรื่องใน <rawDiskRoot> แบบแยกคำค้น (Multi-Token Fuzzy Match รองรับภาษาไทย UTF-8 100%) + สร้าง Work Bin ปลายทาง + สั่ง app.project.importFiles() นำเข้าฟุตเทจทันที แล้วเดินหน้าเข้าสู่ ah_configure ➔ ah_queue_add ➔ ah_run ➔ af_pipeline ➔ pr_export_ame ต่อเนื่องทันที (ห้ามแวะอ่านไฟล์ mcp/autolab/*.json หรือเรียก autolab_list_templates ซ้ำซ้อนตอนสั่งตัดเด็ดขาด!) แต่หากใน rawDiskRoot ก็หมดแล้วให้หยุดรายงานทันที 1 บรรทัด ห้ามเดาหรือสลับไปดึงเรื่องอื่น; ห้ามตัดในคลังกลาง และลบ HIGHLIGHTS_ เฉพาะใน Work Bin ตัวเองเท่านั้น!
+ก่อนเริ่มงาน Premiere ให้โหลดสกิล \`autolab-premiere\` (กลาง) หรือสกิลเวิร์กโฟลว์ประจำเครื่องใน 1 read_file call (ห้ามซอย EndLine) ก่อนเสมอ
 `;
 
 /** Default row config for the whole bundle. */
@@ -223,13 +223,19 @@ function evaluate({ fullName, raw, args, command, rules, shells, state }) {
     }
   }
 
-  // 6 — A leftover output.txt is stale by definition.
+  // 6 — A leftover output.txt is stale by definition, and reading mcp/autolab/*.json schemas wastes turns.
   if (rules.blockStaleOutputTxt !== false && READ_TOOLS.has(fullName.toLowerCase())) {
     const path = String(args.file_path ?? args.path ?? args.file ?? '');
     if (/(?:^|[\\/])output\.txt$/i.test(path)) {
       return deny(
         'ห้ามอ่าน output.txt ที่ค้างจาก session เก่า — มันเป็นขยะ ไม่ใช่ข้อมูลปัจจุบัน ' +
           'ใช้ pr_inspect หรือเครื่องมือ AutoLab ที่คืนค่าสด ๆ แทน (ปิดชั่วคราว: config.rules.blockStaleOutputTxt: false)',
+      );
+    }
+    if (/[\\/]mcp[\\/]autolab[\\/]autolab_[a-z0-9_]+\.json$/i.test(path)) {
+      return deny(
+        'ห้ามเสียเวลาเปิดอ่านไฟล์ mcp/autolab/*.json — พารามิเตอร์ทุกตัวระบุไว้ใน SKILL.md และ GEMINI.md ครบแล้ว ' +
+          '(เช่น autolab_call_jsx ใช้ {"script":"..."}, pr_inspect ใช้ {"query":"...","categoryBin":"..."}) ให้เรียกเครื่องมือตรงทันที!',
       );
     }
   }

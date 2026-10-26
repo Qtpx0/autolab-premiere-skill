@@ -2,11 +2,14 @@
 # Copy this file to: <your antigravity MCP dir>/autolab/instructions.md
 # e.g. C:\Users\<you>\.gemini\antigravity\mcp\autolab\instructions.md
 
-## BEFORE ANY AUTOLAB OPERATION (Current Rule Version: `1.8.2`)
-- **Automatic Personal Skill & `GEMINI.md` Version Check:** Check if the workspace `GEMINI.md` has `<!-- autolab-rule-version: 1.8.2 -->`.
-  - **If it matches `1.8.2` (Normal Fast-Path):** Do NOT read `SKILL.md` for stock checks — immediately run `autolab_pr_inspect` using the user's paths in `GEMINI.md` Rule 1 in **1 single call** and render the Markdown Stock Dashboard Table!
-  - **If `<!-- autolab-rule-version: 1.8.2 -->` is missing or older (Existing User Auto-Upgrade):** Read the user's personal workflow `SKILL.md` (for their `diskRoot`, `categoryBin`, `excludeDirs`, `stagingBin`) and `autolab-premiere/mcp-instructions/gemini-md-template.md` + `references/06-personal-workflow-skill-builder-guide.md` (Section 4), then use `edit_file` to non-destructively upgrade their `GEMINI.md` (substituting their real paths into Rule 1 & Rule 10 and adding `<!-- autolab-rule-version: 1.8.2 -->`) and their personal `SKILL.md` Engine rules without deleting any personal paths or promo mappings!
-- **For Cutting / Framing / Exporting:** Read your personal workflow `SKILL.md` (e.g. `autolab-premiere-automation`) first. Never guess or improvise.
+## BEFORE ANY AUTOLAB OPERATION (Current Rule Version: `1.8.3`)
+- **Automatic Personal Skill & `GEMINI.md` Version Check:** Check if the workspace `GEMINI.md` has `<!-- autolab-rule-version: 1.8.3 -->`.
+  - **If it matches `1.8.3` (Normal Fast-Path):** Do NOT read `SKILL.md` for stock checks — immediately run `autolab_pr_inspect` using the user's paths in `GEMINI.md` Rule 1 in **1 single call** and render the Markdown Stock Dashboard Table!
+  - **If `<!-- autolab-rule-version: 1.8.3 -->` is missing or older (Existing User Auto-Upgrade):** Read the user's personal workflow `SKILL.md` (for their `diskRoot`, `categoryBin`, `excludeDirs`, `stagingBin`) and `autolab-premiere/mcp-instructions/gemini-md-template.md` + `references/06-personal-workflow-skill-builder-guide.md` (Section 4), then use `edit_file` to non-destructively upgrade their `GEMINI.md` (substituting their real paths into Rule 1 & Rule 10 and adding `<!-- autolab-rule-version: 1.8.3 -->`) and their personal `SKILL.md` Engine rules without deleting any personal paths or promo mappings!
+- **For Cutting / Framing / Exporting:**
+  1. Read your personal workflow `SKILL.md` (e.g. `autolab-premiere-automation`) in **1 single `read_file` call without setting `EndLine`**.
+  2. **ZERO SCHEMA READING & ZERO SIDE-QUESTS:** NEVER call `read_file` on `mcp/autolab/*.json` and NEVER call `autolab_list_templates` when frames/promos are already defined in the personal skill.
+  3. **Single-Inspect Truth & 1-Call JSX `rawDiskRoot` Import:** Call `autolab_pr_inspect` ONCE. If the requested movie/episode is not in Premiere Pro (`waiting: 0`), NEVER call `pr_bin_tree` or PowerShell to search again — immediately execute 1 `autolab_call_jsx` (`{"script": "..."}`) to fuzzy-match the show folder inside `rawDiskRoot`, create the target Work Bin, and `app.project.importFiles()` in a single call, then run `ah_configure` ➔ `ah_queue_add` ➔ `ah_run` ➔ `af_pipeline` ➔ `pr_export_ame` straight through!
 
 ## TOOL ROUTING (CRITICAL)
 - **One-Call Stock check / Bin inspection (< 1s):** ALWAYS use `autolab_pr_inspect` (1 call). NEVER use premiere-pro MCP tools (`get_bin_contents`, `list_project_items`, `search_project_items`), NEVER call `autolab_pr_bin_tree` on root/category bins during stock checks (overflows into `output.txt`), and NEVER run PowerShell `Get-ChildItem` to recount disk folders!
