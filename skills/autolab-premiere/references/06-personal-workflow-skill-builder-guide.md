@@ -143,7 +143,7 @@ flowchart LR
 ````markdown
 ---
 name: my-premiere-production-workflow
-version: "1.8.2"
+version: "1.8.3"
 description: "Personal and shared-machine production workflow for AutoLab CEP + Premiere Pro: personal disk stock folders, Bin hygiene (รอ/รอตัด/epX/HIGHLIGHTS_), Auto Highlights presets (TV vs Movie speed), Multi-User/Multi-Promo routing matrix, MOGRT auto-fit framing, af_pipeline (promo + Variety Auto-Name + Name Refiner <=17), batch export to AME"
 ---
 
@@ -158,12 +158,15 @@ description: "Personal and shared-machine production workflow for AutoLab CEP + 
 > AI ต้องอ่านค่า Config ด้านล่างนี้ไปใช้เป็นพารามิเตอร์หลักกับคำสั่ง MCP เสมอ เพื่อให้การทำงานตรงกับเครื่องและโฟลเดอร์ของผู้ใช้ 100%:
 
 ```yaml
-ruleVersion: "1.8.2"
+ruleVersion: "1.8.3"
 rawDiskRoot: "<พาธคลังไฟล์ตัวเต็มในเครื่องที่โหลดมาพักไว้ก่อนเข้า PR (ถ้ามี) เช่น F:\RawMedia>"
 diskRoot: "<พาธโฟลเดอร์หลักบน Disk สำหรับเก็บคลิปตัดเสร็จ เช่น D:\Clips\Output หรือ E:\Work\Videos>"
 categoryBin: "<ชื่อ Root Bin ใน Premiere Pro เช่น หมวดหนัง หรือ หมวดรายการ>"
 excludeDirs: "<โฟลเดอร์ที่ต้องการข้ามเมื่อเช็คสต็อก เช่น ลงแล้ว,จบแล้ว>"
+stagingBin: "<ชื่อ Sub-bin คลังฟุตดิบกลางใน Premiere Pro ที่เก็บฟุตเทจรอตัดทั้งเรื่อง เช่น รอตัด หรือ คลังกลาง>"
 waitingSubBin: "<ชื่อ Sub-bin พักฟุตดิบกลาง เช่น รอ หรือ รอตัด>"
+frameTemplate: "<ชื่อไฟล์ .mogrt กรอบที่ใช้เป็นค่าเริ่มต้น เช่น กรอบหนัง 02 หรือ Master Profile name>"
+promoTemplate: "<ชื่อไฟล์ .mogrt ป้ายโปรโมท ต่อเพจ เช่น หนัง IF_Q (พี่) / หนัง IF_C (คอม)>"
 lowStockThreshold: 25
 ```
 
@@ -261,7 +264,7 @@ lowStockThreshold: 25
      "scanPremiere": true
    }
    ```
-   *(💡 **v1.8.2 One-Call Smart Auto-Scoping:** เมื่อส่ง `diskRoot` พร้อม `categoryBin` + `lowStockThreshold: 25` + `scanPremiere: true` ระบบจะคืน `diskFolders` ครบทุกเรื่องบน Disk และสแกน Premiere Pro เฉพาะเรื่องที่สต็อก `<= 25` คลิปใน `< 0.1s` ขนาด ~1.8 KB ไม่ล้นลง `output.txt` แน่นอน 100%! ห้ามเรียก `pr_bin_tree` กวาดทั้งหมวดงาน และห้ามรันคำสั่ง Shell นับไฟล์ซ้ำเด็ดขาด)*
+   *(💡 **v1.8.3 One-Call Smart Auto-Scoping:** เมื่อส่ง `diskRoot` พร้อม `categoryBin` + `lowStockThreshold: 25` + `scanPremiere: true` ระบบจะคืน `diskFolders` ครบทุกเรื่องบน Disk และสแกน Premiere Pro เฉพาะเรื่องที่สต็อก `<= 25` คลิปใน `< 0.1s` ขนาด ~1.8 KB ไม่ล้นลง `output.txt` แน่นอน 100%! ห้ามเรียก `pr_bin_tree` กวาดทั้งหมวดงาน และห้ามรันคำสั่ง Shell นับไฟล์ซ้ำเด็ดขาด)*
 
 2. **สำรวจ Bin และตรวจหาเลขตอนที่ค้างในโฟลเดอร์พักไฟล์ (ล็อกเฉพาะหมวด ไม่ปนกับหมวดอื่น):**
    ```json
@@ -319,7 +322,7 @@ lowStockThreshold: 25
      "outputDir": "<พาธปลายทางบน Disk>"
    }
    ```
-   *(💡 **v1.8.2 Zero-Delay Auto-Render:** คำสั่ง `pr_export_ame` ตั้งค่า `startQueue: true` อัตโนมัติ จะสั่งให้ Media Encoder เริ่มเรนเดอร์ทันทีใน `0ms` ผ่าน `app.encoder.startBatch()` โดยไม่ต้องกดปุ่ม Start Queue เอง หรือรอตัวนับถอยหลัง 2 นาที)*
+   *(💡 **v1.8.3 Zero-Delay Auto-Render:** คำสั่ง `pr_export_ame` ตั้งค่า `startQueue: true` อัตโนมัติ จะสั่งให้ Media Encoder เริ่มเรนเดอร์ทันทีใน `0ms` ผ่าน `app.encoder.startBatch()` โดยไม่ต้องกดปุ่ม Start Queue เอง หรือรอตัวนับถอยหลัง 2 นาที)*
 ````
 
 ---
@@ -331,7 +334,7 @@ lowStockThreshold: 25
 2. แจ้งตำแหน่งไฟล์สกิลที่สร้างเสร็จแล้วให้ผู้ใช้ทราบ
 3. เสนอทดสอบรันเช็คสต็อกด้วย `autolab_pr_inspect` หรือสำรวจโปรเจกต์จริง 1 เรื่องเพื่อยืนยันว่าพาธและชื่อพรีเซ็ตทั้งหมดทำงานได้ตรง 100%
 4. **ติดตั้ง MCP Instructions + Workspace Rule (ป้องกัน AI ใช้ tool ผิด — ขั้นตอนนี้บังคับ!):**
-   - **สร้าง Workspace Rule (พร้อมแทนค่า Path จริงของผู้ใช้ลงในข้อ 1 และข้อ 10):** คัดลอกเนื้อหาจาก [`mcp-instructions/gemini-md-template.md`](../mcp-instructions/gemini-md-template.md) ไปสร้างเป็นไฟล์ **`GEMINI.md`** ที่ **root ของ workspace** ผู้ใช้ (ห้ามวางใน `.gemini/rules/` เด็ดขาด — ไม่ใช่ discovery path!) **โดยต้องนำค่าจริงของผู้ใช้ (`diskRoot`, `categoryBin`, `excludeDirs`, `<stagingBin>`) ไปแทนที่ Placeholder ในข้อ 1 และข้อ 10 ของ `GEMINI.md` ทันที ห้ามปล่อยเป็น `<...>` ค้างไว้** เพื่อให้เมื่อเปิดเซสชันใหม่ AI สามารถยิง `autolab_pr_inspect` ได้ใน 1 คำสั่งจบ (`< 1s`) โดยไม่ต้องเสียเวลาเปิดอ่าน `SKILL.md` ก่อน!
+   - **สร้าง Workspace Rule (พร้อมแทนค่า Path จริงของผู้ใช้ลงในข้อ 1 และข้อ 10):** คัดลอกเนื้อหาจาก [`mcp-instructions/gemini-md-template.md`](../mcp-instructions/gemini-md-template.md) ไปสร้างเป็นไฟล์ **`GEMINI.md`** ที่ **root ของ workspace** ผู้ใช้ (ห้ามวางใน `.gemini/rules/` เด็ดขาด — ไม่ใช่ discovery path!) **โดยต้องนำค่าจริงของผู้ใช้ (`diskRoot`, `categoryBin`, `excludeDirs`, `rawDiskRoot`, `stagingBin`, `frameTemplate`, `promoTemplate`) ไปแทนที่ Placeholder ในข้อ 1, ข้อ 8 และข้อ 10/11 ของ `GEMINI.md` ทันที ห้ามปล่อยเป็น `<...>` ค้างไว้** เพื่อให้เมื่อเปิดเซสชันใหม่ AI สามารถยิง `autolab_pr_inspect` ได้ใน 1 คำสั่งจบ (`< 1s`) โดยไม่ต้องเสียเวลาเปิดอ่าน `SKILL.md` ก่อน!
    - **คัดลอก MCP Instructions:** คัดลอก [`mcp-instructions/autolab-instructions.md`](../mcp-instructions/autolab-instructions.md) ไปวางที่ `<antigravity MCP dir>/autolab/instructions.md` ของเครื่องผู้ใช้
    - เพิ่มข้อความ routing patch จาก [`mcp-instructions/premiere-pro-patch.md`](../mcp-instructions/premiere-pro-patch.md) เข้าไปที่ต้นของ `<antigravity MCP dir>/premiere-pro/instructions.md`
    - *(ทั้ง 3 ไฟล์ทำงานร่วมกันป้องกัน AI หลอนไปใช้ premiere-pro MCP 432 tools ตรง — workspace rule เป็นตัวหลักที่ชัวร์ 100%, MCP instructions เป็นตัวเสริม)*
@@ -340,10 +343,10 @@ lowStockThreshold: 25
 
 ## 🔄 4. การอัปเกรดสกิลประจำตัวให้ผู้ใช้เดิมอัตโนมัติ (Non-Destructive Auto-Migration for Existing Users)
 
-สำหรับผู้ใช้ที่สร้างสกิลประจำตัวไว้ตั้งแต่เวอร์ชันก่อนหน้า (เช่น v1.8.0 / v1.8.1) เมื่อสกิลกลาง `autolab-premiere` อัปเดตเป็นเวอร์ชันใหม่ (หรือเมื่อตรวจพบว่าสกิลประจำตัวของผู้ใช้ยังไม่มี `ruleVersion: "1.8.2"` / ยังใช้ `--check-disk` แบบเก่า):
+สำหรับผู้ใช้ที่สร้างสกิลประจำตัวไว้ตั้งแต่เวอร์ชันก่อนหน้า (เช่น v1.8.0 / v1.8.1) เมื่อสกิลกลาง `autolab-premiere` อัปเดตเป็นเวอร์ชันใหม่ (หรือเมื่อตรวจพบว่าสกิลประจำตัวของผู้ใช้ยังไม่มี `ruleVersion: "1.8.3"` / ยังใช้ `--check-disk` แบบเก่า):
 1. **ห้ามลบหรือเขียนทับข้อมูลส่วนตัวของผู้ใช้เด็ดขาด:** พาธโฟลเดอร์ (`diskRoot`, `categoryBin`, `excludeDirs`), ชื่อเพจ, และตารางจับคู่ป้ายโปรโมท (`Multi-Promo Matrix`) ของผู้ใช้ต้องอยู่ครบ 100%
 2. **ใช้ `edit_file` อัปเกรดเฉพาะส่วนกฎ Engine มาตรฐาน (Surgical Rule Patch):**
-   - อัปเกรด `lowStockThreshold: 25` และเพิ่ม `ruleVersion: "1.8.2"`
+   - อัปเกรด `lowStockThreshold: 25` และเพิ่ม `ruleVersion: "1.8.3"`
    - อัปเกรดส่วนเช็คสต็อกเป็น **One-Call Stock Check (`< 1s`)** (`scanPremiere: true`, ห้ามเรียก `pr_bin_tree` กวาดทั้งหมวดงาน, ห้ามรัน PowerShell นับไฟล์ซ้ำ)
    - เพิ่มหัวข้อ **`📊 Standard Stock Dashboard Table Protocol`** และ **`Central Raw Pool ➔ Work Bin Routing`** หากยังไม่มี
 3. **ซิงค์ไฟล์บังคับใน Workspace ให้ทันสมัยคู่กัน:** อัปเดต `GEMINI.md` ที่ Root ของ Workspace (ตาม [`mcp-instructions/gemini-md-template.md`](../mcp-instructions/gemini-md-template.md) โดยนำ `diskRoot`, `categoryBin`, `excludeDirs`, `<stagingBin>` จริงของผู้ใช้ไปเติมใส่ในข้อ 1 และข้อ 10 ของ `GEMINI.md` ทันที) และอัปเดต `<antigravity MCP dir>/autolab/instructions.md` ให้เป็นเวอร์ชันล่าสุดทันที

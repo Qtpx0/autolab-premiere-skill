@@ -168,8 +168,11 @@ function evaluate({ fullName, raw, args, command, rules, shells, state }) {
     const premiereish = /premiere|autolab|cep|extendscript|mcp_bridge|\.prproj|\.jsx/i.test(command);
     const adHocNode = /\bnode\s+(?:-e|--eval|-p|--print)\b/i.test(command);
     const writesJsx = /\.jsx\b/i.test(command) && /\b(set-content|out-file|add-content|new-item)\b/i.test(command);
+    // Drive-wide recursive scans are detected structurally (a `-Recurse` walk
+    // combined with a drive-letter enumeration or known media extensions) so the
+    // rule stays portable: no machine-specific folder name is hardcoded here.
     const driveWideScan = /\b(?:get-childitem|gci|dir)\b[\s\S]*?-recurse\b/i.test(command) &&
-      (/\bforeach\s*\(\s*\$\w+\s+in\s+['"][A-Z]:/i.test(command) || /0\.ตัดต่อแล้ว|0\.หนัง\s*-\s*รายการ|\.(?:mp4|mkv|ts|mov)/i.test(command));
+      (/\bforeach\s*\(\s*\$\w+\s+in\s+['"][A-Z]:/i.test(command) || /\.(?:mp4|mkv|ts|mov)\b/i.test(command));
     if (adhoc(premiereish, adHocNode) || writesJsx) {
       return deny(
         'ห้ามสั่ง Premiere/AutoLab ด้วยสคริปต์ ad-hoc (node -e / ExtendScript) — ใช้ MCP tools (`mcp__autolab__*`) ' +
@@ -180,7 +183,7 @@ function evaluate({ fullName, raw, args, command, rules, shells, state }) {
     if (driveWideScan) {
       return deny(
         'ห้ามใช้ PowerShell `Get-ChildItem -Recurse` กวาดไดรฟ์เพื่อหาไฟล์ฟุตเทจหรือนับสต็อก — ' +
-          'เช็คสต็อกใช้ `autolab_pr_inspect` คำสั่งเดียว ส่วนการดึงไฟล์ตัวเต็มจาก `rawDiskRoot` (ตามสกิล `autolab-premiere-automation`) ' +
+          'เช็คสต็อกใช้ `autolab_pr_inspect` คำสั่งเดียว ส่วนการดึงไฟล์ตัวเต็มจาก `rawDiskRoot` (ตามสกิลเวิร์กโฟลว์ประจำเครื่องของผู้ใช้) ' +
           'ให้ใช้ `autolab_call_jsx` (`{"script":"..."}`) สแกนโฟลเดอร์ + import เข้า Premiere Pro ใน 1 คำสั่งจบ!',
       );
     }

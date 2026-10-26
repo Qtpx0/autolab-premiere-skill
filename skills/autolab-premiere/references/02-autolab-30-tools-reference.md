@@ -527,7 +527,7 @@
   | `lowStockThreshold` | `number` | optional | เกณฑ์สต็อกต่ำสำหรับสรุป `lowStockShows` ใน `diskSummary` (`default: 15`) |
   | `scanPremiere` | `boolean` | optional | บังคับให้สแกนเจาะจงใน Premiere Pro แม้จะไม่ได้ระบุ `query` (`default: false`) |
   | `includeShows` | `boolean` | optional | คืนค่าก้อน `shows` สรุปรายเรื่องแบบละเอียด (`default: false` — ตัดออกเป็นค่าเริ่มต้นเพื่อลดขนาด JSON ให้สั้นกระชับ ไม่เด้งเข้า `output.txt`) |
-| `smartScope` | `boolean` | optional | ใน v1.8.2 เมื่อส่ง `diskRoot` พร้อม `categoryBin` โดยไม่ใส่ `queries` ระบบจะสแกนเฉพาะ `lowStockShows` บน Disk อัตโนมัติ (`default: true`) |
+| `smartScope` | `boolean` | optional | ใน v1.8.3 เมื่อส่ง `diskRoot` พร้อม `categoryBin` โดยไม่ใส่ `queries` ระบบจะสแกนเฉพาะ `lowStockShows` บน Disk อัตโนมัติ (`default: true`) |
 - **โครงสร้างข้อมูลที่ได้คืนมา (จัดเรียง Disk ขึ้นก่อนเสมอ และตัด shows ซ้ำซ้อนออก):**
   ```json
   {
@@ -574,7 +574,7 @@
   | `outputDir` | `string` | **required** | โฟลเดอร์ปลายทางบน Disk สำหรับบันทึกไฟล์ `.mp4` ที่เรนเดอร์เสร็จ |
   | `presetPath` | `string` | optional | พาธเต็มของไฟล์ `.epr` preset (หากไม่ระบุจะค้นหา Preset มาตรฐานให้อัตโนมัติ) |
   | `presetName` | `string` | optional | ชื่อไฟล์ `.epr` preset ที่ต้องการค้นหาในเครื่อง |
-| `startQueue` | `boolean` | optional | สั่งให้ Media Encoder เริ่มเรนเดอร์ทันทีใน 0ms ผ่าน `app.encoder.startBatch()` (`default: true` ใน v1.8.2 ไม่ต้องรอปุ่มนับถอยหลัง 2 นาที) |
+| `startQueue` | `boolean` | optional | สั่งให้ Media Encoder เริ่มเรนเดอร์ทันทีใน 0ms ผ่าน `app.encoder.startBatch()` (`default: true` ใน v1.8.3 ไม่ต้องรอปุ่มนับถอยหลัง 2 นาที) |
 
 ### 7.4 `autolab_call_js`
 - **หน้าที่:** รันโค้ด JavaScript ใดๆ ก็ได้ภายในบริบทหน้าต่าง AutoLab CEP Panel โดยตรง (เข้าถึง `window.FrameQueueManager`, `window.AiManager`, `window.NameRefinerChat`, `window.BatchManager`, `window.AutoHighlightsEngine`, และ DOM ทั้งหมดได้ 100%)

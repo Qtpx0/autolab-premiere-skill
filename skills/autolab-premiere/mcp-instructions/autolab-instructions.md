@@ -16,7 +16,7 @@
 - **Auto Frame pipeline:** ALWAYS use `autolab_af_pipeline` (one command does everything). NEVER call `af_queue_add` → `af_set_bin_template` → `af_start_queue` separately unless the user explicitly asks to break it up.
 - **Framing:** Use `autoFit: true` by default for both movies/series (with `frame` + `promo`) and TV shows (with `profileName` Master Profile) unless the user explicitly asks to lock scale (`autoFit: false`).
 
-## AME EXPORT & STOCK INSPECTION (v1.8.2)
+## AME EXPORT & STOCK INSPECTION (v1.8.3)
 - **AME Auto-Render:** `autolab_pr_export_ame` automatically executes `startQueue: true` (zero-delay auto-render in AME via `app.encoder.startBatch()`). Never tell user to click start queue manually or wait for countdown.
 - **Smart Stock Inspection:** `autolab_pr_inspect` returns `diskFolders` for all shows on disk and automatically inspects Premiere Pro for `lowStockShows` (`lowStockThreshold: 25, scanPremiere: true`) in `< 0.1s`. Never report shows with abundant stock (> 25 clips) in `readyToCut` unless explicitly queried.
 

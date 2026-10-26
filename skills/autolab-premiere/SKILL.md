@@ -142,7 +142,7 @@ var roBin = findBin(root, "รอ");
      "scanPremiere": true
    }
    ```
-   *(💡 **v1.8.2 One-Call Smart Auto-Scoping:** เมื่อส่ง `diskRoot` ควบคู่ `categoryBin` + `lowStockThreshold: 25` + `scanPremiere: true` โดยไม่ใส่ `queries` ระบบจะคืน `diskFolders` ครบทุกเรื่องบน Disk พร้อมยอดซับโฟลเดอร์ (`[epX:count]` / `[คิว:X,คอม:Y]`) และคัดกรองเฉพาะเรื่องที่สต็อกใกล้หมด (`<= 25` คลิป) ไปตรวจสถานะ Premiere Pro ใน `queryAudit` + `readyToCut` อัตโนมัติใน `< 0.1s` ขนาด Output กะทัดรัด ~1.8 KB ไม่ล้นลง `output.txt` แน่นอน 100%! **⛔ ห้ามเรียก `pr_bin_tree` กวาดทั้งหมวดงาน และห้ามรันคำสั่ง Shell นับไฟล์บน Disk ซ้ำซ้อนเด็ดขาด!** หากต้องการส่องไฟล์เจาะจงรายเรื่อง ค่อยใส่ `query: "<ชื่อเรื่อง>"` หรือ `queries: [...]`)*
+   *(💡 **v1.8.3 One-Call Smart Auto-Scoping:** เมื่อส่ง `diskRoot` ควบคู่ `categoryBin` + `lowStockThreshold: 25` + `scanPremiere: true` โดยไม่ใส่ `queries` ระบบจะคืน `diskFolders` ครบทุกเรื่องบน Disk พร้อมยอดซับโฟลเดอร์ (`[epX:count]` / `[คิว:X,คอม:Y]`) และคัดกรองเฉพาะเรื่องที่สต็อกใกล้หมด (`<= 25` คลิป) ไปตรวจสถานะ Premiere Pro ใน `queryAudit` + `readyToCut` อัตโนมัติใน `< 0.1s` ขนาด Output กะทัดรัด ~1.8 KB ไม่ล้นลง `output.txt` แน่นอน 100%! **⛔ ห้ามเรียก `pr_bin_tree` กวาดทั้งหมวดงาน และห้ามรันคำสั่ง Shell นับไฟล์บน Disk ซ้ำซ้อนเด็ดขาด!** หากต้องการส่องไฟล์เจาะจงรายเรื่อง ค่อยใส่ `query: "<ชื่อเรื่อง>"` หรือ `queries: [...]`)*
 2. **ห้ามเรียก `autolab_list_templates({})` หรือเปิดอ่านไฟล์ Schema `.json` ตอนสั่งตัดเด็ดขาด:** หากผู้ใช้มีสกิลประจำเครื่อง (หรือระบุชื่อกรอบและป้ายโปรโมทไว้แล้ว) ให้ใช้ชื่อจากตารางสกิลประจำเครื่องส่งเข้า `autolab_af_pipeline` ทันที (เรียก `autolab_list_templates` เฉพาะตอนสร้างสกิลประจำตัวครั้งแรก หรือเมื่อผู้ใช้ถามหารายชื่อเทมเพลตเท่านั้น!)
 3. **เตรียมโฟลเดอร์บน Disk คู่กับสร้าง Sub-bin ตอนใหม่ (`ep1`, `ep2`...) และย้ายไฟล์จาก Sub-bin พักไฟล์ในคำสั่งเดียว (รองรับส่ง `items: [...]` หลายเรื่องพร้อมกัน):**
    ```json
@@ -324,7 +324,7 @@ var roBin = findBin(root, "รอ");
   "outputDir": "D:\\OutputClips\\ชื่อเรื่อง\\ep1"
 }
 ```
-*(💡 **v1.8.2 Zero-Delay Auto-Render:** คำสั่ง `pr_export_ame` ตั้งค่า `startQueue: true` เป็นดีฟอลต์ จะส่งทุก Sequence เข้าคิว AME พร้อมสั่งให้ Media Encoder เริ่มเรนเดอร์ทันทีใน `0ms` ผ่าน `app.encoder.startBatch()` โดยไม่ต้องคลิกปุ่ม Start Queue เอง หรือรอตัวนับถอยหลัง Idle Countdown 2 นาที)*
+*(💡 **v1.8.3 Zero-Delay Auto-Render:** คำสั่ง `pr_export_ame` ตั้งค่า `startQueue: true` เป็นดีฟอลต์ จะส่งทุก Sequence เข้าคิว AME พร้อมสั่งให้ Media Encoder เริ่มเรนเดอร์ทันทีใน `0ms` ผ่าน `app.encoder.startBatch()` โดยไม่ต้องคลิกปุ่ม Start Queue เอง หรือรอตัวนับถอยหลัง Idle Countdown 2 นาที)*
 
 ---
 

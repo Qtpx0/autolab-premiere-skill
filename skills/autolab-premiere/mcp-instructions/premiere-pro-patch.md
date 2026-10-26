@@ -9,4 +9,6 @@
 # > for bin inspection and stock checking instead of `get_bin_contents` /
 # > `list_project_items` / `search_project_items`. AutoLab tools return compact
 # > summaries; premiere-pro tools return raw JSON that often overflows output limits.
-# > Read the `autolab-premiere-automation` SKILL.md before starting any production workflow.
+# > Read your personal workflow SKILL.md (the machine-specific one, e.g. `autolab-premiere-automation`)
+# > before starting any production workflow. It holds your `rawDiskRoot`, `diskRoot`,
+# > `categoryBin`, `excludeDirs`, `stagingBin`, frame `<frameTemplate>` and promo `<promoTemplate>`.
