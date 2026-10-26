@@ -328,7 +328,7 @@ lowStockThreshold: 25
 2. แจ้งตำแหน่งไฟล์สกิลที่สร้างเสร็จแล้วให้ผู้ใช้ทราบ
 3. เสนอทดสอบรันเช็คสต็อกด้วย `autolab_pr_inspect` หรือสำรวจโปรเจกต์จริง 1 เรื่องเพื่อยืนยันว่าพาธและชื่อพรีเซ็ตทั้งหมดทำงานได้ตรง 100%
 4. **ติดตั้ง MCP Instructions + Workspace Rule (ป้องกัน AI ใช้ tool ผิด — ขั้นตอนนี้บังคับ!):**
-   - **สร้าง Workspace Rule:** คัดลอกเนื้อหาจาก [`mcp-instructions/gemini-md-template.md`](../mcp-instructions/gemini-md-template.md) ไปสร้างเป็นไฟล์ **`GEMINI.md`** ที่ **root ของ workspace** ผู้ใช้ (ห้ามวางใน `.gemini/rules/` เด็ดขาด — ไม่ใช่ discovery path!) — ไฟล์ `GEMINI.md` จะ always-on ทุกเซสชันอัตโนมัติ
+   - **สร้าง Workspace Rule (พร้อมแทนค่า Path จริงของผู้ใช้ลงในข้อ 1 และข้อ 10):** คัดลอกเนื้อหาจาก [`mcp-instructions/gemini-md-template.md`](../mcp-instructions/gemini-md-template.md) ไปสร้างเป็นไฟล์ **`GEMINI.md`** ที่ **root ของ workspace** ผู้ใช้ (ห้ามวางใน `.gemini/rules/` เด็ดขาด — ไม่ใช่ discovery path!) **โดยต้องนำค่าจริงของผู้ใช้ (`diskRoot`, `categoryBin`, `excludeDirs`, `<stagingBin>`) ไปแทนที่ Placeholder ในข้อ 1 และข้อ 10 ของ `GEMINI.md` ทันที ห้ามปล่อยเป็น `<...>` ค้างไว้** เพื่อให้เมื่อเปิดเซสชันใหม่ AI สามารถยิง `autolab_pr_inspect` ได้ใน 1 คำสั่งจบ (`< 1s`) โดยไม่ต้องเสียเวลาเปิดอ่าน `SKILL.md` ก่อน!
    - **คัดลอก MCP Instructions:** คัดลอก [`mcp-instructions/autolab-instructions.md`](../mcp-instructions/autolab-instructions.md) ไปวางที่ `<antigravity MCP dir>/autolab/instructions.md` ของเครื่องผู้ใช้
    - เพิ่มข้อความ routing patch จาก [`mcp-instructions/premiere-pro-patch.md`](../mcp-instructions/premiere-pro-patch.md) เข้าไปที่ต้นของ `<antigravity MCP dir>/premiere-pro/instructions.md`
    - *(ทั้ง 3 ไฟล์ทำงานร่วมกันป้องกัน AI หลอนไปใช้ premiere-pro MCP 432 tools ตรง — workspace rule เป็นตัวหลักที่ชัวร์ 100%, MCP instructions เป็นตัวเสริม)*
@@ -343,4 +343,4 @@ lowStockThreshold: 25
    - อัปเกรด `lowStockThreshold: 25` และเพิ่ม `ruleVersion: "1.8.2"`
    - อัปเกรดส่วนเช็คสต็อกเป็น **One-Call Stock Check (`< 1s`)** (`scanPremiere: true`, ห้ามเรียก `pr_bin_tree` กวาดทั้งหมวดงาน, ห้ามรัน PowerShell นับไฟล์ซ้ำ)
    - เพิ่มหัวข้อ **`📊 Standard Stock Dashboard Table Protocol`** และ **`Central Raw Pool ➔ Work Bin Routing`** หากยังไม่มี
-3. **ซิงค์ไฟล์บังคับใน Workspace ให้ทันสมัยคู่กัน:** อัปเดต `GEMINI.md` ที่ Root ของ Workspace (ตาม [`mcp-instructions/gemini-md-template.md`](../mcp-instructions/gemini-md-template.md) โดยคงพาธส่วนตัวของผู้ใช้ไว้) และอัปเดต `<antigravity MCP dir>/autolab/instructions.md` ให้เป็นเวอร์ชันล่าสุดทันที
+3. **ซิงค์ไฟล์บังคับใน Workspace ให้ทันสมัยคู่กัน:** อัปเดต `GEMINI.md` ที่ Root ของ Workspace (ตาม [`mcp-instructions/gemini-md-template.md`](../mcp-instructions/gemini-md-template.md) โดยนำ `diskRoot`, `categoryBin`, `excludeDirs`, `<stagingBin>` จริงของผู้ใช้ไปเติมใส่ในข้อ 1 และข้อ 10 ของ `GEMINI.md` ทันที) และอัปเดต `<antigravity MCP dir>/autolab/instructions.md` ให้เป็นเวอร์ชันล่าสุดทันที
