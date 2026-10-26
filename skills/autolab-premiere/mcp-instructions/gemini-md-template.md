@@ -3,6 +3,7 @@
 # e.g. G:\Dev\my-premiere-workspace\GEMINI.md
 # This file is always-on and loaded every session automatically.
 
+<!-- autolab-rule-version: 1.8.2 -->
 ## Premiere Pro + AutoLab Tool Routing (MANDATORY)
 
 เมื่อผู้ใช้สั่งงานเกี่ยวกับ Premiere Pro (เช็คสต็อก, ดู bin, ตัดไฮไลท์, ใส่กรอบ, export):

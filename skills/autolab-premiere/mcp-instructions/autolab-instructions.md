@@ -2,8 +2,10 @@
 # Copy this file to: <your antigravity MCP dir>/autolab/instructions.md
 # e.g. C:\Users\<you>\.gemini\antigravity\mcp\autolab\instructions.md
 
-## BEFORE ANY AUTOLAB OPERATION
-- **For Stock Check (`เช็คสต็อก`):** Do NOT waste turns reading `SKILL.md` first — call `autolab_pr_inspect` (`{ diskRoot, categoryBin, excludeDirs: "จบแล้ว,ลงแล้ว", lowStockThreshold: 25, scanPremiere: true }`) in **1 single call** and render the Markdown Stock Dashboard Table immediately!
+## BEFORE ANY AUTOLAB OPERATION (Current Rule Version: `1.8.2`)
+- **Automatic Personal Skill & `GEMINI.md` Version Check:** Check if the workspace `GEMINI.md` has `<!-- autolab-rule-version: 1.8.2 -->`.
+  - **If it matches `1.8.2` (Normal Fast-Path):** Do NOT read `SKILL.md` for stock checks — immediately run `autolab_pr_inspect` using the user's paths in `GEMINI.md` Rule 1 in **1 single call** and render the Markdown Stock Dashboard Table!
+  - **If `<!-- autolab-rule-version: 1.8.2 -->` is missing or older (Existing User Auto-Upgrade):** Read the user's personal workflow `SKILL.md` (for their `diskRoot`, `categoryBin`, `excludeDirs`, `stagingBin`) and `autolab-premiere/mcp-instructions/gemini-md-template.md` + `references/06-personal-workflow-skill-builder-guide.md` (Section 4), then use `edit_file` to non-destructively upgrade their `GEMINI.md` (substituting their real paths into Rule 1 & Rule 10 and adding `<!-- autolab-rule-version: 1.8.2 -->`) and their personal `SKILL.md` Engine rules without deleting any personal paths or promo mappings!
 - **For Cutting / Framing / Exporting:** Read your personal workflow `SKILL.md` (e.g. `autolab-premiere-automation`) first. Never guess or improvise.
 
 ## TOOL ROUTING (CRITICAL)
