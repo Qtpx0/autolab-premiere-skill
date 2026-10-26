@@ -32,7 +32,7 @@ const READ_TOOLS = new Set(['read', 'read_file', 'readfile']);
  */
 export const DEFAULT_PROMPT = `
 ### AutoLab + Premiere Pro — Operator Contract (บังคับโดย guard):
-1. เช็คสต็อก / ส่อง Bin → ใช้ \`pr_inspect\` (\`autolab_pr_inspect\`) เท่านั้น; ห้าม \`list_project_items\`, \`get_bin_contents\`, \`search_project_items\`, \`get_full_project_overview\`
+1. เช็คสต็อก / ส่อง Bin (One-Call Fast-Path < 1s) → เรียก \`pr_inspect\` (\`autolab_pr_inspect\`) เพียง 1 ครั้งเดียว (\`{ diskRoot, categoryBin, excludeDirs: "จบแล้ว,ลงแล้ว", lowStockThreshold: 25, scanPremiere: true }\`) แล้วสรุปตารางทันที! ห้ามใช้ \`list_project_items\`, \`get_bin_contents\`, \`search_project_items\`, \`get_full_project_overview\`, ห้ามเรียก \`pr_bin_tree\` กวาดทั้งหมวดงานจนล้นลง \`output.txt\`, และห้ามรันคำสั่ง Shell (\`Get-ChildItem\`) นับไฟล์บน Disk ซ้ำซ้อนเด็ดขาด!
 2. จัดการ Bin ใน Premiere Pro (สร้าง/ลบ/ย้าย/ส่องผัง): ใช้ \`pr_create_bin\`, \`pr_delete_bin\`, \`pr_move_item\`, \`pr_bin_tree\` ห้ามเขียนสคริปต์ shell (\`node -e\`, สร้างไฟล์ \`.jsx\`) หากจำเป็นต้องซ่อม State นอกเหนือจากนี้ ให้ใช้ \`autolab_call_jsx\` ยิง ExtendScript สั่ง Premiere Pro DOM ตรงตามข้อ 0 ของ SKILL.md
 3. Auto Highlights: \`engineMode: "gemini_audio"\` เสมอ (ห้าม Whisper); งานหนัง/ซีรีส์ \`autoCutState: 0\` เสมอ
 4. เจอ \`needsRecovery: true\` (ฟุตเทจยังอยู่ใน \`ไฟล์ต้นฉบับ\`) → ห้าม export sequence เก่า ต้องรัน \`pr_prepare_ep\` (\`recoverFromOriginalFirst\`) แล้วตัดใหม่

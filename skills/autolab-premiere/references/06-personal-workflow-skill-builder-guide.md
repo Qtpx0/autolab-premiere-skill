@@ -142,6 +142,7 @@ flowchart LR
 ````markdown
 ---
 name: my-premiere-production-workflow
+version: "1.8.2"
 description: "Personal and shared-machine production workflow for AutoLab CEP + Premiere Pro: personal disk stock folders, Bin hygiene (รอ/รอตัด/epX/HIGHLIGHTS_), Auto Highlights presets (TV vs Movie speed), Multi-User/Multi-Promo routing matrix, MOGRT auto-fit framing, af_pipeline (promo + Variety Auto-Name + Name Refiner <=17), batch export to AME"
 ---
 
@@ -156,11 +157,12 @@ description: "Personal and shared-machine production workflow for AutoLab CEP + 
 > AI ต้องอ่านค่า Config ด้านล่างนี้ไปใช้เป็นพารามิเตอร์หลักกับคำสั่ง MCP เสมอ เพื่อให้การทำงานตรงกับเครื่องและโฟลเดอร์ของผู้ใช้ 100%:
 
 ```yaml
+ruleVersion: "1.8.2"
 diskRoot: "<พาธโฟลเดอร์หลักบน Disk เช่น D:\Clips\Output หรือ E:\Work\Videos>"
 categoryBin: "<ชื่อ Root Bin ใน Premiere Pro เช่น หมวดหนัง หรือ หมวดรายการ>"
 excludeDirs: "<โฟลเดอร์ที่ต้องการข้ามเมื่อเช็คสต็อก เช่น ลงแล้ว,จบแล้ว>"
 waitingSubBin: "<ชื่อ Sub-bin พักฟุตดิบกลาง เช่น รอ หรือ รอตัด>"
-lowStockThreshold: 15
+lowStockThreshold: 25
 ```
 
 ---
@@ -196,6 +198,14 @@ lowStockThreshold: 15
 3. **งานซีรีส์/ละครแบ่งตอน (`ep1`, `ep2`, `ep3`...):**
    - ดูเลขตอนจากชื่อไฟล์ใน `<Sub-bin พักไฟล์>`
    - สร้าง Sub-bin `ep<เลขตอน>` ใน Premiere Pro และสร้างโฟลเดอร์ย่อย `ep<เลขตอน>` บน Disk คู่กันเสมอ (ใช้คำสั่งเดียว `autolab_pr_prepare_ep`)
+
+### 1.4 กฎเช็คสต็อก 1 คำสั่งจบ (`< 1s`) และตารางสรุปผลมาตรฐาน (Standard Stock Dashboard Table Protocol)
+- **ยิง `autolab_pr_inspect` เพียง 1 ครั้งเดียวจบ:** ส่ง `{ "diskRoot": "<diskRoot>", "categoryBin": "<categoryBin>", "excludeDirs": "<excludeDirs>", "lowStockThreshold": 25, "scanPremiere": true }` โดยไม่ต้องใส่ `queries`
+- **⛔ ข้อห้ามเด็ดขาดตอนเช็คสต็อก:** ห้ามเรียก `autolab_pr_bin_tree` กวาดทั้งหมวดงาน (เพราะจะล้นลง `output.txt`), ห้ามรัน PowerShell (`Get-ChildItem`) นับไฟล์บน Disk ซ้ำซ้อน (เพราะ `diskFolders` นับรวมซับโฟลเดอร์มาครบ 100% แล้ว), และห้ามยิง `pr_inspect` รอบที่ 2
+- **📊 มาตรฐานการแสดงผลตาราง Dashboard (บังคับ 100%):**
+  - ห้ามรายงานผลเช็คสต็อกเป็น Bulleted List หรือย่อหน้าซ้อนกันเด็ดขาด
+  - ต้องตีตาราง Markdown Table เสมอ: `| ลำดับ | เรื่อง | สต็อกบน Disk | ตอนที่เหลือบน Disk | สถานะใน Premiere Pro | Action ที่ต้องทำ |`
+  - เรียงจากเรื่องที่สต็อกเหลือน้อยสุด/หมดขึ้นก่อน (🔴 0–2 คลิป ➔ 🟡 ปานกลาง ➔ 🟢 มีฟุตเทจพร้อมตัดทันที ➔ ⚪ สต็อกปลอดภัย) พร้อมสรุป Action ใต้ตาราง 2 บรรทัด
 
 ---
 
@@ -236,16 +246,18 @@ lowStockThreshold: 15
 
 > 💡 **กฎสำคัญ:** ในโปรแกรม AI (Antigravity / Cursor) ให้เรียก **Native MCP Tools** โดยตรงเสมอ (รวดเร็ว 1-5ms ไม่ต้องรัน Terminal) หากจำเป็นต้องรันผ่าน Terminal ให้ใช้พาธติดตั้งสากล: `node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js"`
 
-1. **เช็คสต็อกบน Disk (จัดอันดับเรื่องที่เหลือน้อยสุด พร้อมสแกน Premiere Pro อัตโนมัติเฉพาะเรื่องที่ใกล้หมด):**
+1. **เช็คสต็อกใกล้หมด 1 คำสั่งจบ (`< 0.1s` — จัดอันดับเรื่องที่เหลือน้อยสุด พร้อมสแกน Premiere Pro อัตโนมัติเฉพาะเรื่องที่ใกล้หมด):**
    ```json
    // Tool: autolab_pr_inspect
    {
      "diskRoot": "<พาธโฟลเดอร์บน Disk>",
      "categoryBin": "<ชื่อ Root Bin หมวดงาน>",
-     "excludeDirs": "<โฟลเดอร์ที่ต้องการข้าม เช่น ลงแล้ว,จบแล้ว>"
+     "excludeDirs": "<โฟลเดอร์ที่ต้องการข้าม เช่น ลงแล้ว,จบแล้ว>",
+     "lowStockThreshold": 25,
+     "scanPremiere": true
    }
    ```
-   *(💡 **v1.8.2 Smart Auto-Scoping:** เมื่อส่ง `diskRoot` พร้อม `categoryBin` ระบบจะสแกนเฉพาะเรื่องที่สต็อกใกล้หมด `lowStockShows` (<= 15 คลิป) ใน Premiere Pro อัตโนมัติใน `< 0.2s` ตัดปัญหาเรื่องที่มีสต็อกเยอะไม่ให้หลุดเข้าไปใน `readyToCut`! หรือรันผ่าน CLI: `node "C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AutoLab\mcp\autolab-mcp.js" --check-disk --dir "<พาธโฟลเดอร์บน Disk>" --exclude "<โฟลเดอร์ที่ต้องการข้าม>" --arg categoryBin="<หมวดงาน>"`)*
+   *(💡 **v1.8.2 One-Call Smart Auto-Scoping:** เมื่อส่ง `diskRoot` พร้อม `categoryBin` + `lowStockThreshold: 25` + `scanPremiere: true` ระบบจะคืน `diskFolders` ครบทุกเรื่องบน Disk และสแกน Premiere Pro เฉพาะเรื่องที่สต็อก `<= 25` คลิปใน `< 0.1s` ขนาด ~1.8 KB ไม่ล้นลง `output.txt` แน่นอน 100%! ห้ามเรียก `pr_bin_tree` กวาดทั้งหมวดงาน และห้ามรันคำสั่ง Shell นับไฟล์ซ้ำเด็ดขาด)*
 
 2. **สำรวจ Bin และตรวจหาเลขตอนที่ค้างในโฟลเดอร์พักไฟล์ (ล็อกเฉพาะหมวด ไม่ปนกับหมวดอื่น):**
    ```json
@@ -313,9 +325,21 @@ lowStockThreshold: 15
 หลังจาก AI สร้างไฟล์ `SKILL.md` ประจำตัวให้ผู้ใช้เสร็จแล้ว ให้ AI:
 1. สรุปตารางกฎที่ได้บันทึกไว้ในสกิลให้ผู้ใช้เห็นอย่างชัดเจน
 2. แจ้งตำแหน่งไฟล์สกิลที่สร้างเสร็จแล้วให้ผู้ใช้ทราบ
-3. เสนอทดสอบรันเช็คสต็อกบน Disk (`--check-disk`) หรือสำรวจโปรเจกต์จริง 1 เรื่องเพื่อยืนยันว่าพาธและชื่อพรีเซ็ตทั้งหมดทำงานได้ตรง 100%
+3. เสนอทดสอบรันเช็คสต็อกด้วย `autolab_pr_inspect` หรือสำรวจโปรเจกต์จริง 1 เรื่องเพื่อยืนยันว่าพาธและชื่อพรีเซ็ตทั้งหมดทำงานได้ตรง 100%
 4. **ติดตั้ง MCP Instructions + Workspace Rule (ป้องกัน AI ใช้ tool ผิด — ขั้นตอนนี้บังคับ!):**
    - **สร้าง Workspace Rule:** คัดลอกเนื้อหาจาก [`mcp-instructions/gemini-md-template.md`](../mcp-instructions/gemini-md-template.md) ไปสร้างเป็นไฟล์ **`GEMINI.md`** ที่ **root ของ workspace** ผู้ใช้ (ห้ามวางใน `.gemini/rules/` เด็ดขาด — ไม่ใช่ discovery path!) — ไฟล์ `GEMINI.md` จะ always-on ทุกเซสชันอัตโนมัติ
    - **คัดลอก MCP Instructions:** คัดลอก [`mcp-instructions/autolab-instructions.md`](../mcp-instructions/autolab-instructions.md) ไปวางที่ `<antigravity MCP dir>/autolab/instructions.md` ของเครื่องผู้ใช้
    - เพิ่มข้อความ routing patch จาก [`mcp-instructions/premiere-pro-patch.md`](../mcp-instructions/premiere-pro-patch.md) เข้าไปที่ต้นของ `<antigravity MCP dir>/premiere-pro/instructions.md`
    - *(ทั้ง 3 ไฟล์ทำงานร่วมกันป้องกัน AI หลอนไปใช้ premiere-pro MCP 432 tools ตรง — workspace rule เป็นตัวหลักที่ชัวร์ 100%, MCP instructions เป็นตัวเสริม)*
+
+---
+
+## 🔄 4. การอัปเกรดสกิลประจำตัวให้ผู้ใช้เดิมอัตโนมัติ (Non-Destructive Auto-Migration for Existing Users)
+
+สำหรับผู้ใช้ที่สร้างสกิลประจำตัวไว้ตั้งแต่เวอร์ชันก่อนหน้า (เช่น v1.8.0 / v1.8.1) เมื่อสกิลกลาง `autolab-premiere` อัปเดตเป็นเวอร์ชันใหม่ (หรือเมื่อตรวจพบว่าสกิลประจำตัวของผู้ใช้ยังไม่มี `ruleVersion: "1.8.2"` / ยังใช้ `--check-disk` แบบเก่า):
+1. **ห้ามลบหรือเขียนทับข้อมูลส่วนตัวของผู้ใช้เด็ดขาด:** พาธโฟลเดอร์ (`diskRoot`, `categoryBin`, `excludeDirs`), ชื่อเพจ, และตารางจับคู่ป้ายโปรโมท (`Multi-Promo Matrix`) ของผู้ใช้ต้องอยู่ครบ 100%
+2. **ใช้ `edit_file` อัปเกรดเฉพาะส่วนกฎ Engine มาตรฐาน (Surgical Rule Patch):**
+   - อัปเกรด `lowStockThreshold: 25` และเพิ่ม `ruleVersion: "1.8.2"`
+   - อัปเกรดส่วนเช็คสต็อกเป็น **One-Call Stock Check (`< 1s`)** (`scanPremiere: true`, ห้ามเรียก `pr_bin_tree` กวาดทั้งหมวดงาน, ห้ามรัน PowerShell นับไฟล์ซ้ำ)
+   - เพิ่มหัวข้อ **`📊 Standard Stock Dashboard Table Protocol`** และ **`Central Raw Pool ➔ Work Bin Routing`** หากยังไม่มี
+3. **ซิงค์ไฟล์บังคับใน Workspace ให้ทันสมัยคู่กัน:** อัปเดต `GEMINI.md` ที่ Root ของ Workspace (ตาม [`mcp-instructions/gemini-md-template.md`](../mcp-instructions/gemini-md-template.md) โดยคงพาธส่วนตัวของผู้ใช้ไว้) และอัปเดต `<antigravity MCP dir>/autolab/instructions.md` ให้เป็นเวอร์ชันล่าสุดทันที
