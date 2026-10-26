@@ -163,16 +163,25 @@ function evaluate({ fullName, raw, args, command, rules, shells, state }) {
     );
   }
 
-  // 2 — No ad-hoc scripts driving Premiere.
+  // 2 — No ad-hoc scripts driving Premiere, and no slow PowerShell recursive drive scans for footage.
   if (rules.banAdHocPremiereScripts !== false && command && shells.has(fullName.toLowerCase())) {
     const premiereish = /premiere|autolab|cep|extendscript|mcp_bridge|\.prproj|\.jsx/i.test(command);
     const adHocNode = /\bnode\s+(?:-e|--eval|-p|--print)\b/i.test(command);
     const writesJsx = /\.jsx\b/i.test(command) && /\b(set-content|out-file|add-content|new-item)\b/i.test(command);
+    const driveWideScan = /\b(?:get-childitem|gci|dir)\b[\s\S]*?-recurse\b/i.test(command) &&
+      (/\bforeach\s*\(\s*\$\w+\s+in\s+['"][A-Z]:/i.test(command) || /0\.ตัดต่อแล้ว|0\.หนัง\s*-\s*รายการ|\.(?:mp4|mkv|ts|mov)/i.test(command));
     if (adhoc(premiereish, adHocNode) || writesJsx) {
       return deny(
         'ห้ามสั่ง Premiere/AutoLab ด้วยสคริปต์ ad-hoc (node -e / ExtendScript) — ใช้ MCP tools (`mcp__autolab__*`) ' +
           'หรือ CLI มาตรฐาน `node "<AutoLab>/mcp/autolab-mcp.js" --call <tool> --arg k=v` เท่านั้น ' +
           '(ปิดชั่วคราว: config.rules.banAdHocPremiereScripts: false)',
+      );
+    }
+    if (driveWideScan) {
+      return deny(
+        'ห้ามใช้ PowerShell `Get-ChildItem -Recurse` กวาดไดรฟ์เพื่อหาไฟล์ฟุตเทจหรือนับสต็อก — ' +
+          'เช็คสต็อกใช้ `autolab_pr_inspect` คำสั่งเดียว ส่วนการดึงไฟล์ตัวเต็มจาก `rawDiskRoot` (ตามสกิล `autolab-premiere-automation`) ' +
+          'ให้ใช้ `autolab_call_jsx` (`{"script":"..."}`) สแกนโฟลเดอร์ + import เข้า Premiere Pro ใน 1 คำสั่งจบ!',
       );
     }
   }
